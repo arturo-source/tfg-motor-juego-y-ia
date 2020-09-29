@@ -2,3 +2,4 @@
 *.a
 game
 vgcore*
+.vscode/*

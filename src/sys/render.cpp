@@ -25,12 +25,12 @@ namespace ECS {
             return screen + y*m_w + x;
         };
         auto drawEntity = [&](const Entity_t& e) {
-            if(e.phy != nullptr) {
+            if(e.phy && e.ren) { //e.phy != nullptr && e.ren != nullptr
                 auto screen = getScreenXY(e.phy->x, e.phy->y);
-                auto sprite_it = begin(e.sprite);
-                for(uint32_t y = 0; y < e.h; ++y) {
-                    std::copy(sprite_it, sprite_it + e.w, screen);
-                    sprite_it += e.w;
+                auto sprite_it = begin(e.ren->sprite);
+                for(uint32_t y = 0; y < e.ren->h; ++y) {
+                    std::copy(sprite_it, sprite_it + e.ren->w, screen);
+                    sprite_it += e.ren->w;
                     screen += m_w;
                 }
             }

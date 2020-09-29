@@ -7,10 +7,11 @@ struct Component_t  {
     : entityID {eid}
     {}
 
-    ComponentID_t ComponentID { ++nextID };
-    EntityID_t entityID { 0 };
+    
 private:
     inline static ComponentID_t nextID { 0 };
+    ComponentID_t ComponentID { ++nextID };
+    EntityID_t entityID { 0 };
 };
 
 } // namespace ECS
