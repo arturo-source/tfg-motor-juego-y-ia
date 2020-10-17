@@ -6,6 +6,8 @@ struct Component_t  {
     explicit Component_t(EntityID_t eid) 
     : entityID {eid}
     {}
+    
+    constexpr EntityID_t getEntityID() const noexcept { return entityID; }
 
     
 private:

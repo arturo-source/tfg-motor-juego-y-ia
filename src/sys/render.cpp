@@ -18,14 +18,17 @@ namespace ECS {
         ptc_close();
     }
 
-    void RenderSystem_t::drawAllEntities(const Vec_t<Entity_t>& entities) const {
+    void RenderSystem_t::drawAllEntities(const GameContext_t& g) const {
         auto screen = m_framebuffer.get();
 
         auto getScreenXY = [&](uint32_t x, uint32_t y) {
             return screen + y*m_w + x;
         };
-        auto drawEntity = [&](const Entity_t& e) {
-            if(e.phy && e.ren) { //e.phy != nullptr && e.ren != nullptr
+        auto drawEntity = [&](const RenderComponent_t& rc) {
+            auto eptr = g.getEntityByID(rc.getEntityID());
+
+            if(eptr && eptr->phy) { //eptr != nullptr && eptr->phy != nullptr
+                auto &e = *eptr;
                 auto screen = getScreenXY(e.phy->x, e.phy->y);
                 auto sprite_it = begin(e.ren->sprite);
                 for(uint32_t y = 0; y < e.ren->h; ++y) {
@@ -35,15 +38,16 @@ namespace ECS {
                 }
             }
         };
+        auto& rencmps = g.getRenderComponents();
         
-        std::for_each(begin(entities), end(entities), drawEntity);
+        std::for_each(begin(rencmps), end(rencmps), drawEntity);
     }
 
     bool RenderSystem_t::update(const GameContext_t& g) const {
         auto screen = m_framebuffer.get();
         const auto size = m_w*m_h;
         std::fill(screen, screen + size, kR);
-        drawAllEntities(g.getEntities());
+        drawAllEntities(g);
         
         ptc_update(screen);
 

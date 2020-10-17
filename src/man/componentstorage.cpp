@@ -1,7 +1,7 @@
 #include <man/componentstorage.hpp>
 
 namespace ECS {
-    PhysicsComponent_t& ComponentStorage_t::createPhysicsComponent(EntityID_t eid) {
+/*    PhysicsComponent_t& ComponentStorage_t::createPhysicsComponent(EntityID_t eid) {
         auto& cmp = m_physicsComponents.emplace_back(eid);
         return cmp;
     }
@@ -9,4 +9,8 @@ namespace ECS {
         auto& cmp = m_renderComponents.emplace_back(eid);
         return cmp;
     }
+    InputComponent_t& ComponentStorage_t::createInputComponent(EntityID_t eid) {
+        auto& cmp = m_inputComponents.emplace_back(eid);
+        return cmp;
+    }*/
 } // namespace ECS
