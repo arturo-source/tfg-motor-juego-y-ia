@@ -1,9 +1,7 @@
 #pragma once
 #include <cstdint>
-#include <cmp/physics.hpp>
-#include <cmp/render.hpp>
-#include <cmp/input.hpp>
-#include <util/typealiases.hpp>
+#include <ecs/util/typealiases.hpp>
+#include <ecs/cmp/component.hpp>
 
 namespace ECS {
 

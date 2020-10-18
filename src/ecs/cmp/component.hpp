@@ -1,5 +1,5 @@
 #pragma once
-#include <util/typealiases.hpp>
+#include <ecs/util/typealiases.hpp>
 
 namespace ECS {
 struct Component_t  {

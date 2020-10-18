@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include <cmp/physics.hpp>
-#include <cmp/render.hpp>
-#include <cmp/input.hpp>
-#include <util/typealiases.hpp>
+// #include <cmp/physics.hpp>
+// #include <cmp/render.hpp>
+// #include <cmp/input.hpp>
+#include <ecs/util/typealiases.hpp>
 
 namespace ECS {
 
@@ -50,7 +50,7 @@ struct ComponentStorage_t {
         auto typeID = CMP_t::getComponentTypeID();
         auto it = m_componentVectors.find(typeID);
         if(it != m_componentVectors.end()) {
-            //HAY QUE COMPROBAR SI LO QUE DEVUELVE DYNAMIC NO ES NULL
+            //HAY QUE COMPROBAR SI LO QUE DEVUELVE DYN_CAST DYNAMIC NO ES NULL
             auto* v = dynamic_cast<ComponentVector_t<CMP_t>*>(it->second.get());
             comvec = &(v->components);
         } else {
@@ -64,7 +64,7 @@ struct ComponentStorage_t {
         auto typeID = CMP_t::getComponentTypeID();
         auto it = m_componentVectors.find(typeID);
         if(it != m_componentVectors.end()) {
-            //HAY QUE COMPROBAR SI LO QUE DEVUELVE DYNAMIC NO ES NULL
+            //HAY QUE COMPROBAR SI LO QUE DEVUELVE DYN_CAST DYNAMIC NO ES NULL
             auto* v = dynamic_cast<ComponentVector_t<CMP_t>*>(it->second.get());
             comvec = &(v->components);
         } else {
