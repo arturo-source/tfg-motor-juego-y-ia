@@ -9,6 +9,7 @@ extern "C" {
 #include <game/sys/physics.tpp>
 #include <game/sys/input.tpp>
 #include <game/sys/collision.tpp>
+#include <game/cmp/collider.hpp>
 #include <ecs/man/entitymanager.hpp>
 
 constexpr uint32_t kSCRWIDTH  {640};
@@ -18,10 +19,24 @@ ECS::Entity_t& createEntity(ECS::EntityManager_t& EntityMan, uint32_t x, uint32_
     auto& e = EntityMan.createEntity(); // leer filename¡¡
     auto& rn = EntityMan.addComponent<RenderComponent_t>(e);
     auto& ph = EntityMan.addComponent<PhysicsComponent_t>(e);
+    auto& cl = EntityMan.addComponent<ColliderComponent_t>(e);
     rn.loadFromFile(filename);
     ph.x = x; ph.y = y;
+    cl.box.xLeft  = 0;
+    cl.box.xRight = rn.w;
+    cl.box.yUp    = 0;
+    cl.box.yDown  = rn.h;
 
     return e;
+}
+
+void createPlayer(ECS::EntityManager_t& EntityMan, uint32_t x, uint32_t y) {
+    auto& e = createEntity(EntityMan, x, y, "assets/character.png");
+    EntityMan.addComponent<InputComponent_t>(e);
+}
+
+void createEnemy(ECS::EntityManager_t& EntityMan, uint32_t x, uint32_t y) {
+    auto& e = createEntity(EntityMan, x, y, "assets/enemy.png");
 }
 
 int main() {
@@ -29,15 +44,14 @@ int main() {
         // Systems
         const RenderSystem_t<ECS::EntityManager_t> Render{kSCRWIDTH, kSCRHEIGHT};
         PysicsSystem_t<ECS::EntityManager_t> Physics;
-        CollisionSystem_t<ECS::EntityManager_t> Collision;
+        CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
         InputSystem_t<ECS::EntityManager_t> Input;
         
         // Entities
         ECS::EntityManager_t EntityMan;
-        createEntity(EntityMan, 50, 200, "assets/character.png");
-        createEntity(EntityMan, 20, 40, "assets/character.png");
-        auto& e = createEntity(EntityMan, 30, 100, "assets/character.png");
-        EntityMan.addComponent<InputComponent_t>(e);
+        createEnemy(EntityMan, 50, 200);
+        createEnemy(EntityMan, 40, 20);
+        createPlayer(EntityMan, 30, 100);
         
         // Main Loop
         while(Render.update(EntityMan)) {

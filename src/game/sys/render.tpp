@@ -36,10 +36,21 @@ void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
             if(phy && ren) {
                 auto screen = getScreenXY(phy->x, phy->y);
                 auto sprite_it = begin(ren->sprite);
-                for(uint32_t y = 0; y < ren->h; ++y) {
-                    std::copy(sprite_it, sprite_it + ren->w, screen);
-                    sprite_it += ren->w;
-                    screen += m_w;
+                // for(uint32_t y = 0; y < ren->h; ++y) {
+                //     std::copy(sprite_it, sprite_it + ren->w, screen);
+                //     sprite_it += ren->w;
+                //     screen += m_w;
+                // }
+                uint32_t w {ren->w};
+                for(uint32_t j=0; j<ren->h; ++j) {
+                    for(uint32_t i=0; i<w; ++i) {
+                        if(*sprite_it & 0xFF000000)
+                            *screen = *sprite_it;
+                        ++sprite_it;
+                        ++screen;
+                    }
+                    sprite_it += ren->w - w;
+                    screen    += m_w - w;
                 }
             }
         }
