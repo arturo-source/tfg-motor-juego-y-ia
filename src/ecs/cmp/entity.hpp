@@ -15,7 +15,7 @@ struct Entity_t {
     }
 
     template<typename CMP_t>
-    CMP_t* getComponent() {
+    const CMP_t* getComponent() const {
         auto type = CMP_t::getComponentTypeID();
         auto it = m_components.find(type);
         if(it != m_components.end()) 
@@ -23,10 +23,13 @@ struct Entity_t {
         return nullptr;
     }
 
+    //Modificado porque el pr.retroman explica en la clase 62
+    //que hacer un const_cast desde una funcion no const en una const
+    //es peligroso porque puede que la no const modifique 
     template<typename CMP_t>
-    const CMP_t* getComponent() const {
-        auto* cmp = const_cast<Entity_t*>(this)->getComponent<CMP_t>();
-        return const_cast<const CMP_t*>(cmp);
+    CMP_t* getComponent() {
+        const CMP_t* cmp = const_cast<const Entity_t*>(this)->getComponent<CMP_t>();
+        return const_cast<CMP_t*>(cmp);
     }
 
     constexpr EntityID_t getEntityID() const noexcept { return entityID; }

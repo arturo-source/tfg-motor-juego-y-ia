@@ -13,6 +13,8 @@ namespace ECS {
             return it;
         return {};
     }
+    //El pr.retroman dijo que hay que hacer la version const
+    //de esta función
     // Keyboard_t::OptIter Keyboard_t::getIterator(KeySym k) noexcept {
     //     auto optptr = const_cast<const Keyboard_t*>(this)->getIterator(k);
     //     return const_cast<OptIter>(optptr);
