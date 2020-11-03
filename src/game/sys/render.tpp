@@ -24,34 +24,22 @@ template<typename GameCTX_t>
 void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
 
-    auto getScreenXY = [&](uint32_t x, uint32_t y) {
-        return screen + y*m_w + x;
-    };
-    auto drawEntity = [&](const RenderComponent_t& rc) {
-        auto eptr = g.getEntityByID(rc.getEntityID());
+    auto drawEntity = [&](const RenderComponent_t& ren) {
+        const auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(ren);
+        if(phy) { //phy != null
+            auto screen = getScreenXY(phy->x, phy->y);
+            auto sprite_it = begin(ren.sprite);
 
-        if(eptr) { //eptr != nullptr
-            auto phy = eptr->template getComponent<PhysicsComponent_t>();
-            auto ren = eptr->template getComponent<RenderComponent_t>();
-            if(phy && ren) {
-                auto screen = getScreenXY(phy->x, phy->y);
-                auto sprite_it = begin(ren->sprite);
-                // for(uint32_t y = 0; y < ren->h; ++y) {
-                //     std::copy(sprite_it, sprite_it + ren->w, screen);
-                //     sprite_it += ren->w;
-                //     screen += m_w;
-                // }
-                uint32_t w {ren->w};
-                for(uint32_t j=0; j<ren->h; ++j) {
-                    for(uint32_t i=0; i<w; ++i) {
-                        if(*sprite_it & 0xFF000000)
-                            *screen = *sprite_it;
-                        ++sprite_it;
-                        ++screen;
-                    }
-                    sprite_it += ren->w - w;
-                    screen    += m_w - w;
+            uint32_t w {ren.w};
+            for(uint32_t j=0; j<ren.h; ++j) {
+                for(uint32_t i=0; i<w; ++i) {
+                    if(*sprite_it & 0xFF000000)
+                        *screen = *sprite_it;
+                    ++sprite_it;
+                    ++screen;
                 }
+                sprite_it += ren.w - w;
+                screen    += m_w - w;
             }
         }
     };
@@ -64,7 +52,7 @@ template<typename GameCTX_t>
 bool RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
     const auto size = m_w*m_h;
-    std::fill(screen, screen + size, kR);
+    std::fill(screen, screen + size, kB);
     drawAllEntities(g);
     
     ptc_update(screen);

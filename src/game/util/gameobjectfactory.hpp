@@ -19,6 +19,9 @@ struct GameObjectFactory_t {
     template<typename CALLABLE_t>
     ECS::Entity_t& createSpawner(uint32_t x, uint32_t y, CALLABLE_t callback) const {
         auto& e   = m_EntMan.createEntity();
+        //El componente de render y el de collider es temporal...
+        //porque de momento no estoy clippeando los sprites y si 
+        //spawnea un sprite fuera de pantalla, peta
         auto& rn = m_EntMan.addComponent<RenderComponent_t>(e);
         auto& spw = m_EntMan.addComponent<SpawnerComponent_t>(e);
         auto& ph  = m_EntMan.addComponent<PhysicsComponent_t>(e);

@@ -2,9 +2,10 @@
 #include <cstdint>
 #include <ecs/cmp/component.hpp>
 
-struct BoundingBox {
+struct BoundingBox_t {
     uint32_t xLeft {0}, xRight {0};
     uint32_t yUp {0}, yDown {0};
+    bool collided { false };
 };
 
 
@@ -13,5 +14,5 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
     : ComponentBase_t(eid)
     {}
     
-    BoundingBox box;
+    BoundingBox_t box;
 };

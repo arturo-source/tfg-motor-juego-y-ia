@@ -33,12 +33,12 @@ int main() {
         GOFact.createEnemy(40, 20);
         GOFact.createSpawner(200, 1, 
             [&](const SpawnerComponent_t& spw) {
-                const auto* esp = EntityMan.getEntityByID(spw.getEntityID());
-                if(!esp) return;
-                const auto* phy = esp->getComponent<PhysicsComponent_t>();
+                const auto* phy = EntityMan.getRequiredComponent<PhysicsComponent_t>(spw);
                 if(!phy) return;
-                [[maybe_unused]]auto& e = GOFact.createEnemy(phy->x, phy->y);
-                
+                auto& e = GOFact.createEnemy(phy->x, phy->y);
+                auto* p = e.getComponent<PhysicsComponent_t>();
+                if(!p) return;
+                p->vx = -1; p->vy = 0;
             }
         );
         GOFact.createPlayer(30, 100);

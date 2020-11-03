@@ -9,7 +9,7 @@ void SpawnSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
     auto now = clk::now();
     for(auto& spw: g.template getComponents<SpawnerComponent_t>()) {
         // auto* phy = getRequieredComponent(g, spw);
-        auto* phy = g.template getRequiredComponent<SpawnerComponent_t, PhysicsComponent_t>(spw);
+        auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(spw);
         if(!phy) continue;
 
         auto passed { now - spw.last_spawned_time };

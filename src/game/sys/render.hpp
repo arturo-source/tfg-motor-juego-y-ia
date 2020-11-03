@@ -13,8 +13,9 @@ struct RenderSystem_t {
     void drawAllEntities(const GameCTX_t& g) const;
 
     //Constantes
-    static constexpr uint32_t kR = 0x00FF0000;
+    static constexpr uint32_t kB = 0x00444444;
 private:
+    constexpr uint32_t* getScreenXY(uint32_t x, uint32_t y) const {return m_framebuffer.get() + y*m_w + x;}
     const uint32_t m_w {0}, m_h{0};
     std::unique_ptr<uint32_t[]> m_framebuffer {nullptr};
 };
