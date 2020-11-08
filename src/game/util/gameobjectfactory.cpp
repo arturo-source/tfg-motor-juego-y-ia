@@ -5,6 +5,7 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t x, uint32_t y, const s
     auto& rn = m_EntMan.addComponent<RenderComponent_t>(e);
     auto& ph = m_EntMan.addComponent<PhysicsComponent_t>(e);
     auto& cl = m_EntMan.addComponent<ColliderComponent_t>(e);
+    m_EntMan.addComponent<HealthComponent_t>(e);
     rn.loadFromFile(filename);
     ph.x = x; ph.y = y;
     ph.vx = 1; ph.vy = 1;
@@ -19,6 +20,9 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t x, uint32_t y, const s
 ECS::Entity_t& GameObjectFactory_t::createPlayer(uint32_t x, uint32_t y) const {
     auto& e = createEntity(x, y, "assets/character.png");
     m_EntMan.addComponent<InputComponent_t>(e);
+    auto* h = e.getComponent<HealthComponent_t>();
+    if(!h) return e;
+    h->health = 100;
  
     return e;
 }

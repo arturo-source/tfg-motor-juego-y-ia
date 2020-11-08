@@ -21,10 +21,11 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         
         for(std::size_t j=i+1; j<ColCmpVec.size(); ++j) {
             auto& c2 { ColCmpVec[j] };
+            if( (c1.mask & c2.mask) == 0) continue;
             auto* p2 = g.template getRequiredComponent<PhysicsComponent_t>(c2);
             if(!p2) continue; // p2 == nullptr
             
-            // checkObjectCollision()
+            checkObjectCollision(c1, c2, *p1, *p2);
         }
     }
     return true;
@@ -33,8 +34,8 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderComponent_t& c1, ColliderComponent_t& c2, const PhysicsComponent_t& p1, const PhysicsComponent_t& p2) const noexcept {
     // Move Bounding Boxes to screen coordinates
-    auto& b1 { move2ScreenCoords(c1.box, p1.x, p1.y) };
-    auto& b2 { move2ScreenCoords(c2.box, p2.x, p2.y) };
+    auto b1 { move2ScreenCoords(c1.box, p1.x, p1.y) };
+    auto b2 { move2ScreenCoords(c2.box, p2.x, p2.y) };
 
     auto checkIntervals = [](uint32_t L1, uint32_t R1, uint32_t L2, uint32_t R2) {
         if(L2 > R1) return false;

@@ -1,5 +1,5 @@
 extern "C" {
-    #include <tinyPTC/src/tinyptc.h>
+    #include <tinyPTC/src/linux/tinyptc.h>
 }
 #include <memory>
 #include <algorithm>

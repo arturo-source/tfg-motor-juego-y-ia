@@ -3,7 +3,7 @@
 #include <X11/X.h>
 #include <X11/keysym.h>
 extern "C" {
-    #include <tinyPTC/src/tinyptc.h>
+    #include <tinyPTC/src/linux/tinyptc.h>
 }
 
 template<typename GameCTX_t>

@@ -24,6 +24,7 @@ endef
 ##############
 ### CONFIG
 ##############
+UNAME 	:= $(shell uname)
 APP 	:= libtinyptc.a
 CCFLAGS := -Wall -pedantic
 CFLAGS 	:= $(CCFLAGS)
@@ -36,14 +37,34 @@ MKDIR 	:= mkdir -p
 SRC 	:= src
 OBJ 	:= obj
 
-ifdef DEBUG
-	CFLAGS += -g
+ifeq ($(UNAME),Linux)
+	OS := linux
 else
-	CFLAGS += -O3
+	OS := windows
 endif
 
-ALLCPPS 	:= $(shell find src/ -type f -iname *.cpp)
-ALLCS 		:= $(shell find src/ -type f -iname *.c)
+ifdef CROSSWIN
+	C:=x86_64-w64-mingw32-gcc
+	CC:=x86_64-w64-mingw32-g++
+	AR:=x86_64-w64-mingw32-ar
+	RANLIB:=x86_64-w64-mingw32-ranlib
+	OS:=windows
+endif
+
+
+ifdef DEBUG
+	CFLAGS += -g
+	CCFLAGS += -g
+else ifdef SANITIZE
+	CCFLAGS += -fsanitize=address -fno-omit-frame-pointer -O1 -g
+	CFLAGS  += -fsanitize=address -fno-omit-frame-pointer -O1 -g
+else
+	CFLAGS += -O3
+	CCFLAGS += -O3
+endif
+
+ALLCPPS 	:= $(shell find src/$(OS) -type f -iname *.cpp)
+ALLCS 		:= $(shell find src/$(OS) -type f -iname *.c)
 ALLOBJ 		:= $(foreach FILE,$(ALLCPPS) $(ALLCS),$(call C2O,$(FILE)))
 SUBDIRS 	:= $(shell find $(SRC) -type d)
 OBJSUBDIRS 	:= $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))

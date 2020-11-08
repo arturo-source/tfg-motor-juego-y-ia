@@ -24,6 +24,7 @@ endef
 ##############
 ### CONFIG
 ##############
+UNAME 	:= $(shell uname)
 APP 	:= game
 CCFLAGS	:= $(CFLAGS) -std=c++17
 CFLAGS	:= -Wall -pedantic
@@ -36,9 +37,29 @@ LIBDIR	:= lib
 LIB 	:= $(LIBDIR)/picoPNG/libpicopng.a $(LIBDIR)/tinyPTC/libtinyptc.a -lX11 -lXext
 INCDIR	:= -I$(SRC) -I$(LIBDIR)
 
-ifdef DEBUG
-	CCFLAGS += -g
+ifeq ($(UNAME),Linux)
+	OS := linux
 else
+	OS := windows
+endif
+
+ifdef CROSSWIN
+	C:=x86_64-w64-mingw32-gcc
+	CC:=x86_64-w64-mingw32-g++
+	AR:=x86_64-w64-mingw32-ar
+	RANLIB:=x86_64-w64-mingw32-ranlib
+	OS:=windows
+endif
+
+
+ifdef DEBUG
+	CFLAGS += -g
+	CCFLAGS += -g
+else ifdef SANITIZE
+	CCFLAGS += -fsanitize=address -fno-omit-frame-pointer -O1 -g
+	CFLAGS  += -fsanitize=address -fno-omit-frame-pointer -O1 -g
+else
+	CFLAGS += -O3
 	CCFLAGS += -O3
 endif
 

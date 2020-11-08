@@ -6,6 +6,7 @@
 #include <game/cmp/physics.hpp>
 #include <game/cmp/render.hpp>
 #include <game/cmp/spawner.hpp>
+#include <game/cmp/health.hpp>
 
 struct GameObjectFactory_t {
     explicit GameObjectFactory_t(ECS::EntityManager_t& EntityMan) :
@@ -26,8 +27,8 @@ struct GameObjectFactory_t {
         auto& spw = m_EntMan.addComponent<SpawnerComponent_t>(e);
         auto& ph  = m_EntMan.addComponent<PhysicsComponent_t>(e);
         auto& cl = m_EntMan.addComponent<ColliderComponent_t>(e);
+        cl.mask = 0; //Collide with nothing
         rn.loadFromFile("assets/enemy.png");
-        m_EntMan.addComponent<ColliderComponent_t>(e);
         ph.x = x; ph.y = y;
         ph.vy = 1;
         spw.spawnerMethod = callback;
