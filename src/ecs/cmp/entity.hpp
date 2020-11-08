@@ -32,7 +32,16 @@ struct Entity_t {
         return const_cast<CMP_t*>(cmp);
     }
 
+    void updateComponent(ComponentTypeID_t cid, Component_t* cmpptr) {
+        auto it = m_components.find(cid);
+        if(it != m_components.end()) 
+            it->second = cmpptr;
+    }
+
     constexpr EntityID_t getEntityID() const noexcept { return entityID; }
+    
+    auto begin() const { return m_components.begin(); }
+    auto end() const { return m_components.end(); }
 private:
     Hash_t<ComponentTypeID_t, Component_t*> m_components;
 

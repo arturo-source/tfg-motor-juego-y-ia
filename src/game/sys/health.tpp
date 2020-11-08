@@ -14,6 +14,7 @@ constexpr void HealthSystem_t<GameCTX_t>::update(GameCTX_t& g) const noexcept {
         if( h.health && leafNodeCollided(c->box) ) {
             if( --h.health == 0) {
                 std::cout << "Ha muerto " << h.getEntityID() << "!\n";
+                g.destroyEntityByID(h.getEntityID());
             }
         }
     }

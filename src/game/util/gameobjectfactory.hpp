@@ -1,6 +1,6 @@
 #pragma once
 #include <string_view>
-#include <ecs/man/entitymanager.hpp>
+#include <ecs/man/entitymanager.tpp>
 #include <game/cmp/collider.hpp>
 #include <game/cmp/input.hpp>
 #include <game/cmp/physics.hpp>
@@ -32,6 +32,7 @@ struct GameObjectFactory_t {
         ph.x = x; ph.y = y;
         ph.vy = 1;
         spw.spawnerMethod = callback;
+        spw.to_be_spawned = 100;
         cl.box.xLeft  = 0;
         cl.box.xRight = rn.w;
         cl.box.yUp    = 0;

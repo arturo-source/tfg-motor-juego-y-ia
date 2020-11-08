@@ -13,7 +13,7 @@ extern "C" {
 #include <game/sys/spawn.tpp>
 #include <game/cmp/collider.hpp>
 #include <game/util/gameobjectfactory.hpp>
-#include <ecs/man/entitymanager.hpp>
+#include <ecs/man/entitymanager.tpp>
 
 constexpr uint32_t kSCRWIDTH  {640};
 constexpr uint32_t kSCRHEIGHT {360};
