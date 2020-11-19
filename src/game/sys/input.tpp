@@ -30,13 +30,20 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         if(e) {
             auto phy = e->template getComponent<PhysicsComponent_t>();
             if(phy) { // phy != nullptr
-                phy->vx = phy->vy = 0;
+                phy->vx = 0;
                 if(ms_Keyboard.isKeyPressed(inp.key_LEFT )) phy->vx = -1;
                 if(ms_Keyboard.isKeyPressed(inp.key_RIGHT)) phy->vx = 1;
-                if(ms_Keyboard.isKeyPressed(inp.key_UP   )) phy->vy = -1;
+                if(ms_Keyboard.isKeyPressed(inp.key_UP   )) 
+                    if(phy->jumpIdx == phy->jumpTable.size()) 
+                        phy->jumpIdx = 0;
                 if(ms_Keyboard.isKeyPressed(inp.key_DOWN )) phy->vy = 1;
             }
         }
     }
     return true;
+}
+
+template<typename GameCTX_t>
+bool InputSystem_t<GameCTX_t>::isEscPressed() {
+    return ms_Keyboard.isEscPressed();
 }

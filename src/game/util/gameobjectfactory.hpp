@@ -16,6 +16,8 @@ struct GameObjectFactory_t {
     ECS::Entity_t& createEntity(uint32_t x, uint32_t y, const std::string_view filename) const;
     ECS::Entity_t& createPlayer(uint32_t x, uint32_t y) const;
     ECS::Entity_t& createEnemy(uint32_t x, uint32_t y) const;
+    // ECS::Entity_t& createPallete(uint32_t x, uint32_t y) const;
+    // ECS::Entity_t& createBall(uint32_t x, uint32_t y) const;
 
     template<typename CALLABLE_t>
     ECS::Entity_t& createSpawner(uint32_t x, uint32_t y, CALLABLE_t callback) const {
@@ -27,10 +29,11 @@ struct GameObjectFactory_t {
         auto& spw = m_EntMan.addComponent<SpawnerComponent_t>(e);
         auto& ph  = m_EntMan.addComponent<PhysicsComponent_t>(e);
         auto& cl = m_EntMan.addComponent<ColliderComponent_t>(e);
-        cl.mask = 0; //Collide with nothing
+        cl.mask = ColliderComponent_t::L_NoLayer; //Collide with nothing
         rn.loadFromFile("assets/enemy.png");
         ph.x = x; ph.y = y;
         ph.vy = 1;
+        ph.gravity = 0;
         spw.spawnerMethod = callback;
         spw.to_be_spawned = 100;
         cl.box.xLeft  = 0;

@@ -14,6 +14,7 @@ struct Keyboard_t {
     Keyboard_t& operator=(Keyboard_t&&)      = delete;
 
     bool isKeyPressed (KeySym k) noexcept;
+    bool isEscPressed () noexcept;
     void keyPressed(KeySym k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = true;
@@ -28,6 +29,7 @@ private:
     std::unordered_map<KeySym, bool> m_pressedKeys {
         {XK_BackSpace, false},
         {XK_Tab, false},
+        {XK_Escape, false},
         {XK_a, false},
         {XK_s, false},
         {XK_d, false},

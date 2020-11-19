@@ -6,6 +6,9 @@ namespace ECS {
             return (*it)->second;
         return false;
     }
+    bool Keyboard_t::isEscPressed () noexcept {
+        return isKeyPressed(XK_Escape);
+    }
 
     Keyboard_t::OptIter Keyboard_t::getIterator(KeySym k) noexcept {
         auto it = m_pressedKeys.find(k);

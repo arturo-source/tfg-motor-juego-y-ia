@@ -1,6 +1,7 @@
 #include <game/sys/collision.hpp>
 #include <game/cmp/physics.hpp>
 #include <game/cmp/collider.hpp>
+#include <game/cmp/health.hpp>
 
 template<typename GameCTX_t>
 CollisionSystem_t<GameCTX_t>::CollisionSystem_t(uint32_t w, uint32_t h)
@@ -25,14 +26,73 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
             auto* p2 = g.template getRequiredComponent<PhysicsComponent_t>(c2);
             if(!p2) continue; // p2 == nullptr
             
-            checkObjectCollision(c1, c2, *p1, *p2);
+            if( checkObjectCollision(c1, c2, *p1, *p2)) 
+                react2Collision(g, c1, c2);
         }
     }
     return true;
 }
 
 template <typename GameCTX_t>
-constexpr void CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderComponent_t& c1, ColliderComponent_t& c2, const PhysicsComponent_t& p1, const PhysicsComponent_t& p2) const noexcept {
+constexpr void CollisionSystem_t<GameCTX_t>::inflictDamage(GameCTX_t& g, ColliderComponent_t& inflicter, ColliderComponent_t& receiver) const noexcept {
+    auto* receivHealth = g.template getRequiredComponent<HealthComponent_t>(receiver);
+    auto* infliHealth = g.template getRequiredComponent<HealthComponent_t>(inflicter);
+    if(!receivHealth || !infliHealth) return;
+
+    receivHealth->damage += infliHealth->damageInflicted;
+    infliHealth->damage += infliHealth->selfDamageOnInfliction;
+}
+
+template <typename GameCTX_t>
+constexpr void CollisionSystem_t<GameCTX_t>::undoCollision(GameCTX_t& g, ColliderComponent_t& solid, ColliderComponent_t& mobile) const noexcept {
+    auto* solidPhy = g.template getRequiredComponent<PhysicsComponent_t>(solid);
+    auto* mobilePhy = g.template getRequiredComponent<PhysicsComponent_t>(mobile);
+    if(!solidPhy || !mobilePhy) return;
+    
+    //Translate to screen coords
+    auto solidBox = move2ScreenCoords(solid.box, solidPhy->x, solidPhy->y);
+    auto mobileBox = move2ScreenCoords(mobile.box, mobilePhy->x, mobilePhy->y);
+
+    auto intervalIntersection = [](uint32_t Ml, uint32_t Mr, uint32_t Sl, uint32_t Sr) -> int32_t {
+        if(Ml < Sl) {
+            if(Mr < Sr)    return Sl - Mr;
+        } else if(Mr > Sr) return Sr - Ml;
+        return 0;
+    };
+
+    //Calculate intersection
+    struct { int32_t x,y; } overlap {
+        intervalIntersection(mobileBox.xLeft, mobileBox.xRight, solidBox.xLeft, solidBox.xRight)
+        ,intervalIntersection(mobileBox.yUp, mobileBox.yDown, solidBox.yUp, solidBox.yDown)
+    };
+
+    //Undo overlap
+    if ((overlap.x == 0) || ( overlap.y != 0 && std::abs(overlap.y) <= std::abs(overlap.x))) {
+        mobilePhy->y += overlap.y;
+        mobilePhy->vy = 0;
+    } else {
+        mobilePhy->x += overlap.x;
+        mobilePhy->vx = 0;
+    }
+}
+
+template <typename GameCTX_t>
+constexpr void CollisionSystem_t<GameCTX_t>::react2Collision(GameCTX_t& g, ColliderComponent_t& c1, ColliderComponent_t& c2) const noexcept {
+    using CP = ColliderComponent_t;
+    CP *player { &c1 }, *other { &c2 };
+
+    if(c2.properties & CP::P_IsPlayer) { std::swap(player, other); }
+    else if(!(c1.properties & CP::P_IsPlayer)) return;
+
+    if(other->properties & CP::P_Damages) {
+        inflictDamage(g, *other, *player);
+    } else if(other->properties & CP::P_IsSolid) {
+        undoCollision(g, *other, *player);
+    }
+}
+
+template <typename GameCTX_t>
+constexpr bool CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderComponent_t& c1, ColliderComponent_t& c2, const PhysicsComponent_t& p1, const PhysicsComponent_t& p2) const noexcept {
     // Move Bounding Boxes to screen coordinates
     auto b1 { move2ScreenCoords(c1.box, p1.x, p1.y) };
     auto b2 { move2ScreenCoords(c2.box, p2.x, p2.y) };
@@ -48,7 +108,9 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderCompon
      && checkIntervals(b1.yUp, b1.yDown, b2.yUp, b2.yDown)) {
         c1.box.collided = true;
         c2.box.collided = true;
+        return true;
     }
+    return false;
 }
 
 template <typename GameCTX_t>
@@ -66,5 +128,9 @@ template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const ColliderComponent_t& c, PhysicsComponent_t& p) const noexcept {
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
     if(b.xLeft > m_w || b.xRight > m_w) { p.x -= p.vx; p.vx = -p.vx; }
-    if(b.yUp   > m_h || b.yDown > m_h) { p.y -= p.vy; p.vy = -p.vy; }
+    if(b.yUp   > m_h || b.yDown  > m_h) { 
+        p.y -= p.vy; 
+        if(p.gravity) p.vy = 0; 
+        else p.vy = -p.vy;
+    }
 }

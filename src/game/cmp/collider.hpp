@@ -16,10 +16,18 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
 
     enum {
         L_NoLayer   = 0x00,
-        L_Blade     = 0x01,
+        L_Enemy     = 0x01,
         L_Platforms = 0x02
-    }
+    };
 
+    enum {
+        P_Nothing = 0x00,
+        P_IsPlayer = 0x01,
+        P_IsSolid = 0x02,
+        P_Damages = 0x04,
+    };
+
+    uint8_t properties { P_Nothing };
     uint8_t mask { 0xFF };
     BoundingBox_t box;
 };
