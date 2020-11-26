@@ -5,7 +5,7 @@
 #include <iostream>
 #include <game/man/game.hpp>
 #include <game/man/state.hpp>
-#include <game/man/replay.hpp>
+// #include <game/man/replay.hpp>
 
 struct MenuState_t : StateBase_t {
     explicit MenuState_t(StateManager_t& sm) : SM{sm} {}
@@ -22,7 +22,7 @@ MENU:
         switch (opt) {
             case 1: SM.pushState<GameManager_t>(SM); break;
             case 2:  break;
-            case 3: SM.pushState<ReplayGame_t>(SM, "datainput0.bin"); break;
+            // case 3: SM.pushState<ReplayGame_t>(SM, "datainput0.bin"); break;
             default: m_Alive = false;
         }
     }
