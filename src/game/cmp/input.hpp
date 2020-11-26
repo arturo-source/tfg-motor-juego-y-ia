@@ -9,8 +9,8 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
         : ComponentBase_t(eid)
     {}
 
-    KeySym key_LEFT  {XK_a};
-    KeySym key_RIGHT {XK_d};
+    // KeySym key_LEFT  {XK_a};
+    // KeySym key_RIGHT {XK_d};
     KeySym key_UP    {XK_w};
     KeySym key_DOWN  {XK_s};
 };

@@ -16,6 +16,7 @@ private:
     constexpr void react2Collision(GameCTX_t& g, ColliderComponent_t& c1, ColliderComponent_t& c2) const noexcept;
     constexpr void inflictDamage(GameCTX_t& g, ColliderComponent_t& inflicter, ColliderComponent_t& receiver) const noexcept;
     constexpr void undoCollision(GameCTX_t& g, ColliderComponent_t& solid, ColliderComponent_t& mobile) const noexcept;
+    constexpr void bounceBall(GameCTX_t& g, ColliderComponent_t& ball, ColliderComponent_t& player) const noexcept;
     
     const uint32_t m_w{0}, m_h{0};
 };

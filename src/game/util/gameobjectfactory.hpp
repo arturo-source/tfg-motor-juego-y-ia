@@ -7,6 +7,7 @@
 #include <game/cmp/render.hpp>
 #include <game/cmp/spawner.hpp>
 #include <game/cmp/health.hpp>
+#include <game/cmp/score.hpp>
 
 struct GameObjectFactory_t {
     explicit GameObjectFactory_t(ECS::EntityManager_t& EntityMan) :
@@ -14,10 +15,11 @@ struct GameObjectFactory_t {
      {}
     
     ECS::Entity_t& createEntity(uint32_t x, uint32_t y, const std::string_view filename) const;
+    ECS::Entity_t& createEntity(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color) const;
     ECS::Entity_t& createPlayer(uint32_t x, uint32_t y) const;
     ECS::Entity_t& createEnemy(uint32_t x, uint32_t y) const;
-    // ECS::Entity_t& createPallete(uint32_t x, uint32_t y) const;
-    // ECS::Entity_t& createBall(uint32_t x, uint32_t y) const;
+    ECS::Entity_t& createPalette(uint32_t x, uint32_t y, bool isRight) const;
+    ECS::Entity_t& createBall(uint32_t x, uint32_t y) const;
 
     template<typename CALLABLE_t>
     ECS::Entity_t& createSpawner(uint32_t x, uint32_t y, CALLABLE_t callback) const {

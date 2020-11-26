@@ -16,6 +16,7 @@ struct RenderComponent_t : ECS::ComponentBase_t<RenderComponent_t> {
 
     void loadFromFile(const std::string_view filename);
     void initSpriteFromABGRData(std::vector<unsigned char> pixels);
+    void loadFromWH(uint32_t dw, uint32_t dh, uint32_t color);
 
     uint32_t w{0}, h{0};
     std::vector<uint32_t> sprite {};

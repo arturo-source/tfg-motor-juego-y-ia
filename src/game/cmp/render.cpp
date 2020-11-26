@@ -1,6 +1,7 @@
 #include <game/cmp/render.hpp>
 #include <tuple>
 #include <string_view>
+#include <iostream>
 
 auto loadPNGFileIntoVector(const std::string_view filename) {
     std::vector<unsigned char> pixels;
@@ -27,9 +28,14 @@ void RenderComponent_t::initSpriteFromABGRData(std::vector<unsigned char> pixels
     }
 }
 
-
 void RenderComponent_t::loadFromFile(const std::string_view filename) {
     auto [dw, dh, pixels] = loadPNGFileIntoVector(filename);
     w = dw; h = dh;
     initSpriteFromABGRData(pixels);
+}
+
+void RenderComponent_t::loadFromWH(uint32_t dw, uint32_t dh, uint32_t color) {
+    w = dw; h = dh;
+    sprite.resize(w*h);
+    std::fill(sprite.begin(), sprite.end(), color);
 }

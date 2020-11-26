@@ -2,6 +2,7 @@
 #include <game/cmp/physics.hpp>
 #include <game/cmp/collider.hpp>
 #include <game/cmp/health.hpp>
+#include <game/cmp/score.hpp>
 
 template<typename GameCTX_t>
 CollisionSystem_t<GameCTX_t>::CollisionSystem_t(uint32_t w, uint32_t h)
@@ -77,6 +78,16 @@ constexpr void CollisionSystem_t<GameCTX_t>::undoCollision(GameCTX_t& g, Collide
 }
 
 template <typename GameCTX_t>
+constexpr void CollisionSystem_t<GameCTX_t>::bounceBall(GameCTX_t& g, ColliderComponent_t& ball, ColliderComponent_t& player) const noexcept {
+    auto* ballPhy = g.template getRequiredComponent<PhysicsComponent_t>(ball);
+    auto* playerPhy = g.template getRequiredComponent<PhysicsComponent_t>(player);
+    if(!ballPhy || !playerPhy) return;
+
+    ballPhy->vx = -ballPhy->vx;
+    ballPhy->vy -= playerPhy->vy;
+}
+
+template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::react2Collision(GameCTX_t& g, ColliderComponent_t& c1, ColliderComponent_t& c2) const noexcept {
     using CP = ColliderComponent_t;
     CP *player { &c1 }, *other { &c2 };
@@ -84,11 +95,15 @@ constexpr void CollisionSystem_t<GameCTX_t>::react2Collision(GameCTX_t& g, Colli
     if(c2.properties & CP::P_IsPlayer) { std::swap(player, other); }
     else if(!(c1.properties & CP::P_IsPlayer)) return;
 
-    if(other->properties & CP::P_Damages) {
-        inflictDamage(g, *other, *player);
-    } else if(other->properties & CP::P_IsSolid) {
-        undoCollision(g, *other, *player);
+    if(other->properties & CP::P_IsBall) {
+        bounceBall(g, *other, *player);
     }
+
+    // if(other->properties & CP::P_Damages) {
+    //     inflictDamage(g, *other, *player);
+    // } else if(other->properties & CP::P_IsSolid) {
+    //     undoCollision(g, *other, *player);
+    // }
 }
 
 template <typename GameCTX_t>
@@ -127,10 +142,21 @@ constexpr BoundingBox_t CollisionSystem_t<GameCTX_t>::move2ScreenCoords(const Bo
 template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const ColliderComponent_t& c, PhysicsComponent_t& p) const noexcept {
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
-    if(b.xLeft > m_w || b.xRight > m_w) { p.x -= p.vx; p.vx = -p.vx; }
-    if(b.yUp   > m_h || b.yDown  > m_h) { 
-        p.y -= p.vy; 
-        if(p.gravity) p.vy = 0; 
-        else p.vy = -p.vy;
+    if(b.xLeft > m_w || b.xRight > m_w) { 
+        p.x -= p.vx;
+        if(c.properties & ColliderComponent_t::P_IsBall) {
+            p.vx = 0;
+            ScoreComponent_t::scorePosX = p.x;
+            ScoreComponent_t::scored = true;
+        }
+        // p.x -= p.vx; p.vx = -p.vx;
+    }
+    if(b.yUp > m_h || b.yDown > m_h) { 
+        p.y -= p.getVy();
+        if(c.properties & ColliderComponent_t::P_IsBall) {
+            p.vy = -p.vy;
+        } else if(c.properties & ColliderComponent_t::P_IsPlayer) {
+            p.vy = 0;
+        }
     }
 }

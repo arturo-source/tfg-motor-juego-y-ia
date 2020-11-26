@@ -25,6 +25,8 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
         P_IsPlayer = 0x01,
         P_IsSolid = 0x02,
         P_Damages = 0x04,
+        P_Bounces = 0x08,
+        P_IsBall = 0x10
     };
 
     uint8_t properties { P_Nothing };

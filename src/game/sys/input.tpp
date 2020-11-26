@@ -1,5 +1,4 @@
 #include <game/sys/input.hpp>
-#include <game/cmp/input.hpp>
 #include <X11/X.h>
 #include <X11/keysym.h>
 extern "C" {
@@ -19,6 +18,36 @@ template<typename GameCTX_t>
 InputSystem_t<GameCTX_t>::InputSystem_t() {
     ptc_set_on_keypress( onkeypress );
     ptc_set_on_keyrelease( onkeyrelease );
+    ms_Keyboard.reset();
+}
+
+template<typename GameCTX_t>
+void InputSystem_t<GameCTX_t>::dump() const {
+    std::ofstream file(filename.c_str(), std::ios::app | std::ios::binary);
+    for(KeysPressed_t& inpkey: inputKeys) {
+        if(inpkey.player_ID != 0)
+            file.write(reinterpret_cast<const char*>(&inpkey), sizeof(inpkey));
+    }
+    file.close();
+    inputKeys.clear();
+    inputKeys.resize(KMaxInputsStored);
+}
+
+template<typename GameCTX_t>
+void InputSystem_t<GameCTX_t>::addInput(const InputComponent_t& inp) const {
+    KeysPressed_t k {
+        inp.getEntityID(),
+        ms_Keyboard.isKeyPressed(inp.key_UP),
+        ms_Keyboard.isKeyPressed(inp.key_DOWN)
+    };
+    if(piputKeys < inputKeys.capacity()) {
+        inputKeys[piputKeys] = k;
+        piputKeys++;
+    } else {
+        dump();
+        inputKeys[0] = k;
+        piputKeys = 1;
+    }
 }
 
 template<typename GameCTX_t>
@@ -30,20 +59,27 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         if(e) {
             auto phy = e->template getComponent<PhysicsComponent_t>();
             if(phy) { // phy != nullptr
-                phy->vx = 0;
-                if(ms_Keyboard.isKeyPressed(inp.key_LEFT )) phy->vx = -1;
-                if(ms_Keyboard.isKeyPressed(inp.key_RIGHT)) phy->vx = 1;
-                if(ms_Keyboard.isKeyPressed(inp.key_UP   )) 
-                    if(phy->jumpIdx == phy->jumpTable.size()) 
-                        phy->jumpIdx = 0;
-                if(ms_Keyboard.isKeyPressed(inp.key_DOWN )) phy->vy = 1;
+                phy->aceleration = 0;
+                // phy->vx = 0;
+                // if(ms_Keyboard.isKeyPressed(inp.key_LEFT )) phy->vx = -1;
+                // if(ms_Keyboard.isKeyPressed(inp.key_RIGHT)) phy->vx = 1;
+                if(ms_Keyboard.isKeyPressed(inp.key_UP   )) phy->aceleration = -1;
+                    // if(phy->jumpIdx == phy->jumpTable.size()) 
+                    //     phy->jumpIdx = 0;
+                if(ms_Keyboard.isKeyPressed(inp.key_DOWN )) phy->aceleration = 1;
             }
         }
+        addInput(inp);
     }
     return true;
 }
 
 template<typename GameCTX_t>
 bool InputSystem_t<GameCTX_t>::isEscPressed() {
-    return ms_Keyboard.isEscPressed();
+    return ms_Keyboard.isKeyPressed(XK_Escape);
+}
+
+template<typename GameCTX_t>
+bool InputSystem_t<GameCTX_t>::isPausePressed() {
+    return ms_Keyboard.isKeyPressed(XK_space);
 }
