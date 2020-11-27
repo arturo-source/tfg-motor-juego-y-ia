@@ -37,8 +37,8 @@ struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm) : SM{sm} {
         Input.initCSV(   findFilename("input", "csv") );
         Physics.initCSV( findFilename("physics", "csv") );
-        GOFact.createPalette(10, kSCRHEIGHT/2, false);
-        GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, true);
+        GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+        GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
         GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
         // GOFact.createEnemy(50, 200);
         // GOFact.createEnemy(40, 20);
@@ -84,7 +84,7 @@ struct GameManager_t : StateBase_t {
         // Stop when data%s%d.bin doesnt exist
         while(fi_is_open) {
             filename.str("");
-            filename << "data" << toSystem << num << "." << type;
+            filename << "CSVs/data" << toSystem << num << "." << type;
             // sprintf(filename.data(), "data%s%d.bin", toSystem.data(), num);
             fi.open(filename.str());
             fi_is_open = fi.is_open();
@@ -94,6 +94,7 @@ struct GameManager_t : StateBase_t {
 
         return filename.str();
     }
+    ECS::Keyboard_t& getKeyboard() { return Input.getKeyboard(); }
 private:
     //Game consts
     static constexpr uint32_t kSCRWIDTH  {700};

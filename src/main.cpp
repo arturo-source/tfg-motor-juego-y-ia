@@ -3,9 +3,10 @@
 //     #include <tinyPTC/src/linux/tinyptc.h> //Ruta relativa a la hora de compilar
 // }
 #include <iostream>
+#include <filesystem>
 #include <game/man/game.hpp>
 #include <game/man/state.hpp>
-// #include <game/man/replay.hpp>
+#include <game/man/replay.hpp>
 
 struct MenuState_t : StateBase_t {
     explicit MenuState_t(StateManager_t& sm) : SM{sm} {}
@@ -18,13 +19,33 @@ MENU:
 -. Exit
 [[ SELECT OPTION ]])";
         int opt;
+        std::vector<std::string> options;
         std::cin >> opt;
         switch (opt) {
             case 1: SM.pushState<GameManager_t>(SM); break;
-            case 2:  break;
-            // case 3: SM.pushState<ReplayGame_t>(SM, "datainput0.bin"); break;
+            case 2: break;
+            case 3: 
+                do {
+                    std::cout << "\nSelect one of the following:\n";
+                    options = showFiles();
+                    std::cout << " >> ";
+                    std::cin >> opt;
+                    if(opt >= options.size()) std::cout << "BAD ANSWER\n";
+                } while(opt >= options.size()); //Select one inside the range
+
+                SM.pushState<ReplayGame_t>(SM, options[opt]); 
+                break;
             default: m_Alive = false;
         }
+    }
+    std::vector<std::string> showFiles() {
+        std::vector<std::string> options {};
+        uint pos = 0;
+        for (const auto & entry : std::filesystem::directory_iterator("CSVs")) {
+            std::cout << pos++ << ": " << entry.path() << "\n";
+            options.push_back(entry.path());
+        }
+        return options;
     }
     bool alive() final { return m_Alive; }
 private:

@@ -4,9 +4,9 @@
 #include <game/cmp/input.hpp>
 
 struct KeysPressed_t {
-    ECS::EntityID_t player_ID;
-    bool     up;
-    bool     down;
+    uint8_t player_side;
+    bool    up;
+    bool    down;
 };
 
 template<typename GameCTX_t>
@@ -22,7 +22,7 @@ struct InputSystem_t {
     void dumpBin(const InputComponent_t& inp) const;
     void dumpCSV(const InputComponent_t& inp) const;
     void initCSV(const std::string fname);
-    ECS::Keyboard_t* getKeyboard() { return &ms_Keyboard; }
+    ECS::Keyboard_t& getKeyboard() { return ms_Keyboard; }
 private:
     static void onkeypress(KeySym k);
     static void onkeyrelease(KeySym k);

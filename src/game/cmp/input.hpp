@@ -9,6 +9,13 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
         : ComponentBase_t(eid)
     {}
 
+    enum {
+        S_NoSide = 0x00,
+        S_Left   = 0x01,
+        S_Right  = 0x02
+    };
+    uint8_t side { S_NoSide };
+
     // KeySym key_LEFT  {XK_a};
     // KeySym key_RIGHT {XK_d};
     KeySym key_UP    {XK_w};

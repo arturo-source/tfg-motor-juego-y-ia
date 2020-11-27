@@ -18,7 +18,7 @@ struct GameObjectFactory_t {
     ECS::Entity_t& createEntity(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color) const;
     ECS::Entity_t& createPlayer(uint32_t x, uint32_t y) const;
     ECS::Entity_t& createEnemy(uint32_t x, uint32_t y) const;
-    ECS::Entity_t& createPalette(uint32_t x, uint32_t y, bool isRight) const;
+    ECS::Entity_t& createPalette(uint32_t x, uint32_t y, uint8_t side) const;
     ECS::Entity_t& createBall(uint32_t x, uint32_t y) const;
 
     template<typename CALLABLE_t>

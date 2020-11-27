@@ -3,11 +3,36 @@
 #include <game/man/game.hpp>
 
 struct ReplayGame_t : StateBase_t {
-    explicit ReplayGame_t(StateManager_t& sm, std::string filename) : SM{sm} {
-        ms_Keyboard = GM.Input.getKeyboard();
-        read(filename);
-    }
+    explicit ReplayGame_t(StateManager_t& sm, std::string filename) 
+    : SM{sm}, ms_Keyboard { GM.getKeyboard() } 
+    { readCSV(filename); }
 
+    void readCSV(std::string& filename) {
+        std::ifstream file(filename.c_str(), std::ios::binary);
+        if(!file) std::runtime_error("Can't open BIN file for read\n");
+        
+        std::string line;
+        std::getline(file,line); //Erase the first line of csv
+        while(std::getline(file,line)) {
+            std::stringstream lineStream(line);
+            std::string side;
+            std::string kUP;
+            std::string kDOWN;
+            std::getline(lineStream,side, ';');
+            std::getline(lineStream,kUP, ';');
+            std::getline(lineStream,kDOWN, ';');
+
+            KeysPressed_t kp {
+                static_cast<uint8_t>( atoi(side.c_str()) ),
+                static_cast<bool>( atoi(kUP.c_str()) ),
+                static_cast<bool>( atoi(kDOWN.c_str()) )
+            };
+            inputKeys.push_back(kp);
+        }
+        file.close();
+        inputKeysIterator = inputKeys.begin();
+    }
+    
     void read(std::string& filename) {
         //Open BIN file
         std::ifstream file(filename.c_str(), std::ios::binary);
@@ -36,25 +61,41 @@ struct ReplayGame_t : StateBase_t {
         inputKeysIterator = inputKeys.begin();
     }
 
+    void pressKeys() const {
+        if( inputKeysIterator->player_side & InputComponent_t::S_Right) {
+            if( inputKeysIterator->up )   ms_Keyboard.keyPressed(XK_o);
+            if( inputKeysIterator->down ) ms_Keyboard.keyPressed(XK_l);
+        } else if( inputKeysIterator->player_side & InputComponent_t::S_Left ) {
+            if( inputKeysIterator->up )   ms_Keyboard.keyPressed(XK_w);
+            if( inputKeysIterator->down ) ms_Keyboard.keyPressed(XK_s);
+        }
+    }
+
     void update() {
-        if(!ms_Keyboard) std::runtime_error("Error manipulating keyboard\n");
-        
-        if( inputKeysIterator->up )   ms_Keyboard->keyPressed(XK_o);
-        if( inputKeysIterator->down ) ms_Keyboard->keyPressed(XK_l);
-        if( inputKeysIterator->up )   ms_Keyboard->keyPressed(XK_w);
-        if( inputKeysIterator->down ) ms_Keyboard->keyPressed(XK_s);
+        pressKeys(); //Move player 1
+        if( ++inputKeysIterator == inputKeys.end() ) {
+            m_playing = false;
+            return;
+        }
+        pressKeys(); //Move player 2
         
         GM.update();
         
         if( ++inputKeysIterator == inputKeys.end() ) m_playing = false;
         else m_playing = GM.alive();
+        
+        //Release all keys
+        ms_Keyboard.keyReleased(XK_o);
+        ms_Keyboard.keyReleased(XK_l);
+        ms_Keyboard.keyReleased(XK_w);
+        ms_Keyboard.keyReleased(XK_s);
     }
     bool alive() { return m_playing; }
 
     StateManager_t& SM;
     GameManager_t GM { SM };
-    inline static ECS::Keyboard_t* ms_Keyboard { nullptr };
-    std::vector<KeysPressed_t> inputKeys;
+    ECS::Keyboard_t& ms_Keyboard;
+    std::vector<KeysPressed_t> inputKeys {};
     std::vector<KeysPressed_t>::iterator inputKeysIterator;
     bool m_playing { true };
 };

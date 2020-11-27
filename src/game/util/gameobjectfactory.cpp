@@ -67,15 +67,16 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t x, uint32_t y, uint32_
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPalette(uint32_t x, uint32_t y, bool isRight) const {
+ECS::Entity_t& GameObjectFactory_t::createPalette(uint32_t x, uint32_t y, uint8_t side) const {
     constexpr uint32_t w { 10 }, h { 100 };
     auto& e = createEntity(x - w/2 , y - h/2, w, h, 0xFFFF0000);
     auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
-    if(isRight) {
+    if(side & InputComponent_t::S_Right) {
         inp.key_UP   = XK_o;
         inp.key_DOWN = XK_l;
     }
+    inp.side = side;
     auto* col = e.getComponent<ColliderComponent_t>();
     if(col) {
         col->properties = ColliderComponent_t::P_IsPlayer;

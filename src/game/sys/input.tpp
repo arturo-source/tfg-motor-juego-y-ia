@@ -24,7 +24,7 @@ InputSystem_t<GameCTX_t>::InputSystem_t() {
 template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::dumpBin(const InputComponent_t& inp) const {
     KeysPressed_t k {
-        inp.getEntityID(),
+        inp.side,
         ms_Keyboard.isKeyPressed(inp.key_UP),
         ms_Keyboard.isKeyPressed(inp.key_DOWN)
     };
@@ -44,7 +44,7 @@ void InputSystem_t<GameCTX_t>::initCSV(const std::string fname) {
 template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::dumpCSV(const InputComponent_t& inp) const {
     std::ofstream file(filename.c_str(), std::ios::app);
-    file << inp.getEntityID() << ";" << ms_Keyboard.isKeyPressed(inp.key_UP) << ";" << ms_Keyboard.isKeyPressed(inp.key_DOWN) << "\n";
+    file << static_cast<int>(inp.side) << ";" << ms_Keyboard.isKeyPressed(inp.key_UP) << ";" << ms_Keyboard.isKeyPressed(inp.key_DOWN) << "\n";
     file.close();
 }
 
