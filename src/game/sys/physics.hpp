@@ -15,6 +15,8 @@ struct PysicsSystem_t {
     std::string filename;
 
     bool update(GameCTX_t& g) const;
-    void dump(const PhysicsComponent_t& phy) const;
-private:    
+    void dumpBin(const PhysicsComponent_t& phy) const;
+    void dumpCSV(const PhysicsComponent_t& phy) const;
+    void initCSV(std::string fname);
+private:
 };

@@ -19,7 +19,9 @@ struct InputSystem_t {
     bool isEscPressed();
     bool isPausePressed();
     
-    void dump(const InputComponent_t& inp) const;
+    void dumpBin(const InputComponent_t& inp) const;
+    void dumpCSV(const InputComponent_t& inp) const;
+    void initCSV(const std::string fname);
     ECS::Keyboard_t* getKeyboard() { return &ms_Keyboard; }
 private:
     static void onkeypress(KeySym k);

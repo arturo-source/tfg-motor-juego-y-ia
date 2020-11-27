@@ -35,8 +35,8 @@ private:
 
 struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm) : SM{sm} {
-        Input.filename   = findFilename("input");
-        Physics.filename = findFilename("physics");
+        Input.initCSV(   findFilename("input", "csv") );
+        Physics.initCSV( findFilename("physics", "csv") );
         GOFact.createPalette(10, kSCRHEIGHT/2, false);
         GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, true);
         GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
@@ -75,7 +75,7 @@ struct GameManager_t : StateBase_t {
 
     bool alive() final { return m_playing; }
 
-    std::string findFilename(std::string_view toSystem) const {
+    std::string findFilename(const std::string_view toSystem, const std::string_view type) const {
         std::stringstream filename;
         int num = 0;
         std::ifstream fi;
@@ -84,7 +84,7 @@ struct GameManager_t : StateBase_t {
         // Stop when data%s%d.bin doesnt exist
         while(fi_is_open) {
             filename.str("");
-            filename << "data" << toSystem << num << ".bin";
+            filename << "data" << toSystem << num << "." << type;
             // sprintf(filename.data(), "data%s%d.bin", toSystem.data(), num);
             fi.open(filename.str());
             fi_is_open = fi.is_open();
