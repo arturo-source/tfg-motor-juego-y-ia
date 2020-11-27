@@ -22,32 +22,15 @@ InputSystem_t<GameCTX_t>::InputSystem_t() {
 }
 
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::dump() const {
-    std::ofstream file(filename.c_str(), std::ios::app | std::ios::binary);
-    for(KeysPressed_t& inpkey: inputKeys) {
-        if(inpkey.player_ID != 0)
-            file.write(reinterpret_cast<const char*>(&inpkey), sizeof(inpkey));
-    }
-    file.close();
-    inputKeys.clear();
-    inputKeys.resize(KMaxInputsStored);
-}
-
-template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::addInput(const InputComponent_t& inp) const {
+void InputSystem_t<GameCTX_t>::dump(const InputComponent_t& inp) const {
     KeysPressed_t k {
         inp.getEntityID(),
         ms_Keyboard.isKeyPressed(inp.key_UP),
         ms_Keyboard.isKeyPressed(inp.key_DOWN)
     };
-    if(piputKeys < inputKeys.capacity()) {
-        inputKeys[piputKeys] = k;
-        piputKeys++;
-    } else {
-        dump();
-        inputKeys[0] = k;
-        piputKeys = 1;
-    }
+    std::ofstream file(filename.c_str(), std::ios::app | std::ios::binary);
+    file.write(reinterpret_cast<const char*>(&k), sizeof(k));
+    file.close();
 }
 
 template<typename GameCTX_t>
@@ -69,7 +52,7 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
                 if(ms_Keyboard.isKeyPressed(inp.key_DOWN )) phy->aceleration = 1;
             }
         }
-        addInput(inp);
+        dump(inp);
     }
     return true;
 }

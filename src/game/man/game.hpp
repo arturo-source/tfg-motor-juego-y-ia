@@ -35,8 +35,8 @@ private:
 
 struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm) : SM{sm} {
-        // Input.filename   = findFilename("input");
-        // Physics.filename = findFilename("physics");
+        Input.filename   = findFilename("input");
+        Physics.filename = findFilename("physics");
         GOFact.createPalette(10, kSCRHEIGHT/2, false);
         GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, true);
         GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
@@ -65,15 +65,10 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
         // timer.timedCall("SPW", [&](){ Spawn.update(EntityMan); } );
-        timer.waitUntil_ns(NSPF);
-        // std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
+        // timer.waitUntil_ns(NSPF);
+        std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
 
         m_playing = !Input.isEscPressed();
-        // if( Input.isEscPressed() ) {
-        //     m_playing = false;
-        //     Input.dump();
-        //     Physics.dump();
-        // }
         if(Input.isPausePressed())
             SM.pushState<PauseState_t>();
     }
