@@ -15,6 +15,7 @@ private:
     constexpr bool checkObjectCollision(ColliderComponent_t& c1, ColliderComponent_t& c2, const PhysicsComponent_t& p1, const PhysicsComponent_t& p2) const noexcept;
     constexpr void react2Collision(GameCTX_t& g, ColliderComponent_t& c1, ColliderComponent_t& c2) const noexcept;
     constexpr void bounceBall(GameCTX_t& g, ColliderComponent_t& ball, ColliderComponent_t& player) const noexcept;
+    constexpr float relativeCollisionPointInPercentage(const BoundingBox_t& ballBox, const PhysicsComponent_t& ballPhy, const BoundingBox_t& playerBox, const PhysicsComponent_t& playerPhy) const noexcept;
     
     const uint32_t m_w{0}, m_h{0};
 };

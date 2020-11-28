@@ -35,13 +35,37 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 }
 
 template <typename GameCTX_t>
-constexpr void CollisionSystem_t<GameCTX_t>::bounceBall(GameCTX_t& g, ColliderComponent_t& ball, ColliderComponent_t& player) const noexcept {
-    auto* ballPhy = g.template getRequiredComponent<PhysicsComponent_t>(ball);
-    auto* playerPhy = g.template getRequiredComponent<PhysicsComponent_t>(player);
+constexpr float CollisionSystem_t<GameCTX_t>::relativeCollisionPointInPercentage(const BoundingBox_t& ballBox, const PhysicsComponent_t& ballPhy, const BoundingBox_t& playerBox, const PhysicsComponent_t& playerPhy) const noexcept {
+    auto centerOf = [&](const BoundingBox_t& objectBox, const PhysicsComponent_t& phy) {
+        auto box { move2ScreenCoords(objectBox, phy.x, phy.y) };
+        return (box.yDown + box.yUp)/2;
+    };
+    float ballCenter   = centerOf(ballBox, ballPhy);
+    float playerCenter = centerOf(playerBox, playerPhy);
+
+    auto heightOf = [&](const BoundingBox_t& objectBox, const PhysicsComponent_t& phy) {
+        auto box { move2ScreenCoords(objectBox, phy.x, phy.y) };
+        return box.yDown - box.yUp;
+    };
+    float relativePointOfCollision = ballCenter - playerCenter;
+    float playerHeight = heightOf(playerBox, playerPhy);
+
+    return relativePointOfCollision / (playerHeight / 2);
+}
+
+template <typename GameCTX_t>
+constexpr void CollisionSystem_t<GameCTX_t>::bounceBall(GameCTX_t& g, ColliderComponent_t& ballCol, ColliderComponent_t& playerCol) const noexcept {
+    auto* ballPhy = g.template getRequiredComponent<PhysicsComponent_t>(ballCol);
+    auto* playerPhy = g.template getRequiredComponent<PhysicsComponent_t>(playerCol);
     if(!ballPhy || !playerPhy) return;
 
+    //Update ball velocity bcause of palette velocity
     ballPhy->vx = -ballPhy->vx;
     ballPhy->vy -= playerPhy->vy;
+
+    //Update ball velocity because of point of collision
+    float newBallDirection = relativeCollisionPointInPercentage(ballCol.box, *ballPhy, playerCol.box, *playerPhy);
+    ballPhy->vy += std::abs(ballPhy->vx)*newBallDirection;
 }
 
 template <typename GameCTX_t>
