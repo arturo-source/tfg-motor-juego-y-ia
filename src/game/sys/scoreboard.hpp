@@ -7,6 +7,7 @@ struct ScoreboardSystem_t {
     {}
 
     void update(GameCTX_t& g) const;
+    constexpr void show(GameCTX_t& g) const;
 private:
     const uint32_t avgwidth { 0 };
 };

@@ -36,7 +36,7 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
 ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y) const {
     constexpr uint32_t w { 10 }, h { 10 };
     auto& e = createEntity(x - w/2 , y - h/2, w, h, 0xFF0000FF);
-    m_EntMan.addComponent<HealthComponent_t>(e);
+    // m_EntMan.addComponent<HealthComponent_t>(e);
 
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {

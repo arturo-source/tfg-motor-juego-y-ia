@@ -93,14 +93,16 @@ constexpr BoundingBox_t CollisionSystem_t<GameCTX_t>::move2ScreenCoords(const Bo
 template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const ColliderComponent_t& c, PhysicsComponent_t& p) const noexcept {
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
-    if(b.xLeft > m_w || b.xRight > m_w) { 
-        p.x -= p.vx;
+    if(b.xLeft < 0 || b.xRight > m_w) { 
         if(c.properties & ColliderComponent_t::P_IsBall) {
-            p.vx = 0;
             ScoreComponent_t::scorePosX = p.x;
             ScoreComponent_t::scored = true;
+            
+            //Reubicate the ball
+            p.x = m_w/2;
+            p.y = m_h/2;
+            p.vy = 0;
         }
-        // p.x -= p.vx; p.vx = -p.vx;
     }
     if(b.yUp < 0 || b.yDown > m_h) { 
         p.y -= p.vy;

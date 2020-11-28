@@ -49,14 +49,19 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("INP", [&](){ Input.update(EntityMan); } );
         timer.timedCall("PHY", [&](){ Physics.update(EntityMan); } );
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
-        timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
+        // timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
-        timer.waitUntil_ns(NSPF);
-        // std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
+        // timer.waitUntil_ns(NSPF);
+        std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
 
         m_playing = !Input.isEscPressed();
         if(Input.isPausePressed())
             SM.pushState<PauseState_t>();
+
+        if(ScoreComponent_t::scored) {
+            ScoreComponent_t::scored = false;
+            Score.show(EntityMan);
+        }
     }
 
     bool alive() final { return m_playing; }
@@ -93,8 +98,8 @@ private:
     PysicsSystem_t<ECS::EntityManager_t> Physics {};
     InputSystem_t<ECS::EntityManager_t> Input {};
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
-    ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
-    const HealthSystem_t<ECS::EntityManager_t> Health {};
+    inline static ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
+    // const HealthSystem_t<ECS::EntityManager_t> Health {};
 
     ECS::EntityManager_t EntityMan;
     GameObjectFactory_t GOFact { EntityMan };

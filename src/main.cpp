@@ -29,8 +29,13 @@ MENU:
                     std::cout << "\nSelect one of the following:\n";
                     options = showFiles();
                     std::cout << " >> ";
-                    std::cin >> opt;
-                    if(opt >= options.size()) std::cout << "BAD ANSWER\n";
+                    if(options.size() == 0) {
+                        std::cout << "No files stored yet, first play a game\n";
+                        break;
+                    } else {
+                        std::cin >> opt;
+                        if(opt >= options.size()) std::cout << "BAD ANSWER\n";
+                    }
                 } while(opt >= options.size()); //Select one inside the range
 
                 SM.pushState<ReplayGame_t>(SM, options[opt]); 

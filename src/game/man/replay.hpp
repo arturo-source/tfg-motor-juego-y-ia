@@ -82,7 +82,7 @@ struct ReplayGame_t : StateBase_t {
         GM.update();
         
         if( ++inputKeysIterator == inputKeys.end() ) m_playing = false;
-        else m_playing = GM.alive();
+        // else m_playing = GM.alive();
         
         //Release all keys
         ms_Keyboard.keyReleased(XK_o);
