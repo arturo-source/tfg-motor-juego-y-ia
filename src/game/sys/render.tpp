@@ -21,6 +21,13 @@ RenderSystem_t<GameCTX_t>::~RenderSystem_t() {
 }
 
 template<typename GameCTX_t>
+constexpr uint32_t* RenderSystem_t<GameCTX_t>::getScreenXY(float x, float y) const {
+    return m_framebuffer.get() + 
+    static_cast<uint32_t>(std::round(y))*m_w + 
+    static_cast<uint32_t>(std::round(x));
+}
+
+template<typename GameCTX_t>
 void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
 

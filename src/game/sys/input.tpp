@@ -53,19 +53,11 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
     ptc_process_events();
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
-        auto* e = g.getEntityByID(inp.getEntityID());
-        if(e) {
-            auto phy = e->template getComponent<PhysicsComponent_t>();
-            if(phy) { // phy != nullptr
-                phy->aceleration = 0;
-                // phy->vx = 0;
-                // if(ms_Keyboard.isKeyPressed(inp.key_LEFT )) phy->vx = -1;
-                // if(ms_Keyboard.isKeyPressed(inp.key_RIGHT)) phy->vx = 1;
-                if(ms_Keyboard.isKeyPressed(inp.key_UP   )) phy->aceleration = -1;
-                    // if(phy->jumpIdx == phy->jumpTable.size()) 
-                    //     phy->jumpIdx = 0;
-                if(ms_Keyboard.isKeyPressed(inp.key_DOWN )) phy->aceleration = 1;
-            }
+        auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
+        if(phy) { // phy != nullptr
+            phy->aceleration = 0;
+            if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.1;
+            if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.1;
         }
         dumpCSV(inp);
     }

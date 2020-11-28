@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
+#include <cmath>
 #include <ecs/util/typealiases.hpp>
 #include <ecs/cmp/entity.hpp>
 
@@ -15,7 +16,7 @@ struct RenderSystem_t {
     //Constantes
     static constexpr uint32_t kB = 0x00444444;
 private:
-    constexpr uint32_t* getScreenXY(uint32_t x, uint32_t y) const {return m_framebuffer.get() + y*m_w + x;}
+    constexpr uint32_t* getScreenXY(float x, float y) const;
     const uint32_t m_w {0}, m_h{0};
     std::unique_ptr<uint32_t[]> m_framebuffer {nullptr};
 };

@@ -14,38 +14,9 @@ struct GameObjectFactory_t {
     m_EntMan(EntityMan)
      {}
     
-    ECS::Entity_t& createEntity(uint32_t x, uint32_t y, const std::string_view filename) const;
-    ECS::Entity_t& createEntity(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color) const;
-    ECS::Entity_t& createPlayer(uint32_t x, uint32_t y) const;
-    ECS::Entity_t& createEnemy(uint32_t x, uint32_t y) const;
-    ECS::Entity_t& createPalette(uint32_t x, uint32_t y, uint8_t side) const;
-    ECS::Entity_t& createBall(uint32_t x, uint32_t y) const;
-
-    template<typename CALLABLE_t>
-    ECS::Entity_t& createSpawner(uint32_t x, uint32_t y, CALLABLE_t callback) const {
-        auto& e   = m_EntMan.createEntity();
-        //El componente de render y el de collider es temporal...
-        //porque de momento no estoy clippeando los sprites y si 
-        //spawnea un sprite fuera de pantalla, peta
-        auto& rn = m_EntMan.addComponent<RenderComponent_t>(e);
-        auto& spw = m_EntMan.addComponent<SpawnerComponent_t>(e);
-        auto& ph  = m_EntMan.addComponent<PhysicsComponent_t>(e);
-        auto& cl = m_EntMan.addComponent<ColliderComponent_t>(e);
-        cl.mask = ColliderComponent_t::L_NoLayer; //Collide with nothing
-        rn.loadFromFile("assets/enemy.png");
-        ph.x = x; ph.y = y;
-        ph.vy = 1;
-        ph.gravity = 0;
-        spw.spawnerMethod = callback;
-        spw.to_be_spawned = 100;
-        cl.box.xLeft  = 0;
-        cl.box.xRight = rn.w;
-        cl.box.yUp    = 0;
-        cl.box.yDown  = rn.h;
-
-        return e;
-    }
-
+    ECS::Entity_t& createEntity(float x, float y, uint32_t w, uint32_t h, uint32_t color) const;
+    ECS::Entity_t& createPalette(float x, float y, uint8_t side) const;
+    ECS::Entity_t& createBall(float x, float y) const;
 private:
     ECS::EntityManager_t& m_EntMan;
 };

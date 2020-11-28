@@ -23,7 +23,7 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         
         for(std::size_t j=i+1; j<ColCmpVec.size(); ++j) {
             auto& c2 { ColCmpVec[j] };
-            if( (c1.mask & c2.mask) == 0) continue;
+            // if( (c1.mask & c2.mask) == 0) continue;
             auto* p2 = g.template getRequiredComponent<PhysicsComponent_t>(c2);
             if(!p2) continue; // p2 == nullptr
             
@@ -32,49 +32,6 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         }
     }
     return true;
-}
-
-template <typename GameCTX_t>
-constexpr void CollisionSystem_t<GameCTX_t>::inflictDamage(GameCTX_t& g, ColliderComponent_t& inflicter, ColliderComponent_t& receiver) const noexcept {
-    auto* receivHealth = g.template getRequiredComponent<HealthComponent_t>(receiver);
-    auto* infliHealth = g.template getRequiredComponent<HealthComponent_t>(inflicter);
-    if(!receivHealth || !infliHealth) return;
-
-    receivHealth->damage += infliHealth->damageInflicted;
-    infliHealth->damage += infliHealth->selfDamageOnInfliction;
-}
-
-template <typename GameCTX_t>
-constexpr void CollisionSystem_t<GameCTX_t>::undoCollision(GameCTX_t& g, ColliderComponent_t& solid, ColliderComponent_t& mobile) const noexcept {
-    auto* solidPhy = g.template getRequiredComponent<PhysicsComponent_t>(solid);
-    auto* mobilePhy = g.template getRequiredComponent<PhysicsComponent_t>(mobile);
-    if(!solidPhy || !mobilePhy) return;
-    
-    //Translate to screen coords
-    auto solidBox = move2ScreenCoords(solid.box, solidPhy->x, solidPhy->y);
-    auto mobileBox = move2ScreenCoords(mobile.box, mobilePhy->x, mobilePhy->y);
-
-    auto intervalIntersection = [](uint32_t Ml, uint32_t Mr, uint32_t Sl, uint32_t Sr) -> int32_t {
-        if(Ml < Sl) {
-            if(Mr < Sr)    return Sl - Mr;
-        } else if(Mr > Sr) return Sr - Ml;
-        return 0;
-    };
-
-    //Calculate intersection
-    struct { int32_t x,y; } overlap {
-        intervalIntersection(mobileBox.xLeft, mobileBox.xRight, solidBox.xLeft, solidBox.xRight)
-        ,intervalIntersection(mobileBox.yUp, mobileBox.yDown, solidBox.yUp, solidBox.yDown)
-    };
-
-    //Undo overlap
-    if ((overlap.x == 0) || ( overlap.y != 0 && std::abs(overlap.y) <= std::abs(overlap.x))) {
-        mobilePhy->y += overlap.y;
-        mobilePhy->vy = 0;
-    } else {
-        mobilePhy->x += overlap.x;
-        mobilePhy->vx = 0;
-    }
 }
 
 template <typename GameCTX_t>
@@ -98,12 +55,6 @@ constexpr void CollisionSystem_t<GameCTX_t>::react2Collision(GameCTX_t& g, Colli
     if(other->properties & CP::P_IsBall) {
         bounceBall(g, *other, *player);
     }
-
-    // if(other->properties & CP::P_Damages) {
-    //     inflictDamage(g, *other, *player);
-    // } else if(other->properties & CP::P_IsSolid) {
-    //     undoCollision(g, *other, *player);
-    // }
 }
 
 template <typename GameCTX_t>
@@ -112,7 +63,7 @@ constexpr bool CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderCompon
     auto b1 { move2ScreenCoords(c1.box, p1.x, p1.y) };
     auto b2 { move2ScreenCoords(c2.box, p2.x, p2.y) };
 
-    auto checkIntervals = [](uint32_t L1, uint32_t R1, uint32_t L2, uint32_t R2) {
+    auto checkIntervals = [](float L1, float R1, float L2, float R2) {
         if(L2 > R1) return false;
         if(L1 > R2) return false;
         return true;
@@ -129,7 +80,7 @@ constexpr bool CollisionSystem_t<GameCTX_t>::checkObjectCollision(ColliderCompon
 }
 
 template <typename GameCTX_t>
-constexpr BoundingBox_t CollisionSystem_t<GameCTX_t>::move2ScreenCoords(const BoundingBox_t& box, uint32_t x, uint32_t y) const noexcept {
+constexpr BoundingBox_t CollisionSystem_t<GameCTX_t>::move2ScreenCoords(const BoundingBox_t& box, float x, float y) const noexcept {
     BoundingBox_t screenBox {
         x + box.xLeft
     ,   x + box.xRight
@@ -151,8 +102,8 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const Colli
         }
         // p.x -= p.vx; p.vx = -p.vx;
     }
-    if(b.yUp > m_h || b.yDown > m_h) { 
-        p.y -= p.getVy();
+    if(b.yUp < 0 || b.yDown > m_h) { 
+        p.y -= p.vy;
         if(c.properties & ColliderComponent_t::P_IsBall) {
             p.vy = -p.vy;
         } else if(c.properties & ColliderComponent_t::P_IsPlayer) {

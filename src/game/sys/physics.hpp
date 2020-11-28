@@ -3,9 +3,9 @@
 
 struct CurrentPhysics_t {
     ECS::EntityID_t player_ID;
-    uint32_t x, y;
-    int32_t vx, vy;
-    int32_t aceleration;
+    float x, y;
+    float vx, vy;
+    float aceleration;
 };
 
 template<typename GameCTX_t>

@@ -40,19 +40,6 @@ struct GameManager_t : StateBase_t {
         GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
         GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
         GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
-        // GOFact.createEnemy(50, 200);
-        // GOFact.createEnemy(40, 20);
-        // GOFact.createSpawner(200, 1, 
-        //     [&](const SpawnerComponent_t& spw) {
-        //         const auto* phy = EntityMan.getRequiredComponent<PhysicsComponent_t>(spw);
-        //         if(!phy) return;
-        //         auto& e = GOFact.createEnemy(phy->x, phy->y);
-        //         auto* p = e.getComponent<PhysicsComponent_t>();
-        //         if(!p) return;
-        //         p->vx = -1; p->vy = 0;
-        //     }
-        // );
-        // GOFact.createPlayer(30, 100);
     };
 
     void update() final {
@@ -64,9 +51,8 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
         timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
-        // timer.timedCall("SPW", [&](){ Spawn.update(EntityMan); } );
-        // timer.waitUntil_ns(NSPF);
-        std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
+        timer.waitUntil_ns(NSPF);
+        // std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
 
         m_playing = !Input.isEscPressed();
         if(Input.isPausePressed())
@@ -108,7 +94,6 @@ private:
     InputSystem_t<ECS::EntityManager_t> Input {};
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
     ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
-    // SpawnSystem_t<ECS::EntityManager_t> Spawn {};
     const HealthSystem_t<ECS::EntityManager_t> Health {};
 
     ECS::EntityManager_t EntityMan;
