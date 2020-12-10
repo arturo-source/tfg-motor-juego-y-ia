@@ -56,8 +56,8 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
         if(phy) { // phy != nullptr
             phy->aceleration = 0;
-            if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.1;
-            if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.1;
+            if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
+            if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
         }
         dumpCSV(inp);
     }

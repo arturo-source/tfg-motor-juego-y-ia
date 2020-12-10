@@ -4,8 +4,8 @@
 template<typename GameCTX_t>
 bool PysicsSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
     for(auto& phy: g.template getComponents<PhysicsComponent_t>()) {
-        //Gravity
         phy.vy += phy.aceleration;
+        phy.vy *= phy.friction;
         //Keep velocity variable between min and max
         phy.vy = std::clamp(phy.vy, phy.KMinVy, phy.KMaxVy);
 

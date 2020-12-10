@@ -26,6 +26,10 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
         inp.key_DOWN = XK_l;
     }
     inp.side = side;
+    auto* phy = e.getComponent<PhysicsComponent_t>();
+    if(phy) {
+        phy->friction = 0.97;
+    }
     auto* col = e.getComponent<ColliderComponent_t>();
     if(col) {
         col->properties = ColliderComponent_t::P_IsPlayer;

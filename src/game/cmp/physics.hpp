@@ -11,6 +11,7 @@ struct PhysicsComponent_t : public ECS::ComponentBase_t<PhysicsComponent_t> {
     static constexpr float KMinVx    { -4 };
     static constexpr float KMaxVx    {  4 };
 
+    float friction {1};
     float x{0}, y{0};
     float vx{0}, vy{0};
     float aceleration { 0 };
