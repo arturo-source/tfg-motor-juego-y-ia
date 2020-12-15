@@ -8,6 +8,7 @@
 #include <game/cmp/spawner.hpp>
 #include <game/cmp/health.hpp>
 #include <game/cmp/score.hpp>
+#include <game/cmp/inteligence.hpp>
 
 struct GameObjectFactory_t {
     explicit GameObjectFactory_t(ECS::EntityManager_t& EntityMan) :
@@ -16,6 +17,7 @@ struct GameObjectFactory_t {
     
     ECS::Entity_t& createEntity(float x, float y, uint32_t w, uint32_t h, uint32_t color) const;
     ECS::Entity_t& createPalette(float x, float y, uint8_t side) const;
+    ECS::Entity_t& createPaletteAI(float x, float y, uint8_t side) const;
     ECS::Entity_t& createBall(float x, float y) const;
 private:
     ECS::EntityManager_t& m_EntMan;

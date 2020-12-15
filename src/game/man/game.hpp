@@ -11,6 +11,7 @@
 #include <game/sys/health.tpp>
 #include <game/sys/spawn.tpp>
 #include <game/sys/scoreboard.tpp>
+#include <game/sys/artificialinteligence.tpp>
 #include <game/cmp/collider.hpp>
 #include <game/util/gameobjectfactory.hpp>
 #include <game/util/timer.hpp>
@@ -34,9 +35,12 @@ private:
 };
 
 struct GameManager_t : StateBase_t {
-    explicit GameManager_t(StateManager_t& sm) : SM{sm} {
+    explicit GameManager_t(StateManager_t& sm, ArtificialInteligenceSystem_t<ECS::EntityManager_t>& ai) 
+    : SM{sm}, Physics{ai}, Input{ai}, ArtificialInteligence{ai}
+    {
         Input.initCSV(   findFilename("input", "csv") );
         Physics.initCSV( findFilename("physics", "csv") );
+        // GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
         GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
         GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
         GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
@@ -46,6 +50,7 @@ struct GameManager_t : StateBase_t {
         // Main Loop
         GameTimer_t timer;
         timer.timedCall("REN", [&](){ Render.update(EntityMan); } );
+        timer.timedCall("AIN", [&](){ ArtificialInteligence.update(EntityMan); } );
         timer.timedCall("INP", [&](){ Input.update(EntityMan); } );
         timer.timedCall("PHY", [&](){ Physics.update(EntityMan); } );
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
@@ -95,9 +100,10 @@ private:
 
     // Systems
     const RenderSystem_t<ECS::EntityManager_t> Render{kSCRWIDTH, kSCRHEIGHT};
-    PysicsSystem_t<ECS::EntityManager_t> Physics {};
-    InputSystem_t<ECS::EntityManager_t> Input {};
+    PysicsSystem_t<ECS::EntityManager_t> Physics;
+    InputSystem_t<ECS::EntityManager_t> Input;
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
+    ArtificialInteligenceSystem_t<ECS::EntityManager_t>& ArtificialInteligence;
     inline static ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
     // const HealthSystem_t<ECS::EntityManager_t> Health {};
 

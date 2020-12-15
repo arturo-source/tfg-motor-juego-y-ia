@@ -9,7 +9,7 @@ struct ReplayGame_t : StateBase_t {
 
     void readCSV(std::string& filename) {
         std::ifstream file(filename.c_str(), std::ios::binary);
-        if(!file) std::runtime_error("Can't open BIN file for read\n");
+        if(!file) throw std::runtime_error("Can't open BIN file for read\n");
         
         std::string line;
         std::getline(file,line); //Erase the first line of csv
@@ -36,7 +36,7 @@ struct ReplayGame_t : StateBase_t {
     void read(std::string& filename) {
         //Open BIN file
         std::ifstream file(filename.c_str(), std::ios::binary);
-        if(!file) std::runtime_error("Can't open BIN file for read\n");
+        if(!file) throw std::runtime_error("Can't open BIN file for read\n");
 
         //Calculate lenght
         std::size_t lenght = [&]() {
@@ -93,7 +93,8 @@ struct ReplayGame_t : StateBase_t {
     bool alive() { return m_playing; }
 
     StateManager_t& SM;
-    GameManager_t GM { SM };
+    ArtificialInteligenceSystem_t<ECS::EntityManager_t> AI;
+    GameManager_t GM { SM, AI };
     ECS::Keyboard_t& ms_Keyboard;
     std::vector<KeysPressed_t> inputKeys {};
     std::vector<KeysPressed_t>::iterator inputKeysIterator;

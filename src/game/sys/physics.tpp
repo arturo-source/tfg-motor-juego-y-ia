@@ -11,35 +11,20 @@ bool PysicsSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
         phy.x += phy.vx;
         phy.y += phy.vy;
-        dumpCSV(phy);
+
+        auto* inp = g.template getRequiredComponent<InputComponent_t>(phy);
+        if(inp) AI_system.dumpCSV(phy, inp->side);
+        else    AI_system.dumpCSV(phy, InputComponent_t::S_NoSide); //Ball doesnt have input
     }
     return true;
 }
 
 template<typename GameCTX_t>
-void PysicsSystem_t<GameCTX_t>::dumpBin(const PhysicsComponent_t& phy) const {
-    CurrentPhysics_t cp {
-        phy.getEntityID(),
-        phy.x, phy.y,
-        phy.vx, phy.vy,
-        phy.aceleration
-    };
-    std::ofstream file(filename.c_str(), std::ios::app | std::ios::binary);
-    file.write(reinterpret_cast<const char*>(&cp), sizeof(cp));
-    file.close();
-}
-
-template<typename GameCTX_t>
 void PysicsSystem_t<GameCTX_t>::initCSV(std::string fname) {
-    filename = fname;
-    std::ofstream file(filename.c_str(), std::ios::app);
-    file << "EntityID;x;y;vx;vy;aceleration\n";
-    file.close();
-}
+    AI_system.physicsfilename = fname;
+    std::ofstream file(fname.c_str(), std::ios::app);
+    if(!file) throw std::runtime_error("Can't open physics CSV file for write\n");
 
-template<typename GameCTX_t>
-void PysicsSystem_t<GameCTX_t>::dumpCSV(const PhysicsComponent_t& phy) const {
-    std::ofstream file(filename.c_str(), std::ios::app);
-    file << phy.getEntityID() << ";" << phy.x << ";" << phy.y << ";" << phy.vx << ";" << phy.vy << ";" << phy.aceleration << "\n";
+    file << "Side;x;y;vx;vy;aceleration\n";
     file.close();
 }

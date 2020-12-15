@@ -15,36 +15,19 @@ void InputSystem_t<GameCTX_t>::onkeyrelease(KeySym k) {
 }
 
 template<typename GameCTX_t>
-InputSystem_t<GameCTX_t>::InputSystem_t() {
+InputSystem_t<GameCTX_t>::InputSystem_t(ArtificialInteligenceSystem_t<GameCTX_t>& ai) : AI_system{ai} {
     ptc_set_on_keypress( onkeypress );
     ptc_set_on_keyrelease( onkeyrelease );
     ms_Keyboard.reset();
 }
 
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::dumpBin(const InputComponent_t& inp) const {
-    KeysPressed_t k {
-        inp.side,
-        ms_Keyboard.isKeyPressed(inp.key_UP),
-        ms_Keyboard.isKeyPressed(inp.key_DOWN)
-    };
-    std::ofstream file(filename.c_str(), std::ios::app | std::ios::binary);
-    file.write(reinterpret_cast<const char*>(&k), sizeof(k));
-    file.close();
-}
-
-template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::initCSV(const std::string fname) {
-    filename = fname;
-    std::ofstream file(filename.c_str(), std::ios::app);
-    file << "EntityID;kUP;kDOWN\n";
-    file.close();
-}
+    AI_system.keysfilename = fname;
+    std::ofstream file(fname.c_str(), std::ios::app);
+    if(!file) throw std::runtime_error("Can't open keys CSV file for write\n");
 
-template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::dumpCSV(const InputComponent_t& inp) const {
-    std::ofstream file(filename.c_str(), std::ios::app);
-    file << static_cast<int>(inp.side) << ";" << ms_Keyboard.isKeyPressed(inp.key_UP) << ";" << ms_Keyboard.isKeyPressed(inp.key_DOWN) << "\n";
+    file << "Side;kUP;kDOWN\n";
     file.close();
 }
 
@@ -54,12 +37,18 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
         auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
+        auto ic = g.template getRequiredComponent<InteligenceComponent_t>(inp);
         if(phy) { // phy != nullptr
             phy->aceleration = 0;
-            if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
-            if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
+            if(ic) { // ic != nullptr
+                if(ic->keyDOWN_pressed) phy->aceleration += 0.44;
+                if(ic->keyUP_pressed  ) phy->aceleration -= 0.44;
+            } else {
+                if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
+                if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
+            }
+            AI_system.dumpCSV(inp, ms_Keyboard);
         }
-        dumpCSV(inp);
     }
     return true;
 }
