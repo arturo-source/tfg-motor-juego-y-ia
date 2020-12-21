@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <game/man/game.hpp>
 #include <game/man/state.hpp>
-#include <game/man/replay.hpp>
+#include <game/util/artificialinteligence.hpp>
 
 struct MenuState_t : StateBase_t {
     explicit MenuState_t(StateManager_t& sm) : SM{sm} {}
@@ -16,22 +16,19 @@ MENU:
 1. Play
 2. Train
 3. Play against AI
-4. Replay game
 -. Exit
 [[ SELECT OPTION ]])";
         int opt;
         std::cin >> opt;
         std::string filename;
+        ArtificialInteligence_t AI {};
         switch (opt) {
-            case 1: SM.pushState<GameManager_t>(SM, AI); break;
+            case 1: SM.pushState<GameManager_t>(SM, false); break;
             case 2:
-                AI.train("CSVs/datainput0.csv", "CSVs/dataphysics0.csv");
-                break;
-            case 3: break;
-            case 4: 
                 filename = showOptions();
-                SM.pushState<ReplayGame_t>(SM, filename); 
+                AI.train(filename);
                 break;
+            case 3: SM.pushState<GameManager_t>(SM, true); break;
             default: m_Alive = false;
         }
     }
@@ -68,7 +65,6 @@ MENU:
 
     bool alive() final { return m_Alive; }
 private:
-    ArtificialInteligenceSystem_t<ECS::EntityManager_t> AI;
     bool m_Alive { true };
     StateManager_t& SM;
 };
@@ -81,7 +77,7 @@ int main() {
         while (States.alive()) {
             States.update();
         }
-    } catch(...) {
-        std::cout << "Capturada: \n";
+    } catch(const std::exception& ex) {
+        std::cout << "Capturada: " << ex.what() << "\n";
     }
 }

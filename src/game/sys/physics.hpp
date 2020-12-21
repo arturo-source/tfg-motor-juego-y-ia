@@ -5,12 +5,7 @@
 
 template<typename GameCTX_t>
 struct PysicsSystem_t {
-    explicit PysicsSystem_t(ArtificialInteligenceSystem_t<GameCTX_t>& ai) : 
-    AI_system{ai} 
-    {}
+    explicit PysicsSystem_t() = default;
 
     bool update(GameCTX_t& g) const;
-    void initCSV(std::string fname);
-private:
-    ArtificialInteligenceSystem_t<GameCTX_t>& AI_system {nullptr};
 };

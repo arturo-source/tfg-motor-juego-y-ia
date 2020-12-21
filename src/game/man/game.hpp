@@ -35,16 +35,36 @@ private:
 };
 
 struct GameManager_t : StateBase_t {
-    explicit GameManager_t(StateManager_t& sm, ArtificialInteligenceSystem_t<ECS::EntityManager_t>& ai) 
-    : SM{sm}, Physics{ai}, Input{ai}, ArtificialInteligence{ai}
+    explicit GameManager_t(StateManager_t& sm, bool ai) 
+    : SM{sm}, keyboard{Input.getKeyboard()}
     {
-        Input.initCSV(   findFilename("input", "csv") );
-        Physics.initCSV( findFilename("physics", "csv") );
-        // GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
-        GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+        against_ai = ai;
         GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
-        GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
+        ECS::Entity_t& ball = GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
+
+        if(against_ai) {
+            GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+        }
+        else {
+            ECS::Entity_t& player = GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+            filename = findFilename();
+            
+            ball_ptr   = ball.getComponent<PhysicsComponent_t>();
+            player_ptr = player.getComponent<PhysicsComponent_t>();
+            input_ptr  = player.getComponent<InputComponent_t>();
+        }
     };
+
+    void dumpCSV() const {
+        std::ofstream file(filename.c_str(), std::ios::app);
+        if(!ball_ptr || !player_ptr || !input_ptr) throw std::runtime_error("Missing player or ball pointer"); 
+        
+        file << player_ptr->x << ";" << player_ptr->y << ";" << player_ptr->vx << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
+        file << ball_ptr->x << ";" << ball_ptr->y << ";" << ball_ptr->vx << ";" << ball_ptr->vy << ";";
+        file << keyboard.isKeyPressed(input_ptr->key_UP) << ";" << keyboard.isKeyPressed(input_ptr->key_DOWN) << "\n";
+    
+        file.close();
+    }
 
     void update() final {
         // Main Loop
@@ -56,6 +76,7 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
         // timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
+        if(!against_ai) timer.timedCall("CSV", [&](){ dumpCSV(); } );
         // timer.waitUntil_ns(NSPF);
         std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
 
@@ -71,7 +92,7 @@ struct GameManager_t : StateBase_t {
 
     bool alive() final { return m_playing; }
 
-    std::string findFilename(const std::string_view toSystem, const std::string_view type) const {
+    std::string findFilename() const {
         std::stringstream filename;
         int num = 0;
         std::ifstream fi;
@@ -80,7 +101,7 @@ struct GameManager_t : StateBase_t {
         // Stop when data%s%d.bin doesnt exist
         while(fi_is_open) {
             filename.str("");
-            filename << "CSVs/data" << toSystem << num << "." << type;
+            filename << "CSVs/data" << num << ".csv";
             // sprintf(filename.data(), "data%s%d.bin", toSystem.data(), num);
             fi.open(filename.str());
             fi_is_open = fi.is_open();
@@ -103,9 +124,17 @@ private:
     PysicsSystem_t<ECS::EntityManager_t> Physics;
     InputSystem_t<ECS::EntityManager_t> Input;
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
-    ArtificialInteligenceSystem_t<ECS::EntityManager_t>& ArtificialInteligence;
+    ArtificialInteligenceSystem_t<ECS::EntityManager_t> ArtificialInteligence;
     inline static ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
     // const HealthSystem_t<ECS::EntityManager_t> Health {};
+
+    //Game references to dump to AI
+    PhysicsComponent_t* ball_ptr   {nullptr};
+    PhysicsComponent_t* player_ptr {nullptr};
+    InputComponent_t*   input_ptr  {nullptr};
+    ECS::Keyboard_t&    keyboard;
+    std::string         filename;
+    bool                against_ai;
 
     ECS::EntityManager_t EntityMan;
     GameObjectFactory_t GOFact { EntityMan };

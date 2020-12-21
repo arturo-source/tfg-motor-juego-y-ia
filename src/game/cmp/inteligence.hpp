@@ -1,6 +1,7 @@
 #pragma once
 #include <ecs/cmp/component.hpp>
 #include <fstream>
+#include <sstream>
 
 struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent_t> {
     explicit InteligenceComponent_t(ECS::EntityID_t eid) 
@@ -8,42 +9,42 @@ struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent
     {}
     
     using float_array = std::array<float, 10>;
-    float_array inputs {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-    float_array weights {
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-    };
-
-    int8_t output {0};
-    float threshold = 0;
-    inline static const char* filename = "weights.csv";
+    float_array weightsUp {};
+    float_array weightsDown {};
 
     bool keyUP_pressed { false };
     bool keyDOWN_pressed { false };
 
-    constexpr int8_t calculateOutput(float_array given_inputs) {
-        inputs = given_inputs;
+    enum {
+        Up   = 0x01,
+        Down = 0x02
+    };
+
+    constexpr bool calculateOutput(float_array given_inputs, int8_t side) {
         float totalSum = 0;
 
-        for(int32_t i = 0; i < inputs.size(); i++)
-            totalSum += inputs[i] * weights[i];
+        for(int32_t i = 0; i < given_inputs.size(); i++) {
+            if(side & Up)   totalSum += given_inputs[i] * weightsUp[i];
+            if(side & Down) totalSum += given_inputs[i] * weightsDown[i];
+        }
 
-        if(totalSum > threshold)
-            output = 1;
-        else
-            output = 0;
-
-        return output;
+        return totalSum > 0;
     }
     
     void setWeights() {
-        std::ifstream file(filename);
+        std::ifstream file("weights.csv");
         if(!file) throw std::runtime_error("Can't open weights CSV file for read\n");
+        readLine(file, weightsUp);
+        readLine(file, weightsDown);
+    }
+    void readLine(std::ifstream& file, float_array& weights) {
         std::string weight_str;
         uint32_t i = 0;
+        std::string line;
 
-        while(getline(file, weight_str, ';')) {
+        std::getline(file,line);
+        std::stringstream lineStream(line);
+        while(std::getline(lineStream, weight_str, ';')) {
             weights[i] = atof(weight_str.c_str());
             ++i;
         }

@@ -15,20 +15,10 @@ void InputSystem_t<GameCTX_t>::onkeyrelease(KeySym k) {
 }
 
 template<typename GameCTX_t>
-InputSystem_t<GameCTX_t>::InputSystem_t(ArtificialInteligenceSystem_t<GameCTX_t>& ai) : AI_system{ai} {
+InputSystem_t<GameCTX_t>::InputSystem_t() {
     ptc_set_on_keypress( onkeypress );
     ptc_set_on_keyrelease( onkeyrelease );
     ms_Keyboard.reset();
-}
-
-template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::initCSV(const std::string fname) {
-    AI_system.keysfilename = fname;
-    std::ofstream file(fname.c_str(), std::ios::app);
-    if(!file) throw std::runtime_error("Can't open keys CSV file for write\n");
-
-    file << "Side;kUP;kDOWN\n";
-    file.close();
 }
 
 template<typename GameCTX_t>
@@ -47,7 +37,6 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
                 if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
                 if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
             }
-            AI_system.dumpCSV(inp, ms_Keyboard);
         }
     }
     return true;
