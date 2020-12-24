@@ -31,8 +31,8 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         if(phy) { // phy != nullptr
             phy->aceleration = 0;
             if(ic) { // ic != nullptr
-                if(ic->keyDOWN_pressed) phy->aceleration += 0.44;
-                if(ic->keyUP_pressed  ) phy->aceleration -= 0.44;
+                if(ic->keyDOWN_pressed && !ic->keyUP_pressed) phy->aceleration += 0.44;
+                if(ic->keyUP_pressed && !ic->keyDOWN_pressed) phy->aceleration -= 0.44;
             } else {
                 if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
                 if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;

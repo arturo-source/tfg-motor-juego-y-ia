@@ -19,6 +19,7 @@ MENU:
 -. Exit
 [[ SELECT OPTION ]])";
         int opt;
+        int N;
         std::cin >> opt;
         std::string filename;
         ArtificialInteligence_t AI {};
@@ -26,7 +27,9 @@ MENU:
             case 1: SM.pushState<GameManager_t>(SM, false); break;
             case 2:
                 filename = showOptions();
-                AI.train(filename);
+                std::cout << "Times of training: ";
+                std::cin >> N;
+                AI.train(filename, N);
                 break;
             case 3: SM.pushState<GameManager_t>(SM, true); break;
             default: m_Alive = false;

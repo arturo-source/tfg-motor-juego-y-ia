@@ -39,27 +39,25 @@ struct GameManager_t : StateBase_t {
     : SM{sm}, keyboard{Input.getKeyboard()}
     {
         against_ai = ai;
-        GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
+        ECS::Entity_t* player = &GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
         ECS::Entity_t& ball = GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
 
-        if(against_ai) {
-            GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
-        }
-        else {
-            ECS::Entity_t& player = GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
-            filename = findFilename();
-            
-            ball_ptr   = ball.getComponent<PhysicsComponent_t>();
-            player_ptr = player.getComponent<PhysicsComponent_t>();
-            input_ptr  = player.getComponent<InputComponent_t>();
-        }
+        if(against_ai) GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+        else player = &GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+
+        filename   = findFilename();
+        ball_ptr   = ball.getComponent<PhysicsComponent_t>();
+        player_ptr = player->getComponent<PhysicsComponent_t>();
+        input_ptr  = player->getComponent<InputComponent_t>();
+
     };
 
     void dumpCSV() const {
         std::ofstream file(filename.c_str(), std::ios::app);
+        if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
         if(!ball_ptr || !player_ptr || !input_ptr) throw std::runtime_error("Missing player or ball pointer"); 
         
-        file << player_ptr->x << ";" << player_ptr->y << ";" << player_ptr->vx << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
+        file << player_ptr->y << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
         file << ball_ptr->x << ";" << ball_ptr->y << ";" << ball_ptr->vx << ";" << ball_ptr->vy << ";";
         file << keyboard.isKeyPressed(input_ptr->key_UP) << ";" << keyboard.isKeyPressed(input_ptr->key_DOWN) << "\n";
     
@@ -77,8 +75,8 @@ struct GameManager_t : StateBase_t {
         // timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
         if(!against_ai) timer.timedCall("CSV", [&](){ dumpCSV(); } );
-        // timer.waitUntil_ns(NSPF);
-        std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
+        timer.timedCall("[EXT]", [&](){ timer.waitUntil_ns(NSPF); } );
+        // std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
 
         m_playing = !Input.isEscPressed();
         if(Input.isPausePressed())

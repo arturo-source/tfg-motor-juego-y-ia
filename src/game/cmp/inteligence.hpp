@@ -8,7 +8,7 @@ struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent
         : ComponentBase_t(eid)
     {}
     
-    using float_array = std::array<float, 10>;
+    using float_array = std::array<float, 8>;
     float_array weightsUp {};
     float_array weightsDown {};
 
@@ -20,7 +20,7 @@ struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent
         Down = 0x02
     };
 
-    constexpr bool calculateOutput(float_array given_inputs, int8_t side) {
+    constexpr bool isKeyPressed(float_array given_inputs, int8_t side) {
         float totalSum = 0;
 
         for(int32_t i = 0; i < given_inputs.size(); i++) {

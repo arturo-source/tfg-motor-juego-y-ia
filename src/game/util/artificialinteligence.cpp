@@ -1,36 +1,94 @@
 #include <game/util/artificialinteligence.hpp>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <random>
 
-void ArtificialInteligence_t::train(const std::string& filename) {
+void ArtificialInteligence_t::train(const std::string& filename, const int32_t N) {
     readCSV(filename);
-    train(Up);
-    train(Down);
+    train(this->weightsUp, this->Up, N);
+    train(this->weightsDown, this->Down, N);
     dumpWeights();
 }
-void ArtificialInteligence_t::train(int8_t key) {
-    if(key & Up) {
-        for(CurrentMatchState_t& ms: matchStates) {
-            float_array given_physics = CurrentMatchState2array(ms);
-            int8_t output { calculatedOutput(weightsUp, given_physics) };
-            updateWeights(weightsUp, given_physics, output, ms.upPressed);
-        }
-    } else if(key & Down) {
-        for(CurrentMatchState_t& ms: matchStates) {
-            float_array given_physics = CurrentMatchState2array(ms);
-            int8_t output { calculatedOutput(weightsDown, given_physics) };
-            updateWeights(weightsDown, given_physics, output, ms.downPressed);
+
+auto ArtificialInteligence_t::adjust_dataset(const Vec_MS& states, const int8_t usedKey) const {
+    Vec_MS correctStates;
+    uint32_t keysPressedAdded = 0;
+    for(const CurrentMatchState_t& s: states) {
+        if(isKeyPressed(s, usedKey)) {
+            correctStates.push_back(s);
+            ++keysPressedAdded;
         }
     }
+    
+    if(keysPressedAdded > states.size()/2) throw std::runtime_error("Too much pressed keys in dataset.");
+
+    uint32_t notKeysPressedAdded = 0;
+    for(const CurrentMatchState_t& s: states) {
+        if(!isKeyPressed(s, usedKey)) {
+            correctStates.push_back(s);
+            if(++notKeysPressedAdded >= keysPressedAdded) break;
+        }
+    }
+
+    return correctStates;
 }
 
-constexpr ArtificialInteligence_t::float_array ArtificialInteligence_t::CurrentMatchState2array(CurrentMatchState_t& ms) const {
+auto ArtificialInteligence_t::calculateErrors(const Vec_MS& dataset, float_array& weights, const int8_t usedKey) const {
+    std::vector<uint32_t> errors;
+    uint32_t index = 0;
+
+    for(const CurrentMatchState_t& ms: dataset) {
+        bool isPressed { isKeyPressed(ms, usedKey) };
+        float_array given_physics { CurrentMatchState2array(ms) };
+        
+        int8_t perceptronOutput { calculateOutput(weights, given_physics) };
+        int8_t userOutput       { static_cast<int8_t>(isPressed ? 1 : -1) };
+        
+        if(userOutput != perceptronOutput) errors.push_back(index); 
+
+        ++index;
+    }
+
+    return errors;
+}
+
+void ArtificialInteligence_t::train(float_array& weights, const int8_t usedKey, const int32_t N) {
+    auto dataset { adjust_dataset(matchStates, usedKey) };
+
+    std::size_t currLessErrors { dataset.size() };
+    float_array bestWeights {}; //Pocket
+    std::default_random_engine randeng{ 0 }; //Seed is 0 to debug
+
+    for(uint32_t i = 0; i<N; ++i) {
+        auto errors { calculateErrors(dataset, weights, usedKey) };
+        if(errors.size() < currLessErrors) { 
+            bestWeights = weights;
+            currLessErrors = errors.size();
+            if(currLessErrors == 0) break; //Success on all example cases
+        }
+
+        const uint32_t randindex = errors[randeng()%errors.size()];
+        const float_array given_physics = CurrentMatchState2array(dataset[randindex]);
+        const int8_t addOrSubstract { isKeyPressed(dataset[randindex], usedKey) ? 1 : -1 };
+        updateWeights(weights, given_physics, addOrSubstract);
+    }
+
+    std::cout << "Total training fails: " << currLessErrors << "/" << dataset.size() << "\n";
+    weights = bestWeights;
+}
+
+constexpr bool ArtificialInteligence_t::isKeyPressed(const CurrentMatchState_t& ms, const int8_t usedKey) const {
+    return (usedKey == Up) ? ms.upPressed : ms.downPressed;
+}
+
+constexpr ArtificialInteligence_t::float_array ArtificialInteligence_t::CurrentMatchState2array(const CurrentMatchState_t& ms) const {
     return float_array {
-        1, ms.x, ms.y, ms.aceleration, ms.ballx, ms.bally, ms.ballVx, ms.ballVy
+        1, ms.y, ms.vy, ms.aceleration, ms.ballx, ms.bally, ms.ballVx, ms.ballVy
     }; //1st is threshold
 }
 
-constexpr int8_t ArtificialInteligence_t::calculatedOutput(float_array& weights, float_array& inputs) {
+constexpr int8_t ArtificialInteligence_t::calculateOutput(const float_array& weights, const float_array& inputs) const {
     float totalSum = 0;
     for(uint32_t i = 0; i < inputs.size(); i++) totalSum += inputs[i] * weights[i];
 
@@ -38,11 +96,9 @@ constexpr int8_t ArtificialInteligence_t::calculatedOutput(float_array& weights,
     return 1;
 }
 
-constexpr void ArtificialInteligence_t::updateWeights(float_array& weights, float_array& inputs, int8_t output, bool keyPressed) const {
-    int8_t desiredOutput { static_cast<int8_t>(keyPressed ? 1 : -1) };
-
-    for(int32_t i = 0; i < weights.size(); i++)
-        weights[i] = weights[i] + (desiredOutput-output)/2 * inputs[i]; //Peligroso modificar un atributo de la clase desde una funcion constante con un puntero??
+constexpr void ArtificialInteligence_t::updateWeights(float_array& weights, const float_array& inputs, const int8_t addOrSubstract) const {
+    for(uint32_t i = 0; i < weights.size(); i++)
+        weights[i] = weights[i] + addOrSubstract*inputs[i]; //Peligroso modificar un atributo de la clase desde una funcion constante con un puntero??
 }
 
 void ArtificialInteligence_t::dumpWeights() const {
@@ -70,17 +126,15 @@ void ArtificialInteligence_t::readCSV(const std::string& filename) {
     std::string line;
     while(std::getline(file,line)) {
         std::stringstream lineStream(line);
-        std::string x, y;
-        std::string vx, vy;
+        std::string y;
+        std::string vy;
         std::string aceleration;
         std::string ballx, bally;
         std::string ballVx, ballVy;
         std::string upPressed;
         std::string downPressed;
 
-        std::getline(lineStream, x, ';');
         std::getline(lineStream, y, ';');
-        std::getline(lineStream, vx, ';');
         std::getline(lineStream, vy, ';');
         std::getline(lineStream, aceleration, ';');
         std::getline(lineStream, ballx, ';');
@@ -91,9 +145,7 @@ void ArtificialInteligence_t::readCSV(const std::string& filename) {
         std::getline(lineStream, downPressed, ';');
 
         CurrentMatchState_t ms {
-            static_cast<float>(atof(x.c_str())),
             static_cast<float>(atof(y.c_str())),
-            static_cast<float>(atof(vx.c_str())),
             static_cast<float>(atof(vy.c_str())),
             static_cast<float>(atof(aceleration.c_str())),
             static_cast<float>(atof(ballx.c_str())),
