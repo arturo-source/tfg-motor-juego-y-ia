@@ -1,17 +1,17 @@
-#include <game/util/artificialinteligence.hpp>
+#include <game/util/aitrainer.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <random>
 
-void ArtificialInteligence_t::train(const std::string& filename, const int32_t N) {
+void AI_trainer_t::train(const std::string& filename, const int32_t N) {
     readCSV(filename);
     train(this->weightsUp, this->Up, N);
     train(this->weightsDown, this->Down, N);
     dumpWeights();
 }
 
-auto ArtificialInteligence_t::adjust_dataset(const Vec_MS& states, const int8_t usedKey) const {
+auto AI_trainer_t::adjust_dataset(const Vec_MS& states, const int8_t usedKey) const {
     Vec_MS correctStates;
     uint32_t keysPressedAdded = 0;
     for(const CurrentMatchState_t& s: states) {
@@ -34,7 +34,7 @@ auto ArtificialInteligence_t::adjust_dataset(const Vec_MS& states, const int8_t 
     return correctStates;
 }
 
-auto ArtificialInteligence_t::calculateErrors(const Vec_MS& dataset, float_array& weights, const int8_t usedKey) const {
+auto AI_trainer_t::calculateErrors(const Vec_MS& dataset, float_array& weights, const int8_t usedKey) const {
     std::vector<uint32_t> errors;
     uint32_t index = 0;
 
@@ -53,7 +53,7 @@ auto ArtificialInteligence_t::calculateErrors(const Vec_MS& dataset, float_array
     return errors;
 }
 
-void ArtificialInteligence_t::train(float_array& weights, const int8_t usedKey, const int32_t N) {
+void AI_trainer_t::train(float_array& weights, const int8_t usedKey, const int32_t N) {
     auto dataset { adjust_dataset(matchStates, usedKey) };
 
     std::size_t currLessErrors { dataset.size() };
@@ -78,17 +78,17 @@ void ArtificialInteligence_t::train(float_array& weights, const int8_t usedKey, 
     weights = bestWeights;
 }
 
-constexpr bool ArtificialInteligence_t::isKeyPressed(const CurrentMatchState_t& ms, const int8_t usedKey) const {
+constexpr bool AI_trainer_t::isKeyPressed(const CurrentMatchState_t& ms, const int8_t usedKey) const {
     return (usedKey == Up) ? ms.upPressed : ms.downPressed;
 }
 
-constexpr ArtificialInteligence_t::float_array ArtificialInteligence_t::CurrentMatchState2array(const CurrentMatchState_t& ms) const {
+constexpr AI_trainer_t::float_array AI_trainer_t::CurrentMatchState2array(const CurrentMatchState_t& ms) const {
     return float_array {
         1, ms.y, ms.vy, ms.aceleration, ms.ballx, ms.bally, ms.ballVx, ms.ballVy
     }; //1st is threshold
 }
 
-constexpr int8_t ArtificialInteligence_t::calculateOutput(const float_array& weights, const float_array& inputs) const {
+constexpr int8_t AI_trainer_t::calculateOutput(const float_array& weights, const float_array& inputs) const {
     float totalSum = 0;
     for(uint32_t i = 0; i < inputs.size(); i++) totalSum += inputs[i] * weights[i];
 
@@ -96,12 +96,12 @@ constexpr int8_t ArtificialInteligence_t::calculateOutput(const float_array& wei
     return 1;
 }
 
-constexpr void ArtificialInteligence_t::updateWeights(float_array& weights, const float_array& inputs, const int8_t addOrSubstract) const {
+constexpr void AI_trainer_t::updateWeights(float_array& weights, const float_array& inputs, const int8_t addOrSubstract) const {
     for(uint32_t i = 0; i < weights.size(); i++)
         weights[i] = weights[i] + addOrSubstract*inputs[i]; //Peligroso modificar un atributo de la clase desde una funcion constante con un puntero??
 }
 
-void ArtificialInteligence_t::dumpWeights() const {
+void AI_trainer_t::dumpWeights() const {
     std::ofstream file("weights.csv", std::ios::trunc);
     if(!file) throw std::runtime_error("Can't open weights CSV file for write\n");
     
@@ -119,7 +119,7 @@ void ArtificialInteligence_t::dumpWeights() const {
     file.close();
 }
 
-void ArtificialInteligence_t::readCSV(const std::string& filename) {
+void AI_trainer_t::readCSV(const std::string& filename) {
     std::ifstream file(filename.c_str());
     if(!file) throw std::runtime_error("Can't open physics CSV file for read\n");
     

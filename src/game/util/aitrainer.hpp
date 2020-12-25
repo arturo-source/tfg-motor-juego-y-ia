@@ -14,8 +14,8 @@ struct CurrentMatchState_t {
     bool  downPressed;
 };
 
-struct ArtificialInteligence_t {
-    explicit ArtificialInteligence_t() = default;
+struct AI_trainer_t {
+    explicit AI_trainer_t() = default;
     using float_array = std::array<float, 8>;
     using Vec_MS      = std::vector<CurrentMatchState_t>;
 

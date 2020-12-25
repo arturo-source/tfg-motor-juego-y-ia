@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <game/man/game.hpp>
 #include <game/man/state.hpp>
-#include <game/util/artificialinteligence.hpp>
+#include <game/util/aitrainer.hpp>
 
 struct MenuState_t : StateBase_t {
     explicit MenuState_t(StateManager_t& sm) : SM{sm} {}
@@ -22,7 +22,7 @@ MENU:
         int N;
         std::cin >> opt;
         std::string filename;
-        ArtificialInteligence_t AI {};
+        AI_trainer_t AI {};
         switch (opt) {
             case 1: SM.pushState<GameManager_t>(SM, false); break;
             case 2:

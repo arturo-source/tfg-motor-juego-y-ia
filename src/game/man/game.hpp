@@ -75,8 +75,8 @@ struct GameManager_t : StateBase_t {
         // timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
         if(!against_ai) timer.timedCall("CSV", [&](){ dumpCSV(); } );
-        timer.timedCall("[EXT]", [&](){ timer.waitUntil_ns(NSPF); } );
-        // std::cout << "[EXT]" << timer.waitUntil_ns(NSPF) << "\n";
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
 
         m_playing = !Input.isEscPressed();
         if(Input.isPausePressed())
