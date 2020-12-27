@@ -81,11 +81,6 @@ struct GameManager_t : StateBase_t {
         m_playing = !Input.isEscPressed();
         if(Input.isPausePressed())
             SM.pushState<PauseState_t>();
-
-        if(ScoreComponent_t::scored) {
-            ScoreComponent_t::scored = false;
-            Score.show(EntityMan);
-        }
     }
 
     bool alive() final { return m_playing; }

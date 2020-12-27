@@ -4,7 +4,6 @@
 #include <string>
 #include <picoPNG/src/picopng.hpp>
 #include <fstream>
-#include <iostream>
 #include <cstring>
 #include <ecs/cmp/component.hpp>
 #include <ecs/util/typealiases.hpp>

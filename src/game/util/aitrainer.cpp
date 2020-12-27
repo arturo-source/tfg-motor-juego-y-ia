@@ -70,7 +70,7 @@ void AI_trainer_t::train(float_array& weights, const int8_t usedKey, const int32
 
         const uint32_t randindex = errors[randeng()%errors.size()];
         const float_array given_physics = CurrentMatchState2array(dataset[randindex]);
-        const int8_t addOrSubstract { isKeyPressed(dataset[randindex], usedKey) ? 1 : -1 };
+        const int8_t addOrSubstract { static_cast<int8_t>(isKeyPressed(dataset[randindex], usedKey) ? 1 : -1) };
         updateWeights(weights, given_physics, addOrSubstract);
     }
 

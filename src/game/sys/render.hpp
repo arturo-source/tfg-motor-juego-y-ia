@@ -16,6 +16,7 @@ struct RenderSystem_t {
     //Constantes
     static constexpr uint32_t kB = 0x00444444;
 private:
+    constexpr void drawSprite(uint32_t* screen, const uint32_t* sprite, const uint32_t w, const uint32_t h) const;
     constexpr uint32_t* getScreenXY(float x, float y) const;
     const uint32_t m_w {0}, m_h{0};
     std::unique_ptr<uint32_t[]> m_framebuffer {nullptr};

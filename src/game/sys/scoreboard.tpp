@@ -12,13 +12,5 @@ void ScoreboardSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
             }
         }
     }
-}
-
-template<typename GameCTX_t>
-constexpr void ScoreboardSystem_t<GameCTX_t>::show(GameCTX_t& g) const { 
-    std::cout << "|";
-    for(auto& sco: g.template getComponents<ScoreComponent_t>()) {
-        std::cout << " Player" << sco.getEntityID() << ": " << sco.score << " |";
-    }
-    std::cout << "\n";
+    ScoreComponent_t::scored = false;
 }

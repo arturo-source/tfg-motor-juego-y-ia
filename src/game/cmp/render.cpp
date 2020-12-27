@@ -1,7 +1,6 @@
 #include <game/cmp/render.hpp>
 #include <tuple>
 #include <string_view>
-#include <iostream>
 
 auto loadPNGFileIntoVector(const std::string_view filename) {
     std::vector<unsigned char> pixels;

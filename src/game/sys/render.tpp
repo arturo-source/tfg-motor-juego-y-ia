@@ -7,6 +7,8 @@ extern "C" {
 #include <game/sys/render.hpp>
 #include <game/cmp/render.hpp>
 #include <game/cmp/physics.hpp>
+#include <game/cmp/score.hpp>
+#include <game/util/numbers.hpp>
 
 template<typename GameCTX_t>
 RenderSystem_t<GameCTX_t>::RenderSystem_t(uint32_t w, uint32_t h)
@@ -33,26 +35,34 @@ void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
 
     auto drawEntity = [&](const RenderComponent_t& ren) {
         const auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(ren);
+        const auto* sco = g.template getRequiredComponent<ScoreComponent_t>(ren);
         if(phy) { //phy != null
             auto screen = getScreenXY(phy->x, phy->y);
-            auto sprite_it = begin(ren.sprite);
-
-            uint32_t w {ren.w};
-            for(uint32_t j=0; j<ren.h; ++j) {
-                for(uint32_t i=0; i<w; ++i) {
-                    if(*sprite_it & 0xFF000000)
-                        *screen = *sprite_it;
-                    ++sprite_it;
-                    ++screen;
-                }
-                sprite_it += ren.w - w;
-                screen    += m_w - w;
+            auto sprite = ren.sprite.data();
+            
+            drawSprite(screen, sprite, ren.w, ren.h);
+            if(sco) {
+                screen = getScreenXY(phy->x, 10);
+                drawSprite(screen, RenderNumbers::numbers[sco->score], 6, 6);
             }
         }
     };
     auto& rencmps = g.template getComponents<RenderComponent_t>();
     
     std::for_each(begin(rencmps), end(rencmps), drawEntity);
+}
+
+template<typename GameCTX_t>
+constexpr void RenderSystem_t<GameCTX_t>::drawSprite(uint32_t* screen, const uint32_t* sprite, const uint32_t w, const uint32_t h) const {
+    for(uint32_t j=0; j<h; ++j) {
+        for(uint32_t i=0; i<w; ++i) {
+            if(*sprite & 0xFF000000)
+                *screen = *sprite;
+            ++sprite;
+            ++screen;
+        }
+        screen += m_w - w;
+    }
 }
 
 template<typename GameCTX_t>
