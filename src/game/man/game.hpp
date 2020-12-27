@@ -18,22 +18,6 @@
 #include <game/man/state.hpp>
 #include <ecs/man/entitymanager.tpp>
 
-struct PauseState_t : StateBase_t {
-    explicit PauseState_t() = default;
-    void update() final {
-        std::cout << R"(
-GAME PAUSED
-[[ TYPE IN SOMETHING ]])";
-        int opt;
-        std::cin >> opt;
-        std::cout << "Has pulsado " << opt << "\n";
-        m_alive = false;
-    }
-    bool alive() final { return m_alive; }
-private:
-    bool m_alive { true };
-};
-
 struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm, bool ai) 
     : SM{sm}, keyboard{Input.getKeyboard()}
@@ -68,19 +52,16 @@ struct GameManager_t : StateBase_t {
         // Main Loop
         GameTimer_t timer;
         timer.timedCall("REN", [&](){ Render.update(EntityMan); } );
-        timer.timedCall("AIN", [&](){ ArtificialInteligence.update(EntityMan); } );
+        if(against_ai)  timer.timedCall("AIN", [&](){ ArtificialInteligence.update(EntityMan); } );
         timer.timedCall("INP", [&](){ Input.update(EntityMan); } );
         timer.timedCall("PHY", [&](){ Physics.update(EntityMan); } );
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
-        // timer.timedCall("HEA", [&](){ Health.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
         if(!against_ai) timer.timedCall("CSV", [&](){ dumpCSV(); } );
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
         m_playing = !Input.isEscPressed();
-        if(Input.isPausePressed())
-            SM.pushState<PauseState_t>();
     }
 
     bool alive() final { return m_playing; }
@@ -91,11 +72,10 @@ struct GameManager_t : StateBase_t {
         std::ifstream fi;
         bool fi_is_open = true; 
 
-        // Stop when data%s%d.bin doesnt exist
+        // Stop when data%d.csv doesnt exist
         while(fi_is_open) {
             filename.str("");
             filename << "CSVs/data" << num << ".csv";
-            // sprintf(filename.data(), "data%s%d.bin", toSystem.data(), num);
             fi.open(filename.str());
             fi_is_open = fi.is_open();
             num++;
@@ -118,8 +98,7 @@ private:
     InputSystem_t<ECS::EntityManager_t> Input;
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
     ArtificialInteligenceSystem_t<ECS::EntityManager_t> ArtificialInteligence;
-    inline static ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
-    // const HealthSystem_t<ECS::EntityManager_t> Health {};
+    ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
 
     //Game references to dump to AI
     PhysicsComponent_t* ball_ptr   {nullptr};
