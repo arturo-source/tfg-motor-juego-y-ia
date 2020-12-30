@@ -24,12 +24,15 @@ auto AI_trainer_t::adjust_dataset(const Vec_MS& states, const int8_t usedKey) co
     if(keysPressedAdded > states.size()/2) throw std::runtime_error("Too much pressed keys in dataset.");
 
     uint32_t notKeysPressedAdded = 0;
-    for(const CurrentMatchState_t& s: states) {
+    std::default_random_engine randeng{ 0 }; //Seed is 0 to debug
+    while (notKeysPressedAdded != keysPressedAdded) {
+        const CurrentMatchState_t& s = states[randeng()%states.size()];
         if(!isKeyPressed(s, usedKey)) {
             correctStates.push_back(s);
-            if(++notKeysPressedAdded >= keysPressedAdded) break;
+            ++notKeysPressedAdded;
         }
     }
+    
 
     return correctStates;
 }
