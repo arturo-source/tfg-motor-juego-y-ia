@@ -16,5 +16,5 @@ struct ArtificialInteligenceSystem_t {
 
     void update(GameCTX_t& g) const;
 private:
-    constexpr bool isKeyPressed(InteligenceComponent_t &ic, const PhysicsComponent_t& playerPhysics, const PhysicsComponent_t& ballPhysics, int8_t side) const;
+    constexpr bool isKeyPressed(const PerceptronComponent_t &pc, const PhysicsComponent_t& playerPhysics, const PhysicsComponent_t& ballPhysics, int8_t side) const;
 };

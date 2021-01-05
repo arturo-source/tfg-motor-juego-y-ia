@@ -18,8 +18,8 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(float x, float y, uint32_t w, u
 
 ECS::Entity_t& GameObjectFactory_t::createPaletteAI(float x, float y, uint8_t side) const {
     auto& e = createPalette(x, y, side);
-    auto& ic = m_EntMan.addComponent<InteligenceComponent_t>(e);
-    ic.setWeights();
+    auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(e);
+    pc.setWeights();
     return e;
 }
 ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side) const {

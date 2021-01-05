@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent_t> {
-    explicit InteligenceComponent_t(ECS::EntityID_t eid) 
+struct PerceptronComponent_t : public ECS::ComponentBase_t<PerceptronComponent_t> {
+    explicit PerceptronComponent_t(ECS::EntityID_t eid) 
         : ComponentBase_t(eid)
     {}
     
@@ -20,7 +20,7 @@ struct InteligenceComponent_t : public ECS::ComponentBase_t<InteligenceComponent
         Down = 0x02
     };
 
-    constexpr bool isKeyPressed(float_array given_inputs, int8_t side) {
+    constexpr bool isKeyPressed(float_array given_inputs, int8_t side) const {
         float totalSum = 0;
 
         for(int32_t i = 0; i < given_inputs.size(); i++) {

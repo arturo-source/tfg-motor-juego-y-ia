@@ -11,21 +11,21 @@ void ArtificialInteligenceSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
     }
     if(!ballPhy) throw std::runtime_error("Ball physics missing in game.");
 
-    for(auto& ic: g.template getComponents<InteligenceComponent_t>()) {
-        auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(ic);
+    for(auto& pc: g.template getComponents<PerceptronComponent_t>()) {
+        auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(pc);
         if(!phy) continue;
 
-        ic.keyUP_pressed   = isKeyPressed(ic, *phy, *ballPhy, InteligenceComponent_t::Up);
-        ic.keyDOWN_pressed = isKeyPressed(ic, *phy, *ballPhy, InteligenceComponent_t::Down);
+        pc.keyUP_pressed   = isKeyPressed(pc, *phy, *ballPhy, PerceptronComponent_t::Up);
+        pc.keyDOWN_pressed = isKeyPressed(pc, *phy, *ballPhy, PerceptronComponent_t::Down);
     }
 }
 
 template<typename GameCTX_t>
-constexpr bool ArtificialInteligenceSystem_t<GameCTX_t>::isKeyPressed(InteligenceComponent_t &ic, const PhysicsComponent_t& playerPhysics, const PhysicsComponent_t& ballPhysics, int8_t side) const {
+constexpr bool ArtificialInteligenceSystem_t<GameCTX_t>::isKeyPressed(const PerceptronComponent_t &pc, const PhysicsComponent_t& playerPhysics, const PhysicsComponent_t& ballPhysics, int8_t side) const {
     std::array<float, 8> dataInputs {
         1, playerPhysics.y, playerPhysics.vy, playerPhysics.aceleration,
         ballPhysics.x, ballPhysics.y, ballPhysics.vx, ballPhysics.vy
     };
 
-    return ic.isKeyPressed(dataInputs, side);
+    return pc.isKeyPressed(dataInputs, side);
 }

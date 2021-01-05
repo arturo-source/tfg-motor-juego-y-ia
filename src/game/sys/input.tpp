@@ -27,12 +27,12 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
         auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
-        auto ic = g.template getRequiredComponent<InteligenceComponent_t>(inp);
+        auto pc = g.template getRequiredComponent<PerceptronComponent_t>(inp);
         if(phy) { // phy != nullptr
             phy->aceleration = 0;
-            if(ic) { // ic != nullptr
-                if(ic->keyDOWN_pressed && !ic->keyUP_pressed) phy->aceleration += 0.44;
-                if(ic->keyUP_pressed && !ic->keyDOWN_pressed) phy->aceleration -= 0.44;
+            if(pc) { // pc != nullptr
+                if(pc->keyDOWN_pressed && !pc->keyUP_pressed) phy->aceleration += 0.44;
+                if(pc->keyUP_pressed && !pc->keyDOWN_pressed) phy->aceleration -= 0.44;
             } else {
                 if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
                 if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
