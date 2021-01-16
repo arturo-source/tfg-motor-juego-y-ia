@@ -1,9 +1,9 @@
+#ifdef windows
+#include <windows.h>
+#else
+#include <X11/keysymdef.h>
+#endif
 #include <game/sys/input.hpp>
-#include <X11/X.h>
-#include <X11/keysym.h>
-extern "C" {
-    #include <tinyPTC/src/linux/tinyptc.h>
-}
 
 template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::onkeypress(KeySym k) {
@@ -44,10 +44,18 @@ bool InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
 template<typename GameCTX_t>
 bool InputSystem_t<GameCTX_t>::isEscPressed() {
+    #ifdef windows
+    return ms_Keyboard.isKeyPressed('\e');
+    #else
     return ms_Keyboard.isKeyPressed(XK_Escape);
+    #endif
 }
 
 template<typename GameCTX_t>
 bool InputSystem_t<GameCTX_t>::isPausePressed() {
+    #ifdef windows
+    return ms_Keyboard.isKeyPressed(' ');
+    #else
     return ms_Keyboard.isKeyPressed(XK_space);
+    #endif
 }

@@ -1,8 +1,13 @@
 #pragma once
+extern "C" {
+    #ifdef windows
+    #include <tinyPTC/src/windows/tinyptc.h>
+    #else
+    #include <tinyPTC/src/linux/tinyptc.h>
+    #endif
+}
 #include <cstdint>
 #include <ecs/cmp/component.hpp>
-#include <X11/X.h>
-#include <X11/keysym.h>
 
 struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     explicit InputComponent_t(ECS::EntityID_t eid) 
@@ -16,8 +21,11 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     };
     uint8_t side { S_NoSide };
 
-    // KeySym key_LEFT  {XK_a};
-    // KeySym key_RIGHT {XK_d};
+    #ifdef windows
+    KeySym key_UP    {'W'};
+    KeySym key_DOWN  {'S'};
+    #else
     KeySym key_UP    {XK_w};
     KeySym key_DOWN  {XK_s};
+    #endif
 };

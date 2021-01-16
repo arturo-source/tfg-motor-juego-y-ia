@@ -28,8 +28,13 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
     auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
     if(side & InputComponent_t::S_Right) {
+        #ifdef windows
+        inp.key_UP   = 'O';
+        inp.key_DOWN = 'L';
+        #else
         inp.key_UP   = XK_o;
         inp.key_DOWN = XK_l;
+        #endif  
     }
     inp.side = side;
     auto* phy = e.getComponent<PhysicsComponent_t>();

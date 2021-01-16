@@ -1,6 +1,12 @@
-#include <X11/X.h>
-#include <X11/keysym.h>
+extern "C" {
+    #ifdef windows
+    #include <tinyPTC/src/windows/tinyptc.h>
+    #else
+    #include <tinyPTC/src/linux/tinyptc.h>
+    #endif
+}
 #include <unordered_map>
+#include <iostream>
 
 namespace ECS {
 struct Keyboard_t {
@@ -30,6 +36,17 @@ private:
     // const OptIter getIterator(KeySym k) const noexcept;
     OptIter getIterator(KeySym k) noexcept;
     std::unordered_map<KeySym, bool> m_pressedKeys {
+        #ifdef windows
+        {'\t', false},
+        {'\e', false},
+        {' ',  false},
+        {'L',  false},
+        {'O',  false},
+        {'A',  false},
+        {'S',  false},
+        {'D',  false},
+        {'W',  false}
+        #else
         {XK_Tab,    false},
         {XK_Escape, false},
         {XK_space,  false},
@@ -39,7 +56,9 @@ private:
         {XK_s,      false},
         {XK_d,      false},
         {XK_w,      false}
-    };   
+        #endif
+        
+    };
 };
 
 } // namespace ECS

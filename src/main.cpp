@@ -58,10 +58,10 @@ MENU:
     
     std::vector<std::string> showFiles() {
         std::vector<std::string> options {};
-        uint pos = 0;
+        unsigned int pos = 0;
         for (const auto & entry : std::filesystem::directory_iterator("CSVs")) {
             std::cout << pos++ << ": " << entry.path() << "\n";
-            options.push_back(entry.path());
+            options.push_back(entry.path().string());
         }
         return options;
     }

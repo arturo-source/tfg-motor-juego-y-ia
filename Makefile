@@ -8,7 +8,7 @@
 #$(5) Compiler flags
 define COMPILE
 $(2) : $(3) $(4)
-	$(1) -c -o $(2) $(3) $(5)
+	$(1) -c -o $(2) $(3) $(5) -D$(OS)
 endef
 
 #$(1) Source file
@@ -34,7 +34,7 @@ MKDIR 	:= mkdir -p
 SRC 	:= src
 OBJ 	:= obj
 LIBDIR	:= lib
-LIB 	:= $(LIBDIR)/picoPNG/libpicopng.a $(LIBDIR)/tinyPTC/libtinyptc.a -lX11 -lXext
+LIB 	:= $(LIBDIR)/picoPNG/libpicopng.a $(LIBDIR)/tinyPTC/libtinyptc.a
 INCDIR	:= -I$(SRC) -I$(LIBDIR)
 
 ifeq ($(UNAME),Linux)
@@ -49,6 +49,8 @@ ifdef CROSSWIN
 	AR:=x86_64-w64-mingw32-ar
 	RANLIB:=x86_64-w64-mingw32-ranlib
 	OS:=windows
+else
+	LIB += -lX11 -lXext
 endif
 
 

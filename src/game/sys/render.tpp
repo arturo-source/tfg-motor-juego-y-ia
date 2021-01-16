@@ -1,5 +1,9 @@
 extern "C" {
+    #ifdef windows
+    #include <tinyPTC/src/windows/tinyptc.h>
+    #else
     #include <tinyPTC/src/linux/tinyptc.h>
+    #endif
 }
 #include <memory>
 #include <algorithm>

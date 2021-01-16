@@ -1,6 +1,5 @@
 #pragma once
 #include <ecs/util/typealiases.hpp>
-#include <game/cmp/input.hpp>
 #include <game/sys/artificialinteligence.hpp>
 
 template<typename GameCTX_t>
