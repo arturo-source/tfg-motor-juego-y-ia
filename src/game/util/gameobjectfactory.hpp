@@ -15,10 +15,12 @@ struct GameObjectFactory_t {
     m_EntMan(EntityMan)
      {}
     
-    ECS::Entity_t& createEntity(float x, float y, uint32_t w, uint32_t h, uint32_t color) const;
     ECS::Entity_t& createPalette(float x, float y, uint8_t side) const;
+    ECS::Entity_t& createMinion(float x, float y, uint8_t side) const;
     ECS::Entity_t& createPaletteAI(float x, float y, uint8_t side) const;
     ECS::Entity_t& createBall(float x, float y) const;
 private:
     ECS::EntityManager_t& m_EntMan;
+    ECS::Entity_t& createEntity(float x, float y, uint32_t w, uint32_t h, uint32_t color) const;
+    ECS::Entity_t& createPalette(float x, float y, uint32_t w, uint32_t h, uint32_t color, uint8_t side) const;
 };

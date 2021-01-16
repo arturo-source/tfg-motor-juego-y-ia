@@ -14,7 +14,7 @@ struct RenderSystem_t {
     void drawAllEntities(const GameCTX_t& g) const;
 
     //Constantes
-    static constexpr uint32_t kB = 0x00444444;
+    static constexpr uint32_t kB = 0xff00897b;
 private:
     constexpr void drawSprite(uint32_t* screen, const uint32_t* sprite, const uint32_t w, const uint32_t h) const;
     constexpr uint32_t* getScreenXY(float x, float y) const;
