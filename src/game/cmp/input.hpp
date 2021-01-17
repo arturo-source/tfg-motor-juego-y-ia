@@ -17,7 +17,8 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     enum {
         S_NoSide = 0x00,
         S_Left   = 0x01,
-        S_Right  = 0x02
+        S_Right  = 0x02,
+        S_Center = 0x04
     };
     uint8_t side { S_NoSide };
 

@@ -22,12 +22,16 @@ struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm, bool ai) 
     : SM{sm}, keyboard{Input.getKeyboard()}
     {
+        constexpr uint32_t leftTeamColor  { 0xFF81c784 };
+        constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
         against_ai = ai;
-        ECS::Entity_t* player = &GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right);
+        ECS::Entity_t* player = &GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right, rightTeamColor);
         ECS::Entity_t& ball = GOFact.createBall(kSCRWIDTH/2, kSCRHEIGHT/2);
+        ECS::Entity_t& Lminion = GOFact.createMinion(kSCRWIDTH/2 - 20,              30, InputComponent_t::S_Right | InputComponent_t::S_Center, rightTeamColor);
+        ECS::Entity_t& Rminion = GOFact.createMinion(kSCRWIDTH/2 + 20, kSCRHEIGHT - 30, InputComponent_t::S_Left  | InputComponent_t::S_Center, leftTeamColor);
 
-        if(against_ai) GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
-        else player = &GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left);
+        if(against_ai) GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left, leftTeamColor);
+        else player = &GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left, leftTeamColor);
 
         filename   = findFilename();
         ball_ptr   = ball.getComponent<PhysicsComponent_t>();
@@ -87,8 +91,8 @@ struct GameManager_t : StateBase_t {
     ECS::Keyboard_t& getKeyboard() { return Input.getKeyboard(); }
 private:
     //Game consts
-    static constexpr uint32_t kSCRWIDTH  {700};
-    static constexpr uint32_t kSCRHEIGHT {400};
+    static constexpr uint32_t kSCRWIDTH  {900};
+    static constexpr uint32_t kSCRHEIGHT {500};
     static constexpr uint64_t FPS  { 60 };
     static constexpr uint64_t NSPF { 1000000000/FPS };
 

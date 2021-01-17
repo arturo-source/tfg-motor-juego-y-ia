@@ -16,39 +16,50 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(float x, float y, uint32_t w, u
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPaletteAI(float x, float y, uint8_t side) const {
-    auto& e = createPalette(x, y, side);
+ECS::Entity_t& GameObjectFactory_t::createPaletteAI(float x, float y, uint8_t side, uint32_t color) const {
+    auto& e = createPalette(x, y, side, color);
     auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(e);
     pc.setWeights();
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side) const {
+ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side, uint32_t color) const {
     constexpr uint32_t w { 10 }, h { 100 };
-    constexpr uint32_t color { 0xFF81c784 };
     return createPalette(x, y, w, h, color, side);
 }
 
-ECS::Entity_t& GameObjectFactory_t::createMinion(float x, float y, uint8_t side) const {
+ECS::Entity_t& GameObjectFactory_t::createMinion(float x, float y, uint8_t side, uint32_t color) const {
     constexpr uint32_t w { 10 }, h { 50 };
-    constexpr uint32_t color { 0xFF006978 };
-    return createPalette(x, y, w, h, color, side);
+    auto& e = createPalette(x, y, w, h, color, side);
+    auto* phy = e.getComponent<PhysicsComponent_t>();
+    if(phy) {
+        phy->friction = 1;
+        phy->vy       = 1;
+    }
+    auto* col = e.getComponent<ColliderComponent_t>();
+    if(col) {
+        col->properties |= ColliderComponent_t::P_Bounces;
+    }
+
+    return e;
 }
 
 ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint32_t w, uint32_t h, uint32_t color, uint8_t side) const {
     auto& e = createEntity(x - w/2 , y - h/2, w, h, color);
     auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
+    if( ! (side & InputComponent_t::S_Center) ) {
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
-    if(side & InputComponent_t::S_Right) {
-        #ifdef windows
-        inp.key_UP   = 'O';
-        inp.key_DOWN = 'L';
-        #else
-        inp.key_UP   = XK_o;
-        inp.key_DOWN = XK_l;
-        #endif  
+        if(side & InputComponent_t::S_Right) {
+            #ifdef windows
+            inp.key_UP   = 'O';
+            inp.key_DOWN = 'L';
+            #else
+            inp.key_UP   = XK_o;
+            inp.key_DOWN = XK_l;
+            #endif  
+        }
+        inp.side = side;
     }
-    inp.side = side;
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
         phy->friction = 0.97;

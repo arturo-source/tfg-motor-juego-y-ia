@@ -130,7 +130,7 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const Colli
     }
     if(b.yUp < 0 || b.yDown > m_h) { 
         p.y -= p.vy;
-        if(c.properties & ColliderComponent_t::P_IsBall) {
+        if(c.properties & (ColliderComponent_t::P_IsBall | ColliderComponent_t::P_Bounces)) {
             p.vy = -p.vy;
         } else if(c.properties & ColliderComponent_t::P_IsPlayer) {
             p.vy = 0;

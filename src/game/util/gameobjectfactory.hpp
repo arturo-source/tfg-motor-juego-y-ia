@@ -15,9 +15,9 @@ struct GameObjectFactory_t {
     m_EntMan(EntityMan)
      {}
     
-    ECS::Entity_t& createPalette(float x, float y, uint8_t side) const;
-    ECS::Entity_t& createMinion(float x, float y, uint8_t side) const;
-    ECS::Entity_t& createPaletteAI(float x, float y, uint8_t side) const;
+    ECS::Entity_t& createPalette(float x, float y, uint8_t side, uint32_t color) const;
+    ECS::Entity_t& createMinion(float x, float y, uint8_t side, uint32_t color) const;
+    ECS::Entity_t& createPaletteAI(float x, float y, uint8_t side, uint32_t color) const;
     ECS::Entity_t& createBall(float x, float y) const;
 private:
     ECS::EntityManager_t& m_EntMan;
