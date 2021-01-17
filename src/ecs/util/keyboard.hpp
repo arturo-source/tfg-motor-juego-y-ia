@@ -11,6 +11,7 @@ extern "C" {
 namespace ECS {
 struct Keyboard_t {
     using OptIter = std::optional<std::unordered_map<KeySym, bool>::iterator>;
+    using ConstOptIter = std::optional<std::unordered_map<KeySym, bool>::const_iterator>;
 
     explicit Keyboard_t() = default;
 
@@ -19,7 +20,7 @@ struct Keyboard_t {
     Keyboard_t& operator=(const Keyboard_t&) = delete;
     Keyboard_t& operator=(Keyboard_t&&)      = delete;
 
-    bool isKeyPressed (KeySym k) noexcept;
+    bool isKeyPressed (KeySym k) const noexcept;
     void keyPressed(KeySym k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = true;
@@ -33,7 +34,7 @@ struct Keyboard_t {
             st = false;
     }
 private:
-    // const OptIter getIterator(KeySym k) const noexcept;
+    const ConstOptIter getIterator(KeySym k) const noexcept;
     OptIter getIterator(KeySym k) noexcept;
     std::unordered_map<KeySym, bool> m_pressedKeys {
         #ifdef windows

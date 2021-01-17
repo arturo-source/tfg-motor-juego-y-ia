@@ -25,8 +25,10 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     #ifdef windows
     KeySym key_UP    {'W'};
     KeySym key_DOWN  {'S'};
+    KeySym key_shoot {' '};
     #else
     KeySym key_UP    {XK_w};
     KeySym key_DOWN  {XK_s};
+    KeySym key_shoot {XK_space};
     #endif
 };

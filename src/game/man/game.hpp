@@ -11,6 +11,7 @@
 #include <game/sys/health.tpp>
 #include <game/sys/spawn.tpp>
 #include <game/sys/scoreboard.tpp>
+#include <game/sys/weapon.tpp>
 #include <game/sys/artificialinteligence.tpp>
 #include <game/cmp/collider.hpp>
 #include <game/util/gameobjectfactory.hpp>
@@ -20,7 +21,7 @@
 
 struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm, bool ai) 
-    : SM{sm}, keyboard{Input.getKeyboard()}
+    : SM{sm}, keyboard{Input.getKeyboard()}, Input{GOFact}
     {
         constexpr uint32_t leftTeamColor  { 0xFF81c784 };
         constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
@@ -61,6 +62,7 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("PHY", [&](){ Physics.update(EntityMan); } );
         timer.timedCall("COL", [&](){ Collision.update(EntityMan); } );
         timer.timedCall("SCO", [&](){ Score.update(EntityMan); } );
+        timer.timedCall("WEA", [&](){ Weapons.update(EntityMan); } );
         if(!against_ai) timer.timedCall("CSV", [&](){ dumpCSV(); } );
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
@@ -103,6 +105,7 @@ private:
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
     ArtificialInteligenceSystem_t<ECS::EntityManager_t> ArtificialInteligence;
     ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
+    WeaponSystem_t<ECS::EntityManager_t> Weapons;
 
     //Game references to dump to AI
     PhysicsComponent_t* ball_ptr   {nullptr};

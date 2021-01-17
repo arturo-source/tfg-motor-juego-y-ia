@@ -6,5 +6,5 @@ template<typename GameCTX_t>
 struct PysicsSystem_t {
     explicit PysicsSystem_t() = default;
 
-    bool update(GameCTX_t& g) const;
+    void update(GameCTX_t& g) const;
 };

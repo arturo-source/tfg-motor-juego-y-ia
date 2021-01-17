@@ -24,12 +24,27 @@ ECS::Entity_t& GameObjectFactory_t::createPaletteAI(float x, float y, uint8_t si
 }
 
 ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side, uint32_t color) const {
-    constexpr uint32_t w { 10 }, h { 100 };
-    return createPalette(x, y, w, h, color, side);
+    auto& e = createPalette(x, y, paletteW, paletteH, color, side);
+    auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
+    auto& weap = m_EntMan.addComponent<WeaponComponent_t>(e);
+
+    auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
+    if(side & InputComponent_t::S_Right) {
+        #ifdef windows
+        inp.key_UP   = 'O';
+        inp.key_DOWN = 'L';
+        #else
+        inp.key_UP   = XK_o;
+        inp.key_DOWN = XK_l;
+        #endif  
+    }
+    inp.side = side;
+
+    return e;
 }
 
 ECS::Entity_t& GameObjectFactory_t::createMinion(float x, float y, uint8_t side, uint32_t color) const {
-    constexpr uint32_t w { 10 }, h { 50 };
+    constexpr uint32_t w { paletteW }, h { paletteH/2 };
     auto& e = createPalette(x, y, w, h, color, side);
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
@@ -45,21 +60,7 @@ ECS::Entity_t& GameObjectFactory_t::createMinion(float x, float y, uint8_t side,
 }
 
 ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint32_t w, uint32_t h, uint32_t color, uint8_t side) const {
-    auto& e = createEntity(x - w/2 , y - h/2, w, h, color);
-    auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
-    if( ! (side & InputComponent_t::S_Center) ) {
-    auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
-        if(side & InputComponent_t::S_Right) {
-            #ifdef windows
-            inp.key_UP   = 'O';
-            inp.key_DOWN = 'L';
-            #else
-            inp.key_UP   = XK_o;
-            inp.key_DOWN = XK_l;
-            #endif  
-        }
-        inp.side = side;
-    }
+    auto& e = createEntity(x - w/2, y - h/2, w, h, color);
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
         phy->friction = 0.97;
@@ -71,6 +72,31 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint32_t w, 
     
     return e;
 }
+
+ECS::Entity_t& GameObjectFactory_t::createBullet(const PhysicsComponent_t& palette_phy, uint8_t side) const {
+    constexpr uint32_t w { 15 }, h { 5 };
+    constexpr float vx { 5 };
+    constexpr uint32_t color { 0xFFf44336 };
+    
+    auto& e = createEntity(palette_phy.x, palette_phy.y + paletteH/2, w, h, color);
+    auto* phy = e.getComponent<PhysicsComponent_t>();
+    if(phy) {
+        if( side & InputComponent_t::S_Left ) {
+            phy->vx = vx;
+            phy->x += paletteW;
+        }
+        if( side & InputComponent_t::S_Right ) {
+            phy->vx = -vx;
+            phy->x -= w;
+        }
+    }
+    auto* col = e.getComponent<ColliderComponent_t>();
+    if(col) {
+        col->properties = ColliderComponent_t::P_IsBullet;
+    }
+    return e;
+}
+
 ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y) const {
     constexpr uint32_t w { 10 }, h { 10 };
     auto& e = createEntity(x - w/2 , y - h/2, w, h, 0xFF005b4f);

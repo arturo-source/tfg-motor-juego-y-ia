@@ -18,7 +18,8 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
         P_Nothing = 0x00,
         P_IsPlayer = 0x01,
         P_Bounces = 0x02,
-        P_IsBall = 0x04
+        P_IsBall = 0x04,
+        P_IsBullet = 0x08
     };
 
     uint8_t properties { P_Nothing };
