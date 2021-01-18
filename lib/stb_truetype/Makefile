@@ -8,7 +8,7 @@
 #$(5) Compiler flags
 define COMPILE
 $(2) : $(3) $(4)
-	$(1) -c -o $(2) $(3) $(5) -D$(OS)
+	$(1) -c -o $(2) $(3) $(5)
 endef
 
 #$(1) Source file
@@ -25,17 +25,17 @@ endef
 ### CONFIG
 ##############
 UNAME 	:= $(shell uname)
-APP 	:= game
-CCFLAGS	:= $(CFLAGS) -std=c++17
-CFLAGS	:= -Wall -pedantic
+APP 	:= libtruetype.a
+CCFLAGS := -Wall -pedantic
+CFLAGS 	:= $(CCFLAGS)
 CC 		:= g++
 C 		:= gcc
+AR		:= ar
+ARFLAGS	:= -crs
+RANLIB	:= ranlib
 MKDIR 	:= mkdir -p
 SRC 	:= src
 OBJ 	:= obj
-LIBDIR	:= lib
-LIB 	:= $(LIBDIR)/picoPNG/libpicopng.a $(LIBDIR)/tinyPTC/libtinyptc.a $(LIBDIR)/stb_truetype/libtruetype.a
-INCDIR	:= -I$(SRC) -I$(LIBDIR)
 
 ifeq ($(UNAME),Linux)
 	OS := linux
@@ -49,8 +49,6 @@ ifdef CROSSWIN
 	AR:=x86_64-w64-mingw32-ar
 	RANLIB:=x86_64-w64-mingw32-ranlib
 	OS:=windows
-else
-	LIB += -lX11 -lXext
 endif
 
 
@@ -71,13 +69,14 @@ ALLOBJ 		:= $(foreach FILE,$(ALLCPPS) $(ALLCS),$(call C2O,$(FILE)))
 SUBDIRS 	:= $(shell find $(SRC) -type d)
 OBJSUBDIRS 	:= $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
 
-.PHONY: info, libs, libs-clean, libs-cleanall
+.PHONY: info
 
 $(APP) : $(OBJSUBDIRS) $(ALLOBJ)
-	$(CC) -o $(APP) $(ALLOBJ) $(LIB) $(CCFLAGS)
+	$(AR) $(ARFLAGS) $(APP) $(ALLOBJ)
+	$(RANLIB) $(APP)
 
-$(foreach FILE,$(ALLCPPS),$(eval $(call COMPILE,$(CC),$(call C2O,$(FILE)),$(FILE),$(call C2H,$(FILE)),$(CCFLAGS) $(INCDIR))))
-$(foreach FILE,$(ALLCS),$(eval $(call COMPILE,$(C),$(call C2O,$(FILE)),$(FILE),$(call C2H,$(FILE)),$(CFLAGS) $(INCDIR))))
+$(foreach FILE,$(ALLCPPS),$(eval $(call COMPILE,$(CC),$(call C2O,$(FILE)),$(FILE),$(call C2H,$(FILE)),$(CCFLAGS))))
+$(foreach FILE,$(ALLCS),$(eval $(call COMPILE,$(C),$(call C2O,$(FILE)),$(FILE),$(call C2H,$(FILE)),$(CFLAGS))))
 
 info :
 	$(info $(SUBDIRS))
@@ -94,13 +93,3 @@ clean:
 
 cleanall: clean
 	rm "./$(APP)"
-
-##Lib makefiles
-libs:
-	$(MAKE) -C $(LIBDIR)
-
-libs-clean:
-	$(MAKE) -C $(LIBDIR) clean
-
-libs-cleanall:
-	$(MAKE) -C $(LIBDIR) cleanall
