@@ -19,7 +19,7 @@ bool CollisionSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
         auto& c1 { ColCmpVec[i] };
         auto* p1 = g.template getRequiredComponent<PhysicsComponent_t>(c1);
         if(!p1) continue; // p1 == nullptr
-        checkBoundaryCollisions(c1, *p1);
+        checkBoundaryCollisions(g, c1, *p1);
         
         for(std::size_t j=i+1; j<ColCmpVec.size(); ++j) {
             auto& c2 { ColCmpVec[j] };
@@ -71,13 +71,25 @@ constexpr void CollisionSystem_t<GameCTX_t>::bounceBall(GameCTX_t& g, ColliderCo
 template <typename GameCTX_t>
 constexpr void CollisionSystem_t<GameCTX_t>::react2Collision(GameCTX_t& g, ColliderComponent_t& c1, ColliderComponent_t& c2) const noexcept {
     using CP = ColliderComponent_t;
-    CP *player { &c1 }, *other { &c2 };
 
-    if(c2.properties & CP::P_IsPlayer) { std::swap(player, other); }
-    else if(!(c1.properties & CP::P_IsPlayer)) return;
+    if(c1.properties & CP::P_IsBall) {
+        if(c2.properties & CP::P_Bounces) bounceBall(g, c1, c2);
+        if(c2.properties & CP::P_IsWall) {
+            g.destroyEntityByID(c2.getEntityID()); 
+            return;
+        }
+    } else if(c2.properties & CP::P_IsBall) {
+        if(c1.properties & CP::P_Bounces) bounceBall(g, c2, c1);
+        if(c1.properties & CP::P_IsWall) {
+            g.destroyEntityByID(c1.getEntityID());
+            return;
+        }
+    }
 
-    if(other->properties & CP::P_IsBall) {
-        bounceBall(g, *other, *player);
+    if(c1.properties & CP::P_IsBullet) {
+        g.destroyEntityByID(c1.getEntityID());
+    } else if(c2.properties & CP::P_IsBullet) {
+        g.destroyEntityByID(c2.getEntityID());
     }
 }
 
@@ -115,10 +127,11 @@ constexpr BoundingBox_t CollisionSystem_t<GameCTX_t>::move2ScreenCoords(const Bo
 }
 
 template <typename GameCTX_t>
-constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const ColliderComponent_t& c, PhysicsComponent_t& p) const noexcept {
+constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(GameCTX_t& g, const ColliderComponent_t& c, PhysicsComponent_t& p) const noexcept {
+    using CP = ColliderComponent_t;
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
     if(b.xLeft < 0 || b.xRight > m_w) { 
-        if(c.properties & ColliderComponent_t::P_IsBall) {
+        if(c.properties & CP::P_IsBall) {
             ScoreComponent_t::scorePosX = p.x;
             ScoreComponent_t::scored = true;
             
@@ -126,14 +139,16 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(const Colli
             p.x = m_w/2;
             p.y = m_h/2;
             p.vy = 0;
+        } else if(c.properties & CP::P_IsBullet) {
+            g.destroyEntityByID(c.getEntityID());
         }
     }
     if(b.yUp < 0 || b.yDown > m_h) { 
         p.y -= p.vy;
-        if(c.properties & (ColliderComponent_t::P_IsBall | ColliderComponent_t::P_Bounces)) {
-            p.vy = -p.vy;
-        } else if(c.properties & ColliderComponent_t::P_IsPlayer) {
+        if(c.properties & CP::P_IsPlayer) {
             p.vy = 0;
+        } else if(c.properties & CP::P_Bounces) {
+            p.vy = -p.vy;
         }
     }
 }

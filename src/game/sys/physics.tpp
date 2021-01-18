@@ -11,5 +11,6 @@ void PysicsSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
         phy.x += phy.vx;
         phy.y += phy.vy;
+        phy.aceleration = 0;
     }
 }

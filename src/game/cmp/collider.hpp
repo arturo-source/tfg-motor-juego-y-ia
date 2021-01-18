@@ -15,11 +15,12 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
     {}
 
     enum {
-        P_Nothing = 0x00,
+        P_Nothing  = 0x00,
         P_IsPlayer = 0x01,
-        P_Bounces = 0x02,
-        P_IsBall = 0x04,
-        P_IsBullet = 0x08
+        P_Bounces  = 0x02,
+        P_IsBall   = 0x04,
+        P_IsBullet = 0x08,
+        P_IsWall   = 0x10
     };
 
     uint8_t properties { P_Nothing };

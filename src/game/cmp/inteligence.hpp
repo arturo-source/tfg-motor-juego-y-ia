@@ -12,9 +12,6 @@ struct PerceptronComponent_t : public ECS::ComponentBase_t<PerceptronComponent_t
     float_array weightsUp {};
     float_array weightsDown {};
 
-    bool keyUP_pressed { false };
-    bool keyDOWN_pressed { false };
-
     enum {
         Up   = 0x01,
         Down = 0x02

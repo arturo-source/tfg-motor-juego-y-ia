@@ -29,24 +29,17 @@ void InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
         auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
-        auto pc = g.template getRequiredComponent<PerceptronComponent_t>(inp);
         if(phy) { // phy != nullptr
-            phy->aceleration = 0;
-            if(pc) { // pc != nullptr
-                if(pc->keyDOWN_pressed && !pc->keyUP_pressed) phy->aceleration += 0.44;
-                if(pc->keyUP_pressed && !pc->keyDOWN_pressed) phy->aceleration -= 0.44;
-            } else {
-                if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration += 0.44;
-                if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration -= 0.44;
+            if(ms_Keyboard.isKeyPressed(inp.key_DOWN)) phy->aceleration =  0.44;
+            if(ms_Keyboard.isKeyPressed(inp.key_UP)  ) phy->aceleration = -0.44;
 
-                auto weap = g.template getRequiredComponent<WeaponComponent_t>(inp);
-                if(weap != nullptr && weap->shoot_cooldown == 0 && weap->bullets > 0
-                   && ms_Keyboard.isKeyPressed(inp.key_shoot)) 
-                {
-                    m_GOFactory.createBullet(*phy, inp.side);
-                    weap->setCooldown();
-                    --(weap->bullets);
-                }
+            auto weap = g.template getRequiredComponent<WeaponComponent_t>(inp);
+            if(weap != nullptr && weap->shoot_cooldown == 0 && weap->bullets > 0
+                && ms_Keyboard.isKeyPressed(inp.key_shoot)) 
+            {
+                m_GOFactory.createBullet(*phy, inp.side);
+                weap->setCooldown();
+                --(weap->bullets);
             }
         }
     }
