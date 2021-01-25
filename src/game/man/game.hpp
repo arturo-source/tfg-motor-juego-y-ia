@@ -17,15 +17,15 @@
 #include <game/util/gameobjectfactory.hpp>
 #include <game/util/timer.hpp>
 #include <game/man/state.hpp>
+#include <game/man/menu.hpp>
 #include <ecs/man/entitymanager.tpp>
 
 struct GameManager_t : StateBase_t {
-    explicit GameManager_t(StateManager_t& sm, bool ai) 
-    : SM{sm}, keyboard{Input.getKeyboard()}, Input{GOFact}
+    explicit GameManager_t(StateManager_t& sm) 
+    : SM{sm}, Input{GOFact}
     {
         constexpr uint32_t leftTeamColor  { 0xFF81c784 };
         constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
-        against_ai = ai;
         
         ECS::Entity_t* player = &GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right, rightTeamColor);
         ECS::Entity_t& Lball = GOFact.createBall(            100, kSCRHEIGHT/2);
@@ -53,7 +53,7 @@ struct GameManager_t : StateBase_t {
         
         file << player_ptr->y << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
         file << ball_ptr->x << ";" << ball_ptr->y << ";" << ball_ptr->vx << ";" << ball_ptr->vy << ";";
-        file << keyboard.isKeyPressed(input_ptr->key_UP) << ";" << keyboard.isKeyPressed(input_ptr->key_DOWN) << "\n";
+        file << Input.getKeyboard().isKeyPressed(input_ptr->key_UP) << ";" << Input.getKeyboard().isKeyPressed(input_ptr->key_DOWN) << "\n";
     
         file.close();
     }
@@ -72,7 +72,8 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
-        m_playing = !Input.isEscPressed();
+        if(Input.isEscPressed())
+            SM.pushState<MenuState_t>(SM, Render, Input, m_playing);
     }
 
     bool alive() final { return m_playing; }
@@ -116,9 +117,8 @@ private:
     PhysicsComponent_t* ball_ptr   {nullptr};
     PhysicsComponent_t* player_ptr {nullptr};
     InputComponent_t*   input_ptr  {nullptr};
-    ECS::Keyboard_t&    keyboard;
     std::string         filename;
-    bool                against_ai;
+    bool                against_ai { true };
 
     ECS::EntityManager_t EntityMan;
     GameObjectFactory_t GOFact { EntityMan };

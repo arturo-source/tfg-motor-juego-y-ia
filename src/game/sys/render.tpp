@@ -7,6 +7,8 @@ extern "C" {
 }
 #include <memory>
 #include <algorithm>
+#include <fstream>
+#include <vector>
 #include <ecs/man/entitymanager.hpp>
 #include <game/sys/render.hpp>
 #include <game/cmp/render.hpp>
@@ -19,6 +21,7 @@ RenderSystem_t<GameCTX_t>::RenderSystem_t(uint32_t w, uint32_t h)
 : m_w{w}, m_h{h}
 , m_framebuffer{std::make_unique<uint32_t[]>(m_w*m_h)} 
 {
+    loadFonts("/usr/share/fonts/TTF/OpenSans-Regular.ttf");
     ptc_open("window", w, h);
 }
 template<typename GameCTX_t>
@@ -70,13 +73,79 @@ constexpr void RenderSystem_t<GameCTX_t>::drawSprite(uint32_t* screen, const uin
 }
 
 template<typename GameCTX_t>
-bool RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
+void RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
     const auto size = m_w*m_h;
-    std::fill(screen, screen + size, kB);
+    std::fill(screen, screen + size, backgroungColor);
     drawAllEntities(g);
     
     ptc_update(screen);
+}
 
-    return !ptc_process_events();
+template<typename GameCTX_t>
+constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, uint32_t *screen, const uint32_t height, const uint32_t width) const {
+    unsigned char bitmap[height][width] = {0};
+
+    int i,j,ascent,baseline,ch=0;
+    float scale, xpos=2;
+
+    scale = stbtt_ScaleForPixelHeight(&font, height);
+    stbtt_GetFontVMetrics(&font, &ascent,0,0);
+    baseline = (int) (ascent*scale);
+
+    while(text[ch]) {
+        int advance,lsb,x0,y0,x1,y1;
+        float x_shift = xpos - (float) floor(xpos);
+        stbtt_GetCodepointHMetrics(&font, text[ch], &advance, &lsb);
+        stbtt_GetCodepointBitmapBoxSubpixel(&font, text[ch], scale,scale,x_shift,0, &x0,&y0,&x1,&y1);
+        stbtt_MakeCodepointBitmapSubpixel(&font, &bitmap[baseline + y0][(int) xpos + x0], x1-x0,y1-y0, width, scale,scale,x_shift,0, text[ch]);
+        xpos += (advance * scale);
+        if (text[ch+1])
+            xpos += scale*stbtt_GetCodepointKernAdvance(&font, text[ch],text[ch+1]);
+        ++ch;
+    }
+
+    for(int i = 0; i < height; ++i) {
+        for(int j = 0; j < width; ++j, ++screen) {
+            if(bitmap[i][j]) *screen = bitmap[i][j] << 24;
+        }
+        screen += m_w - width;
+    }
+}
+
+template<typename GameCTX_t>
+void RenderSystem_t<GameCTX_t>::drawAllOptions(uint32_t *screen) const {
+    std::vector<std::string> options{
+        "1. Play",
+        "2. Train",
+        "3. Play against AI",
+        "4. Exit"
+    };
+    constexpr uint32_t text_height=60, text_width=400;
+    for(auto& o: options) {
+        drawOption(o, screen + (m_w-text_width)/2, text_height, text_width);
+        screen += m_w * text_height;
+    }
+}
+
+template<typename GameCTX_t>
+void RenderSystem_t<GameCTX_t>::updateMenu() const {
+    auto screen = m_framebuffer.get();
+    const auto size = m_w*m_h;
+    std::fill(screen, screen + size, backgroungColor);
+    drawAllOptions(screen);
+
+    ptc_update(screen);
+}
+
+template<typename GameCTX_t>
+void RenderSystem_t<GameCTX_t>::loadFonts(const std::string_view filename) {
+    std::ifstream file(filename.data(), std::ios::binary);
+    if(!file.is_open()) throw std::runtime_error("Error reading fonts file.");
+    
+    static const std::vector<unsigned char> filevec(
+        std::istreambuf_iterator<char>{file},
+        std::istreambuf_iterator<char>{}
+    );
+   stbtt_InitFont(&font, filevec.data(), stbtt_GetFontOffsetForIndex(filevec.data(),0));
 }

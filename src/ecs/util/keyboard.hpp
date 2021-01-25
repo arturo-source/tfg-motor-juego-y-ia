@@ -46,7 +46,13 @@ private:
         {'A',  false},
         {'S',  false},
         {'D',  false},
-        {'W',  false}
+        {'W',  false},
+        {'0',  false},
+        {'1',  false},
+        {'2',  false},
+        {'3',  false},
+        {'4',  false},
+        {'5',  false}
         #else
         {XK_Tab,    false},
         {XK_Escape, false},
@@ -56,7 +62,13 @@ private:
         {XK_a,      false},
         {XK_s,      false},
         {XK_d,      false},
-        {XK_w,      false}
+        {XK_w,      false},
+        {XK_0,      false},
+        {XK_1,      false},
+        {XK_2,      false},
+        {XK_3,      false},
+        {XK_4,      false},
+        {XK_5,      false}
         #endif
         
     };
