@@ -46,29 +46,22 @@ private:
         {'A',  false},
         {'S',  false},
         {'D',  false},
-        {'W',  false},
-        {'0',  false},
-        {'1',  false},
-        {'2',  false},
-        {'3',  false},
-        {'4',  false},
-        {'5',  false}
+        {'W',  false} //Añadir Up Down Left Right e Intro
         #else
         {XK_Tab,    false},
         {XK_Escape, false},
         {XK_space,  false},
+        {XK_Return, false},
         {XK_l,      false},
         {XK_o,      false},
         {XK_a,      false},
         {XK_s,      false},
         {XK_d,      false},
         {XK_w,      false},
-        {XK_0,      false},
-        {XK_1,      false},
-        {XK_2,      false},
-        {XK_3,      false},
-        {XK_4,      false},
-        {XK_5,      false}
+        {XK_Up,     false},
+        {XK_Down,   false},
+        {XK_Left,   false},
+        {XK_Right,  false}
         #endif
         
     };

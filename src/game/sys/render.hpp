@@ -17,15 +17,15 @@ struct RenderSystem_t {
     void update(const GameCTX_t& g) const;
     void drawAllEntities(const GameCTX_t& g) const;
     
-    void updateMenu() const;
+    void updateMenu(const std::vector<std::string> options, uint8_t selected_option) const;
 
     //Constantes
     static constexpr uint32_t backgroungColor = 0xff00897b;
 private:
     constexpr void drawSprite(uint32_t* screen, const uint32_t* sprite, const uint32_t w, const uint32_t h) const;
     constexpr uint32_t* getScreenXY(float x, float y) const;
-    constexpr void drawOption(const std::string text, uint32_t *screen, const uint32_t height, const uint32_t width) const;
-    void drawAllOptions(uint32_t *screen) const;
+    constexpr void drawOption(const std::string text, const uint32_t color, uint32_t *screen, const uint32_t height, const uint32_t width) const;
+    
     void loadFonts(const std::string_view filename);
     
     stbtt_fontinfo font;

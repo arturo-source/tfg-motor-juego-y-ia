@@ -9,8 +9,11 @@ struct InputSystem_t {
     explicit InputSystem_t(GameObjectFactory_t& GOFactory);
 
     void update(GameCTX_t& g) const;
-    constexpr bool isEscPressed()  const;
-    constexpr int  numberPressed() const;
+    constexpr bool isEscPressed() const;
+    constexpr bool isKeyPressed(KeySym k) const {
+        ptc_process_events();
+        return ms_Keyboard.isKeyPressed(k);
+    }
     
     static ECS::Keyboard_t& getKeyboard() { return ms_Keyboard; }
 private:

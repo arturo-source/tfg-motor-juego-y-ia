@@ -53,19 +53,3 @@ constexpr bool InputSystem_t<GameCTX_t>::isEscPressed() const {
     return ms_Keyboard.isKeyPressed(XK_Escape);
     #endif
 }
-
-template<typename GameCTX_t>
-constexpr int InputSystem_t<GameCTX_t>::numberPressed() const {
-    ptc_process_events();
-    #ifdef windows
-    constexpr char zero = '0';
-    #else
-    constexpr KeySym zero = XK_0;
-    #endif
-    int number { -1 };
-
-    for (uint32_t i = 0; i <= 5; i++)
-        if(ms_Keyboard.isKeyPressed(zero + i)) number = i;
-
-    return number;
-}

@@ -83,7 +83,28 @@ void RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
 }
 
 template<typename GameCTX_t>
-constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, uint32_t *screen, const uint32_t height, const uint32_t width) const {
+void RenderSystem_t<GameCTX_t>::updateMenu(const std::vector<std::string> options, uint8_t selected_option) const {
+    constexpr uint32_t text_height=60, text_width=400;
+    const uint32_t options_per_page { m_h/text_height }, page { selected_option/options_per_page };
+
+    auto screen = m_framebuffer.get();
+    const auto size = m_w*m_h;
+
+    std::fill(screen, screen + size, backgroungColor);
+    for(uint8_t i = page * options_per_page; i < (page+1) * options_per_page && i < options.size(); ++i) {
+        if(i != selected_option) 
+            drawOption(options[i], 0xff000000, screen + (m_w-text_width)/2, text_height, text_width);
+        else
+            drawOption(options[i], 0xff56c8d8, screen + (m_w-text_width)/2, text_height, text_width);
+            
+        screen += m_w * text_height;
+    }
+
+    ptc_update(m_framebuffer.get());
+}
+
+template<typename GameCTX_t>
+constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, const uint32_t color, uint32_t *screen, const uint32_t height, const uint32_t width) const {
     unsigned char bitmap[height][width] = {0};
 
     int i,j,ascent,baseline,ch=0;
@@ -107,35 +128,10 @@ constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, uin
 
     for(int i = 0; i < height; ++i) {
         for(int j = 0; j < width; ++j, ++screen) {
-            if(bitmap[i][j]) *screen = bitmap[i][j] << 24;
+            if(bitmap[i][j]) *screen = color;
         }
         screen += m_w - width;
     }
-}
-
-template<typename GameCTX_t>
-void RenderSystem_t<GameCTX_t>::drawAllOptions(uint32_t *screen) const {
-    std::vector<std::string> options{
-        "1. Play",
-        "2. Train",
-        "3. Play against AI",
-        "4. Exit"
-    };
-    constexpr uint32_t text_height=60, text_width=400;
-    for(auto& o: options) {
-        drawOption(o, screen + (m_w-text_width)/2, text_height, text_width);
-        screen += m_w * text_height;
-    }
-}
-
-template<typename GameCTX_t>
-void RenderSystem_t<GameCTX_t>::updateMenu() const {
-    auto screen = m_framebuffer.get();
-    const auto size = m_w*m_h;
-    std::fill(screen, screen + size, backgroungColor);
-    drawAllOptions(screen);
-
-    ptc_update(screen);
 }
 
 template<typename GameCTX_t>
@@ -147,5 +143,5 @@ void RenderSystem_t<GameCTX_t>::loadFonts(const std::string_view filename) {
         std::istreambuf_iterator<char>{file},
         std::istreambuf_iterator<char>{}
     );
-   stbtt_InitFont(&font, filevec.data(), stbtt_GetFontOffsetForIndex(filevec.data(),0));
+    stbtt_InitFont(&font, filevec.data(), stbtt_GetFontOffsetForIndex(filevec.data(),0));
 }
