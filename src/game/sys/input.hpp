@@ -10,7 +10,7 @@ struct InputSystem_t {
 
     void update(GameCTX_t& g) const;
     
-    constexpr bool isKeyPressed(KeySym k) const {
+    constexpr bool isKeyPressed(ECS::Key_t k) const {
         ptc_process_events();
         return ms_Keyboard.isKeyPressed(k);
     }
@@ -18,8 +18,8 @@ struct InputSystem_t {
     
     static ECS::Keyboard_t& getKeyboard() { return ms_Keyboard; }
 private:
-    static void onkeypress(KeySym k);
-    static void onkeyrelease(KeySym k);
+    static void onkeypress(ECS::Key_t k);
+    static void onkeyrelease(ECS::Key_t k);
 
     inline static ECS::Keyboard_t ms_Keyboard {};
     const GameObjectFactory_t* m_GOFactory;

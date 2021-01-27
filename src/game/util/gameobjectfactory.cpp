@@ -30,15 +30,9 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
 
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
     if(side & InputComponent_t::S_Right) {
-        #ifdef windows
-        inp.key_UP   = 'O';
-        inp.key_DOWN = 'L';
-        inp.key_shoot = ' ';
-        #else
-        inp.key_UP   = XK_o;
-        inp.key_DOWN = XK_l;
-        inp.key_shoot = XK_space;
-        #endif
+        inp.key_UP    = ECS::o;
+        inp.key_DOWN  = ECS::l;
+        inp.key_shoot = ECS::Space;
     }
     inp.side = side;
 

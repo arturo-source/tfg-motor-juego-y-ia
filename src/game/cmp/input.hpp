@@ -1,11 +1,5 @@
 #pragma once
-extern "C" {
-    #ifdef windows
-    #include <tinyPTC/src/windows/tinyptc.h>
-    #else
-    #include <tinyPTC/src/linux/tinyptc.h>
-    #endif
-}
+#include <ecs/util/keys.hpp>
 #include <cstdint>
 #include <ecs/cmp/component.hpp>
 
@@ -22,13 +16,7 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     };
     uint8_t side { S_NoSide };
 
-    #ifdef windows
-    KeySym key_UP    {'W'};
-    KeySym key_DOWN  {'S'};
-    KeySym key_shoot {'\t'};
-    #else
-    KeySym key_UP    {XK_w};
-    KeySym key_DOWN  {XK_s};
-    KeySym key_shoot {XK_Tab};
-    #endif
+    ECS::Key_t key_UP    {ECS::w};
+    ECS::Key_t key_DOWN  {ECS::s};
+    ECS::Key_t key_shoot {ECS::Tab};
 };

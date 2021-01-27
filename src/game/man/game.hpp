@@ -19,6 +19,7 @@
 #include <game/man/state.hpp>
 #include <game/man/menu.hpp>
 #include <ecs/man/entitymanager.tpp>
+#include <ecs/util/keys.hpp>
 
 struct GameManager_t : StateBase_t {
     explicit GameManager_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
@@ -73,7 +74,7 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
-        m_playing = !Input.isKeyPressed(XK_Escape);
+        m_playing = !Input.isKeyPressed(ECS::Esc);
     }
 
     bool alive() final { return m_playing; }

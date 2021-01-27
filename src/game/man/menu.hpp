@@ -39,9 +39,9 @@ struct TrainingMenu_t : MenuState_t {
     }
     void update() final {
         GameTimer_t timer;
-        if(Input.isKeyPressed(XK_Down) && selected_option < options.size()-1) ++selected_option;
-        if(Input.isKeyPressed(XK_Up)   && selected_option > 0)                --selected_option;
-        if(Input.isKeyPressed(XK_Return)) {
+        if(Input.isKeyPressed(ECS::Down) && selected_option < options.size()-1) ++selected_option;
+        if(Input.isKeyPressed(ECS::Up)   && selected_option > 0)                --selected_option;
+        if(Input.isKeyPressed(ECS::Intro)) {
             AI.train(options[selected_option], N_times);
             m_Alive = false;
         }
@@ -76,9 +76,9 @@ struct MainMenu_t : MenuState_t {
     void update() final {
         GameTimer_t timer;
 
-        if(Input.isKeyPressed(XK_Down) && selected_option < options.size()-1) ++selected_option;
-        if(Input.isKeyPressed(XK_Up)   && selected_option > 0)                --selected_option;
-        if(Input.isKeyPressed(XK_Return)) {
+        if(Input.isKeyPressed(ECS::Down) && selected_option < options.size()-1) ++selected_option;
+        if(Input.isKeyPressed(ECS::Up)   && selected_option > 0)                --selected_option;
+        if(Input.isKeyPressed(ECS::Intro)) {
             switch (selected_option + 1) {
             case 1:
             case 3: SM.pushState<GameManager_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT); break;

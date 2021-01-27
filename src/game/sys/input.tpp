@@ -1,18 +1,14 @@
-#ifdef windows
-#include <windows.h>
-#else
-#include <X11/keysymdef.h>
-#endif
+#include <ecs/util/keys.hpp>
 #include <game/sys/input.hpp>
 #include <game/cmp/weapon.hpp>
 #include <game/cmp/input.hpp>
 
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::onkeypress(KeySym k) {
+void InputSystem_t<GameCTX_t>::onkeypress(ECS::Key_t k) {
     ms_Keyboard.keyPressed(k);
 }
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::onkeyrelease(KeySym k) {
+void InputSystem_t<GameCTX_t>::onkeyrelease(ECS::Key_t k) {
     ms_Keyboard.keyReleased(k);
 }
 

@@ -1,17 +1,10 @@
-extern "C" {
-    #ifdef windows
-    #include <tinyPTC/src/windows/tinyptc.h>
-    #else
-    #include <tinyPTC/src/linux/tinyptc.h>
-    #endif
-}
 #include <unordered_map>
-#include <iostream>
+#include <ecs/util/keys.hpp>
 
 namespace ECS {
 struct Keyboard_t {
-    using OptIter = std::optional<std::unordered_map<KeySym, bool>::iterator>;
-    using ConstOptIter = std::optional<std::unordered_map<KeySym, bool>::const_iterator>;
+    using OptIter = std::optional<std::unordered_map<Key_t, bool>::iterator>;
+    using ConstOptIter = std::optional<std::unordered_map<Key_t, bool>::const_iterator>;
 
     explicit Keyboard_t() = default;
 
@@ -20,12 +13,12 @@ struct Keyboard_t {
     Keyboard_t& operator=(const Keyboard_t&) = delete;
     Keyboard_t& operator=(Keyboard_t&&)      = delete;
 
-    bool isKeyPressed (KeySym k) const noexcept;
-    void keyPressed(KeySym k) noexcept {
+    bool isKeyPressed (Key_t k) const noexcept;
+    void keyPressed(Key_t k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = true;
     }
-    void keyReleased(KeySym k) noexcept {
+    void keyReleased(Key_t k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = false;
     }
@@ -34,36 +27,23 @@ struct Keyboard_t {
             st = false;
     }
 private:
-    const ConstOptIter getIterator(KeySym k) const noexcept;
-    OptIter getIterator(KeySym k) noexcept;
-    std::unordered_map<KeySym, bool> m_pressedKeys {
-        #ifdef windows
-        {'\t', false},
-        {'\e', false},
-        {' ',  false},
-        {'L',  false},
-        {'O',  false},
-        {'A',  false},
-        {'S',  false},
-        {'D',  false},
-        {'W',  false} //Añadir Up Down Left Right e Intro
-        #else
-        {XK_Tab,    false},
-        {XK_Escape, false},
-        {XK_space,  false},
-        {XK_Return, false},
-        {XK_l,      false},
-        {XK_o,      false},
-        {XK_a,      false},
-        {XK_s,      false},
-        {XK_d,      false},
-        {XK_w,      false},
-        {XK_Up,     false},
-        {XK_Down,   false},
-        {XK_Left,   false},
-        {XK_Right,  false}
-        #endif
-        
+    const ConstOptIter getIterator(Key_t k) const noexcept;
+    OptIter getIterator(Key_t k) noexcept;
+    std::unordered_map<Key_t, bool> m_pressedKeys {
+        {Tab,   false},
+        {Esc,   false},
+        {Space, false},
+        {Intro, false},
+        {l,     false},
+        {o,     false},
+        {a,     false},
+        {s,     false},
+        {d,     false},
+        {w,     false},
+        {Up,    false},
+        {Down,  false},
+        {Left,  false},
+        {Right, false}
     };
 };
 
