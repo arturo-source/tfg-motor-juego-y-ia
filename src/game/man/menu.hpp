@@ -41,6 +41,7 @@ struct TrainingMenu_t : MenuState_t {
         GameTimer_t timer;
         if(Input.isKeyPressed(ECS::Down) && selected_option < options.size()-1) ++selected_option;
         if(Input.isKeyPressed(ECS::Up)   && selected_option > 0)                --selected_option;
+        if(Input.isKeyPressed(ECS::Esc)) m_Alive = false;
         if(Input.isKeyPressed(ECS::Intro)) {
             AI.train(options[selected_option], N_times);
             m_Alive = false;
