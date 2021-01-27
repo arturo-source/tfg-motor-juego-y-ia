@@ -17,7 +17,7 @@ void InputSystem_t<GameCTX_t>::onkeyrelease(KeySym k) {
 }
 
 template<typename GameCTX_t>
-InputSystem_t<GameCTX_t>::InputSystem_t(GameObjectFactory_t& GOFactory) : m_GOFactory{GOFactory} {
+InputSystem_t<GameCTX_t>::InputSystem_t() {
     ptc_set_on_keypress( onkeypress );
     ptc_set_on_keyrelease( onkeyrelease );
     ms_Keyboard.reset();
@@ -25,6 +25,7 @@ InputSystem_t<GameCTX_t>::InputSystem_t(GameObjectFactory_t& GOFactory) : m_GOFa
 
 template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
+    if(!m_GOFactory) throw std::runtime_error("Missing game object factory.");
     ptc_process_events();
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
@@ -37,19 +38,10 @@ void InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
             if(weap != nullptr && weap->shoot_cooldown == 0 && weap->bullets > 0
                 && ms_Keyboard.isKeyPressed(inp.key_shoot)) 
             {
-                m_GOFactory.createBullet(*phy, inp.side);
+                m_GOFactory->createBullet(*phy, inp.side);
                 weap->setCooldown();
                 --(weap->bullets);
             }
         }
     }
-}
-
-template<typename GameCTX_t>
-constexpr bool InputSystem_t<GameCTX_t>::isEscPressed() const {
-    #ifdef windows
-    return ms_Keyboard.isKeyPressed('\e');
-    #else
-    return ms_Keyboard.isKeyPressed(XK_Escape);
-    #endif
 }

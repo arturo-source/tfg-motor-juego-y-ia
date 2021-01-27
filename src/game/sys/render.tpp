@@ -21,7 +21,7 @@ RenderSystem_t<GameCTX_t>::RenderSystem_t(uint32_t w, uint32_t h)
 : m_w{w}, m_h{h}
 , m_framebuffer{std::make_unique<uint32_t[]>(m_w*m_h)} 
 {
-    loadFonts("/usr/share/fonts/TTF/OpenSans-Regular.ttf");
+    loadFonts("assets/OpenSans-Regular.ttf");
     ptc_open("window", w, h);
 }
 template<typename GameCTX_t>
@@ -93,9 +93,9 @@ void RenderSystem_t<GameCTX_t>::updateMenu(const std::vector<std::string> option
     std::fill(screen, screen + size, backgroungColor);
     for(uint8_t i = page * options_per_page; i < (page+1) * options_per_page && i < options.size(); ++i) {
         if(i != selected_option) 
-            drawOption(options[i], 0xff000000, screen + (m_w-text_width)/2, text_height, text_width);
+            drawOption(options[i], 0xff003d33, screen + (m_w-text_width)/2, text_height, text_width);
         else
-            drawOption(options[i], 0xff56c8d8, screen + (m_w-text_width)/2, text_height, text_width);
+            drawOption(options[i], 0xff4ebaaa, screen + (m_w-text_width)/2, text_height, text_width);
             
         screen += m_w * text_height;
     }

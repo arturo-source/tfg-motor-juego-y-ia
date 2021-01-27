@@ -6,14 +6,15 @@
 
 template<typename GameCTX_t>
 struct InputSystem_t {
-    explicit InputSystem_t(GameObjectFactory_t& GOFactory);
+    explicit InputSystem_t();
 
     void update(GameCTX_t& g) const;
-    constexpr bool isEscPressed() const;
+    
     constexpr bool isKeyPressed(KeySym k) const {
         ptc_process_events();
         return ms_Keyboard.isKeyPressed(k);
     }
+    void setObjectFactory(const GameObjectFactory_t& gof) { m_GOFactory = &gof; }
     
     static ECS::Keyboard_t& getKeyboard() { return ms_Keyboard; }
 private:
@@ -21,5 +22,5 @@ private:
     static void onkeyrelease(KeySym k);
 
     inline static ECS::Keyboard_t ms_Keyboard {};
-    const GameObjectFactory_t& m_GOFactory;
+    const GameObjectFactory_t* m_GOFactory;
 };

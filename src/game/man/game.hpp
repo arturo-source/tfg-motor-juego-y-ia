@@ -21,9 +21,10 @@
 #include <ecs/man/entitymanager.tpp>
 
 struct GameManager_t : StateBase_t {
-    explicit GameManager_t(StateManager_t& sm) 
-    : SM{sm}, Input{GOFact}
+    explicit GameManager_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
+    : SM{sm}, Render{ren}, Input{inp}, kSCRWIDTH{scrW}, kSCRHEIGHT{scrH}
     {
+        Input.setObjectFactory(GOFact);
         constexpr uint32_t leftTeamColor  { 0xFF81c784 };
         constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
         
@@ -72,8 +73,7 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
-        if(Input.isEscPressed())
-            SM.pushState<MenuState_t>(SM, Render, Input, m_playing);
+        m_playing = !Input.isKeyPressed(XK_Escape);
     }
 
     bool alive() final { return m_playing; }
@@ -99,15 +99,15 @@ struct GameManager_t : StateBase_t {
     ECS::Keyboard_t& getKeyboard() { return Input.getKeyboard(); }
 private:
     //Game consts
-    static constexpr uint32_t kSCRWIDTH  {900};
-    static constexpr uint32_t kSCRHEIGHT {500};
+    const uint32_t kSCRWIDTH;
+    const uint32_t kSCRHEIGHT;
     static constexpr uint64_t FPS  { 60 };
     static constexpr uint64_t NSPF { 1000000000/FPS };
 
     // Systems
-    const RenderSystem_t<ECS::EntityManager_t> Render{kSCRWIDTH, kSCRHEIGHT};
+    const RenderSystem_t<ECS::EntityManager_t>& Render;
     PysicsSystem_t<ECS::EntityManager_t> Physics;
-    InputSystem_t<ECS::EntityManager_t> Input;
+    InputSystem_t<ECS::EntityManager_t>& Input;
     CollisionSystem_t<ECS::EntityManager_t> Collision{kSCRWIDTH, kSCRHEIGHT};
     ArtificialInteligenceSystem_t<ECS::EntityManager_t> ArtificialInteligence;
     ScoreboardSystem_t<ECS::EntityManager_t> Score {kSCRWIDTH};
