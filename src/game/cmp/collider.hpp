@@ -24,5 +24,6 @@ struct ColliderComponent_t : public ECS::ComponentBase_t<ColliderComponent_t> {
     };
 
     uint8_t properties { P_Nothing };
+    uint32_t color { 0xff000000 };
     BoundingBox_t box;
 };

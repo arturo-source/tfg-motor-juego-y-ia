@@ -12,6 +12,7 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(float x, float y, uint32_t w, u
     cl.box.xRight = rn.w;
     cl.box.yUp    = 0;
     cl.box.yDown  = rn.h;
+    cl.color = color;
 
     return e;
 }
@@ -96,9 +97,9 @@ ECS::Entity_t& GameObjectFactory_t::createBullet(const PhysicsComponent_t& palet
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y) const {
+ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y, const uint32_t color) const {
     constexpr uint32_t w { 10 }, h { 10 };
-    auto& e = createEntity(x - w/2 , y - h/2, w, h, 0xFF005b4f);
+    auto& e = createEntity(x - w/2 , y - h/2, w, h, color);
 
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
@@ -119,23 +120,23 @@ void GameObjectFactory_t::createWalls(const uint32_t scrWidth, const uint32_t sc
 
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth + (i+1) * (wallWidth+3)};
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight);
+        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, 0xFF005b4f);
     }
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth - (i+2) * (wallWidth+3) };
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight);
+        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, 0xFF006978);
     }
 }
 
-void GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight) const {
+void GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const {
     for(uint32_t j = 0; j < wallsPerColumn; ++j) {
         uint32_t y { 10 + j * (wallHeight+3) };
-        auto& e = createEntity(x, y, wallWidth, wallHeight, 0xFF005b4f);
+        auto& e = createEntity(x, y, wallWidth, wallHeight, color);
         auto* col = e.getComponent<ColliderComponent_t>();
         if(col) col->properties = ColliderComponent_t::P_IsWall | ColliderComponent_t::P_Bounces;
     }
 }
 
 void GameObjectFactory_t::createMiddleLine(const uint32_t scrWidth, const uint32_t scrHeight) const {
-    createEntity(scrWidth/2 - 1, 0, 1, scrHeight, 0xff002233);
+    createEntity(scrWidth/2 - 1, 0, 2, scrHeight, 0xff002233);
 }

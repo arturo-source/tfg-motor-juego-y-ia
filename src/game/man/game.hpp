@@ -29,22 +29,20 @@ struct GameManager_t : StateBase_t {
         constexpr uint32_t leftTeamColor  { 0xFF81c784 };
         constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
         
-        ECS::Entity_t* player = &GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right, rightTeamColor);
-        ECS::Entity_t& Lball = GOFact.createBall(            100, kSCRHEIGHT/2);
-        ECS::Entity_t& Rball = GOFact.createBall(kSCRWIDTH - 100, kSCRHEIGHT/2);
+        ECS::Entity_t& Lplayer = GOFact.createPaletteAI(          10, kSCRHEIGHT/2, InputComponent_t::S_Left , leftTeamColor);
+        ECS::Entity_t& Rplayer = GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right, rightTeamColor);
+        ECS::Entity_t& Lball = GOFact.createBall(            100, kSCRHEIGHT/2, 0xFF005b4f);
+        ECS::Entity_t& Rball = GOFact.createBall(kSCRWIDTH - 100, kSCRHEIGHT/2, 0xFF006978);
         ECS::Entity_t& Lminion = GOFact.createMinionAI(kSCRWIDTH/2 - 100,              30, InputComponent_t::S_Right | InputComponent_t::S_Center, rightTeamColor);
         ECS::Entity_t& Rminion = GOFact.createMinionAI(kSCRWIDTH/2 + 100, kSCRHEIGHT - 30, InputComponent_t::S_Left  | InputComponent_t::S_Center, leftTeamColor);
-
-        if(against_ai) GOFact.createPaletteAI(10, kSCRHEIGHT/2, InputComponent_t::S_Left, leftTeamColor);
-        else player = &GOFact.createPalette(10, kSCRHEIGHT/2, InputComponent_t::S_Left, leftTeamColor);
 
         GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 5);
         GOFact.createMiddleLine(kSCRWIDTH, kSCRHEIGHT);
 
         filename   = findFilename();
         ball_ptr   = Lball.getComponent<PhysicsComponent_t>();
-        player_ptr = player->getComponent<PhysicsComponent_t>();
-        input_ptr  = player->getComponent<InputComponent_t>();
+        player_ptr = Lplayer.getComponent<PhysicsComponent_t>();
+        input_ptr  = Lplayer.getComponent<InputComponent_t>();
         ArtificialInteligence.ballPhysics = ball_ptr;
     };
 
