@@ -14,14 +14,16 @@ extern "C" {
 #include <game/cmp/render.hpp>
 #include <game/cmp/physics.hpp>
 #include <game/cmp/score.hpp>
-#include <game/util/numbers.hpp>
 
 template<typename GameCTX_t>
 RenderSystem_t<GameCTX_t>::RenderSystem_t(uint32_t w, uint32_t h)
-: m_w{w}, m_h{h}
+: m_w{w}, m_h{h}, numbers(10)
 , m_framebuffer{std::make_unique<uint32_t[]>(m_w*m_h)} 
 {
     loadFonts("assets/OpenSans-Regular.ttf");
+    for(std::size_t i=0; i<10; ++i)
+       setNumber(i+48, numbers[i]); //48 represents 0 character
+
     ptc_open("window", w, h);
 }
 template<typename GameCTX_t>
@@ -50,7 +52,8 @@ void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
             drawSprite(screen, sprite, ren.w, ren.h);
             if(sco) {
                 screen = getScreenXY(phy->x, 10);
-                drawSprite(screen, RenderNumbers::numbers[sco->score], 6, 6);
+                auto& n { numbers[sco->score] };
+                drawSprite(screen, n.bitmap, n.w, n.h, n.color);
             }
         }
     };
@@ -65,6 +68,18 @@ constexpr void RenderSystem_t<GameCTX_t>::drawSprite(uint32_t* screen, const uin
         for(uint32_t i=0; i<w; ++i) {
             if(*sprite & 0xFF000000)
                 *screen = *sprite;
+            ++sprite;
+            ++screen;
+        }
+        screen += m_w - w;
+    }
+}
+
+template<typename GameCTX_t>
+constexpr void RenderSystem_t<GameCTX_t>::drawSprite(uint32_t* screen, const unsigned char* sprite, const uint32_t w, const uint32_t h, const uint32_t color) const {
+    for(uint32_t j=0; j<h; ++j) {
+        for(uint32_t i=0; i<w; ++i) {
+            if(*sprite) *screen = color;
             ++sprite;
             ++screen;
         }
@@ -93,9 +108,9 @@ void RenderSystem_t<GameCTX_t>::updateMenu(const std::vector<std::string> option
     std::fill(screen, screen + size, backgroungColor);
     for(uint8_t i = page * options_per_page; i < (page+1) * options_per_page && i < options.size(); ++i) {
         if(i != selected_option) 
-            drawOption(options[i], 0xff003d33, screen + (m_w-text_width)/2, text_height, text_width);
+            drawOption(options[i], 0xff003d33, screen + (m_w-text_width)/2, text_width, text_height);
         else
-            drawOption(options[i], 0xff4ebaaa, screen + (m_w-text_width)/2, text_height, text_width);
+            drawOption(options[i], 0xff4ebaaa, screen + (m_w-text_width)/2, text_width, text_height);
             
         screen += m_w * text_height;
     }
@@ -104,8 +119,8 @@ void RenderSystem_t<GameCTX_t>::updateMenu(const std::vector<std::string> option
 }
 
 template<typename GameCTX_t>
-constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, const uint32_t color, uint32_t *screen, const uint32_t height, const uint32_t width) const {
-    unsigned char bitmap[height][width] = {0};
+void RenderSystem_t<GameCTX_t>::drawOption(const std::string& text, const uint32_t color, uint32_t *screen, const uint32_t width, const uint32_t height) const {
+    unsigned char bitmap[height*width] = {0};
 
     int i,j,ascent,baseline,ch=0;
     float scale, xpos=2;
@@ -119,19 +134,20 @@ constexpr void RenderSystem_t<GameCTX_t>::drawOption(const std::string text, con
         float x_shift = xpos - (float) floor(xpos);
         stbtt_GetCodepointHMetrics(&font, text[ch], &advance, &lsb);
         stbtt_GetCodepointBitmapBoxSubpixel(&font, text[ch], scale,scale,x_shift,0, &x0,&y0,&x1,&y1);
-        stbtt_MakeCodepointBitmapSubpixel(&font, &bitmap[baseline + y0][(int) xpos + x0], x1-x0,y1-y0, width, scale,scale,x_shift,0, text[ch]);
+        stbtt_MakeCodepointBitmapSubpixel(&font, &bitmap[(baseline + y0)*width + ((int) xpos + x0)], x1-x0,y1-y0, width, scale,scale,x_shift,0, text[ch]);
         xpos += (advance * scale);
         if (text[ch+1])
             xpos += scale*stbtt_GetCodepointKernAdvance(&font, text[ch],text[ch+1]);
         ++ch;
     }
 
-    for(int i = 0; i < height; ++i) {
-        for(int j = 0; j < width; ++j, ++screen) {
-            if(bitmap[i][j]) *screen = color;
-        }
-        screen += m_w - width;
-    }
+    drawSprite(screen, bitmap, width, height, color);
+    // for(int i = 0; i < height; ++i) {
+    //     for(int j = 0; j < width; ++j, ++screen) {
+    //         if(bitmap[i][j]) *screen = color;
+    //     }
+    //     screen += m_w - width;
+    // }
 }
 
 template<typename GameCTX_t>
@@ -144,4 +160,10 @@ void RenderSystem_t<GameCTX_t>::loadFonts(const std::string_view filename) {
         std::istreambuf_iterator<char>{}
     );
     stbtt_InitFont(&font, filevec.data(), stbtt_GetFontOffsetForIndex(filevec.data(),0));
+}
+
+template<typename GameCTX_t>
+void RenderSystem_t<GameCTX_t>::setNumber(char number, Number& n) {
+    int size = 30;
+    n.bitmap = stbtt_GetCodepointBitmap(&font, 0,stbtt_ScaleForPixelHeight(&font, size), number, &n.w, &n.h, 0,0);
 }
