@@ -7,6 +7,4 @@ struct ScoreComponent_t : public ECS::ComponentBase_t<ScoreComponent_t> {
         : ComponentBase_t(eid)
     {}
     uint32_t score { 0 };
-    inline static float scorePosX { 0 };
-    inline static bool  scored    { false };
 };

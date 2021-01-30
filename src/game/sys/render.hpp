@@ -14,7 +14,7 @@ struct Number {
     int w { 0 }, h { 0 };
     unsigned char* bitmap { nullptr };
     
-    static constexpr uint32_t color { 0xFF005b4f };
+    static constexpr uint32_t color { 0xffffffff };
 };
 
 template<typename GameCTX_t>
@@ -22,6 +22,7 @@ struct RenderSystem_t {
     explicit RenderSystem_t(uint32_t w, uint32_t h);
     ~RenderSystem_t();
 
+    void countdown(const GameCTX_t& g) const;
     void update(const GameCTX_t& g) const;
     void drawAllEntities(const GameCTX_t& g) const;
     

@@ -26,36 +26,44 @@ struct GameManager_t : StateBase_t {
     : SM{sm}, Render{ren}, Input{inp}, kSCRWIDTH{scrW}, kSCRHEIGHT{scrH}
     {
         Input.setObjectFactory(GOFact);
-        constexpr uint32_t leftTeamColor  { 0xFF81c784 };
-        constexpr uint32_t rightTeamColor { 0xFF56c8d8 };
+        constexpr uint32_t leftTeamColor   { 0xFF81c784 };
+        constexpr uint32_t leftTeamColor2  { 0xFF005b4f };
+        constexpr uint32_t rightTeamColor  { 0xFF56c8d8 };
+        constexpr uint32_t rightTeamColor2 { 0xFF006978 };
         
         ECS::Entity_t& Lplayer = GOFact.createPaletteAI(          10, kSCRHEIGHT/2, InputComponent_t::S_Left , leftTeamColor);
         ECS::Entity_t& Rplayer = GOFact.createPalette(kSCRWIDTH - 10, kSCRHEIGHT/2, InputComponent_t::S_Right, rightTeamColor);
-        ECS::Entity_t& Lball = GOFact.createBall(            100, kSCRHEIGHT/2, 0xFF005b4f);
-        ECS::Entity_t& Rball = GOFact.createBall(kSCRWIDTH - 100, kSCRHEIGHT/2, 0xFF006978);
+        ECS::Entity_t& Lball   = GOFact.createBall(            200, kSCRHEIGHT/2, leftTeamColor2);
+        ECS::Entity_t& Rball   = GOFact.createBall(kSCRWIDTH - 200, kSCRHEIGHT/2, rightTeamColor2);
         ECS::Entity_t& Lminion = GOFact.createMinionAI(kSCRWIDTH/2 - 100,              30, InputComponent_t::S_Right | InputComponent_t::S_Center, rightTeamColor);
         ECS::Entity_t& Rminion = GOFact.createMinionAI(kSCRWIDTH/2 + 100, kSCRHEIGHT - 30, InputComponent_t::S_Left  | InputComponent_t::S_Center, leftTeamColor);
 
-        GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 5);
+        GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 5, leftTeamColor2, rightTeamColor2);
         GOFact.createMiddleLine(kSCRWIDTH, kSCRHEIGHT);
 
         filename   = findFilename();
-        ball_ptr   = Lball.getComponent<PhysicsComponent_t>();
-        player_ptr = Lplayer.getComponent<PhysicsComponent_t>();
+        Lballphy   = Lball.getComponent<PhysicsComponent_t>();
+        Rballphy   = Rball.getComponent<PhysicsComponent_t>();
+        Lplayerphy = Lplayer.getComponent<PhysicsComponent_t>();
+        Rplayerphy = Rplayer.getComponent<PhysicsComponent_t>();
+        Lminionphy = Lminion.getComponent<PhysicsComponent_t>();
+        Rminionphy = Rminion.getComponent<PhysicsComponent_t>();
         input_ptr  = Lplayer.getComponent<InputComponent_t>();
-        ArtificialInteligence.ballPhysics = ball_ptr;
+        ArtificialInteligence.ballPhysics = Lballphy;
+
+        reset();
     };
 
     void dumpCSV() const {
-        std::ofstream file(filename.c_str(), std::ios::app);
-        if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
-        if(!ball_ptr || !player_ptr || !input_ptr) throw std::runtime_error("Missing player or ball pointer"); 
+        // std::ofstream file(filename.c_str(), std::ios::app);
+        // if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
+        // if(!ball_ptr || !player_ptr || !input_ptr) throw std::runtime_error("Missing player or ball pointer"); 
         
-        file << player_ptr->y << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
-        file << ball_ptr->x << ";" << ball_ptr->y << ";" << ball_ptr->vx << ";" << ball_ptr->vy << ";";
-        file << Input.getKeyboard().isKeyPressed(input_ptr->key_UP) << ";" << Input.getKeyboard().isKeyPressed(input_ptr->key_DOWN) << "\n";
+        // file << player_ptr->y << ";" << player_ptr->vy << ";" << player_ptr->aceleration << ";";
+        // file << ball_ptr->x << ";" << ball_ptr->y << ";" << ball_ptr->vx << ";" << ball_ptr->vy << ";";
+        // file << Input.getKeyboard().isKeyPressed(input_ptr->key_UP) << ";" << Input.getKeyboard().isKeyPressed(input_ptr->key_DOWN) << "\n";
     
-        file.close();
+        // file.close();
     }
 
     void update() final {
@@ -72,7 +80,22 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
-        m_playing = !Input.isKeyPressed(ECS::Esc);
+        m_playing = !Input.isKeyPressed(ECS::Esc) && !ScoreboardSystem_t<ECS::EntityManager_t>::end_game;
+        if(ScoreboardSystem_t<ECS::EntityManager_t>::scored && m_playing) {
+            ScoreboardSystem_t<ECS::EntityManager_t>::scored = false;
+            reset();
+        }
+    }
+
+    void reset() {
+        const uint32_t avgheight { kSCRHEIGHT/2 };
+        Lballphy->vx = -3; Lballphy->vy = 0; Lballphy->x =             200; Lballphy->y = avgheight; Lballphy->aceleration = 0;
+        Rballphy->vx =  3; Rballphy->vy = 0; Rballphy->x = kSCRWIDTH - 200; Rballphy->y = avgheight; Rballphy->aceleration = 0;
+        Lplayerphy->vx = 0; Lplayerphy->vy = 0; Lplayerphy->y = avgheight; Lplayerphy->aceleration = 0;
+        Rplayerphy->vx = 0; Rplayerphy->vy = 0; Rplayerphy->y = avgheight; Rplayerphy->aceleration = 0;
+        Lminionphy->vx = 0; Lminionphy->vy = 0; Lminionphy->y = avgheight; Lminionphy->aceleration = 0;
+        Rminionphy->vx = 0; Rminionphy->vy = 0; Rminionphy->y = avgheight; Rminionphy->aceleration = 0;
+        Render.countdown(EntityMan);
     }
 
     bool alive() final { return m_playing; }
@@ -113,8 +136,12 @@ private:
     WeaponSystem_t<ECS::EntityManager_t> Weapons;
 
     //Game references to dump to AI
-    PhysicsComponent_t* ball_ptr   {nullptr};
-    PhysicsComponent_t* player_ptr {nullptr};
+    PhysicsComponent_t* Lballphy   {nullptr};
+    PhysicsComponent_t* Rballphy   {nullptr};
+    PhysicsComponent_t* Lplayerphy {nullptr};
+    PhysicsComponent_t* Rplayerphy {nullptr};
+    PhysicsComponent_t* Lminionphy {nullptr};
+    PhysicsComponent_t* Rminionphy {nullptr};
     InputComponent_t*   input_ptr  {nullptr};
     std::string         filename;
     bool                against_ai { true };

@@ -22,7 +22,7 @@ struct GameObjectFactory_t {
     ECS::Entity_t& createMinionAI(float x, float y, uint8_t side, uint32_t color) const;
     ECS::Entity_t& createBall(float x, float y, const uint32_t color) const;
     ECS::Entity_t& createBullet(const PhysicsComponent_t& palette_phy, uint8_t side) const;
-    void           createWalls(const uint32_t scrWidth, const uint32_t scrHeight, const uint32_t columns) const;
+    void           createWalls(const uint32_t scrWidth, const uint32_t scrHeight, const uint32_t columns, const uint32_t leftTeamColor, const uint32_t rightTeamColor) const;
     void           createMiddleLine(const uint32_t scrWidth, const uint32_t scrHeight) const;
 private:
     ECS::EntityManager_t& m_EntMan;

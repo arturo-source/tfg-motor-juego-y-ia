@@ -2,7 +2,7 @@
 #include <game/cmp/physics.hpp>
 #include <game/cmp/collider.hpp>
 #include <game/cmp/health.hpp>
-#include <game/cmp/score.hpp>
+#include <game/sys/scoreboard.hpp>
 
 template<typename GameCTX_t>
 CollisionSystem_t<GameCTX_t>::CollisionSystem_t(uint32_t w, uint32_t h)
@@ -132,8 +132,8 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(GameCTX_t& 
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
     if(b.xLeft < 0 || b.xRight > m_w) { 
         if(c.properties & CP::P_IsBall) {
-            ScoreComponent_t::scorePosX = p.x;
-            ScoreComponent_t::scored = true;
+            ScoreboardSystem_t<GameCTX_t>::scorePosX = p.x;
+            ScoreboardSystem_t<GameCTX_t>::scored = true;
             
             //Reubicate the ball
             p.x = m_w/2;

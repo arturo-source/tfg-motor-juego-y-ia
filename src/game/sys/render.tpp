@@ -98,6 +98,27 @@ void RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
 }
 
 template<typename GameCTX_t>
+void RenderSystem_t<GameCTX_t>::countdown(const GameCTX_t& g) const {
+    #include <chrono>
+    #include <thread>
+    constexpr std::chrono::seconds one_second(1);
+    update(g);
+    
+    for(std::size_t i = 3; i>0; --i) {
+        auto& n = numbers[i];
+        const uint32_t avgwidth { m_w/2 - n.w }, avgheight { m_h/2 - n.h };
+        auto screen { m_framebuffer.get() + avgheight*m_w + avgwidth };
+
+        drawSprite(screen, n.bitmap, n.w, n.h, n.color);
+        ptc_update(m_framebuffer.get());
+    
+        std::this_thread::sleep_for(one_second);
+        update(g);
+    }
+}
+
+
+template<typename GameCTX_t>
 void RenderSystem_t<GameCTX_t>::updateMenu(const std::vector<std::string> options, uint8_t selected_option) const {
     constexpr uint32_t text_height=60, text_width=400;
     const uint32_t options_per_page { m_h/text_height }, page { selected_option/options_per_page };
@@ -142,12 +163,6 @@ void RenderSystem_t<GameCTX_t>::drawOption(const std::string& text, const uint32
     }
 
     drawSprite(screen, bitmap, width, height, color);
-    // for(int i = 0; i < height; ++i) {
-    //     for(int j = 0; j < width; ++j, ++screen) {
-    //         if(bitmap[i][j]) *screen = color;
-    //     }
-    //     screen += m_w - width;
-    // }
 }
 
 template<typename GameCTX_t>

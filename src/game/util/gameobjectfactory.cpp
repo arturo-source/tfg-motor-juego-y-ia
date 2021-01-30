@@ -33,7 +33,7 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
     if(side & InputComponent_t::S_Right) {
         inp.key_UP    = ECS::o;
         inp.key_DOWN  = ECS::l;
-        inp.key_shoot = ECS::Space;
+        inp.key_shoot = ECS::Intro;
     }
     inp.side = side;
 
@@ -113,18 +113,18 @@ ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y, const uint32_t 
     return e;
 }
 
-void GameObjectFactory_t::createWalls(const uint32_t scrWidth, const uint32_t scrHeight, const uint32_t columns) const {
+void GameObjectFactory_t::createWalls(const uint32_t scrWidth, const uint32_t scrHeight, const uint32_t columns, const uint32_t leftTeamColor, const uint32_t rightTeamColor) const {
     constexpr uint32_t wallWidth { 10 }, wallHeight { 50 };
     const uint32_t wallsPerColumn { scrHeight / (wallHeight+1) };
     const uint32_t middleScrWidth { scrWidth/2 };
 
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth + (i+1) * (wallWidth+3)};
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, 0xFF005b4f);
+        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, leftTeamColor);
     }
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth - (i+2) * (wallWidth+3) };
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, 0xFF006978);
+        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, rightTeamColor);
     }
 }
 
