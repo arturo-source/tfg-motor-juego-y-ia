@@ -16,7 +16,7 @@ struct InputComponent_t : public ECS::ComponentBase_t<InputComponent_t> {
     };
     uint8_t side { S_NoSide };
 
-    ECS::Key_t key_UP    {ECS::w};
-    ECS::Key_t key_DOWN  {ECS::s};
-    ECS::Key_t key_shoot {ECS::Tab};
+    ECS::KeySym key_UP    {ECS::w};
+    ECS::KeySym key_DOWN  {ECS::s};
+    ECS::KeySym key_shoot {ECS::Tab};
 };

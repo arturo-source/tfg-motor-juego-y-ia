@@ -3,8 +3,8 @@
 
 namespace ECS {
 struct Keyboard_t {
-    using OptIter = std::optional<std::unordered_map<Key_t, bool>::iterator>;
-    using ConstOptIter = std::optional<std::unordered_map<Key_t, bool>::const_iterator>;
+    using OptIter = std::optional<std::unordered_map<KeySym, bool>::iterator>;
+    using ConstOptIter = std::optional<std::unordered_map<KeySym, bool>::const_iterator>;
 
     explicit Keyboard_t() = default;
 
@@ -13,12 +13,12 @@ struct Keyboard_t {
     Keyboard_t& operator=(const Keyboard_t&) = delete;
     Keyboard_t& operator=(Keyboard_t&&)      = delete;
 
-    bool isKeyPressed (Key_t k) const noexcept;
-    void keyPressed(Key_t k) noexcept {
+    bool isKeyPressed (KeySym k) const noexcept;
+    void keyPressed(KeySym k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = true;
     }
-    void keyReleased(Key_t k) noexcept {
+    void keyReleased(KeySym k) noexcept {
         if(auto it = getIterator(k))
             (*it)->second = false;
     }
@@ -27,9 +27,9 @@ struct Keyboard_t {
             st = false;
     }
 private:
-    const ConstOptIter getIterator(Key_t k) const noexcept;
-    OptIter getIterator(Key_t k) noexcept;
-    std::unordered_map<Key_t, bool> m_pressedKeys {
+    const ConstOptIter getIterator(KeySym k) const noexcept;
+    OptIter getIterator(KeySym k) noexcept;
+    std::unordered_map<KeySym, bool> m_pressedKeys {
         {Tab,   false},
         {Esc,   false},
         {Space, false},

@@ -10,16 +10,16 @@ struct InputSystem_t {
 
     void update(GameCTX_t& g) const;
     
-    constexpr bool isKeyPressed(ECS::Key_t k) const {
-        ptc_process_events();
+    constexpr bool isKeyPressed(ECS::KeySym k) const {
+        // ptc_process_events();
         return ms_Keyboard.isKeyPressed(k);
     }
     void setObjectFactory(const GameObjectFactory_t& gof) { m_GOFactory = &gof; }
     
     static ECS::Keyboard_t& getKeyboard() { return ms_Keyboard; }
 private:
-    static void onkeypress(ECS::Key_t k);
-    static void onkeyrelease(ECS::Key_t k);
+    static void onkeypress(ECS::KeySym k);
+    static void onkeyrelease(ECS::KeySym k);
 
     inline static ECS::Keyboard_t ms_Keyboard {};
     const GameObjectFactory_t* m_GOFactory;

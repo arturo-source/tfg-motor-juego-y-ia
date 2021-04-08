@@ -95,7 +95,6 @@ struct GameManager_t : StateBase_t {
         Rplayerphy->vx = 0; Rplayerphy->vy = 0; Rplayerphy->y = avgheight; Rplayerphy->aceleration = 0;
         Lminionphy->vx = 0; Lminionphy->vy = 0; Lminionphy->y = avgheight; Lminionphy->aceleration = 0;
         Rminionphy->vx = 0; Rminionphy->vy = 0; Rminionphy->y = avgheight; Rminionphy->aceleration = 0;
-        Render.countdown(EntityMan);
     }
 
     bool alive() final { return m_playing; }

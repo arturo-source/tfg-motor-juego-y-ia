@@ -1,42 +1,39 @@
 #pragma once
-#ifndef windows
-extern "C" {
-    #include <tinyPTC/src/linux/tinyptc.h>
-}
-#endif
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 namespace ECS {
-using Key_t = unsigned long;
+using KeySym = unsigned long;
 #ifdef windows
-    constexpr Key_t Tab   = '\t';
-    constexpr Key_t Esc   = '\e';
-    constexpr Key_t Space = ' ';
-    constexpr Key_t Intro = 13;
-    constexpr Key_t l     = 'L';
-    constexpr Key_t o     = 'O';
-    constexpr Key_t a     = 'A';
-    constexpr Key_t s     = 'S';
-    constexpr Key_t d     = 'D';
-    constexpr Key_t w     = 'W';
-    constexpr Key_t Up    = 38;
-    constexpr Key_t Down  = 40;
-    constexpr Key_t Left  = 37;
-    constexpr Key_t Right = 39;
+    constexpr KeySym Tab   = '\t';
+    constexpr KeySym Esc   = '\e';
+    constexpr KeySym Space = ' ';
+    constexpr KeySym Intro = 13;
+    constexpr KeySym l     = 'L';
+    constexpr KeySym o     = 'O';
+    constexpr KeySym a     = 'A';
+    constexpr KeySym s     = 'S';
+    constexpr KeySym d     = 'D';
+    constexpr KeySym w     = 'W';
+    constexpr KeySym Up    = 38;
+    constexpr KeySym Down  = 40;
+    constexpr KeySym Left  = 37;
+    constexpr KeySym Right = 39;
 #else
-    constexpr Key_t Tab   = XK_Tab;
-    constexpr Key_t Esc   = XK_Escape;
-    constexpr Key_t Space = XK_space;
-    constexpr Key_t Intro = XK_Return;
-    constexpr Key_t l     = XK_l;
-    constexpr Key_t o     = XK_o;
-    constexpr Key_t a     = XK_a;
-    constexpr Key_t s     = XK_s;
-    constexpr Key_t d     = XK_d;
-    constexpr Key_t w     = XK_w;
-    constexpr Key_t Up    = XK_Up;
-    constexpr Key_t Down  = XK_Down;
-    constexpr Key_t Left  = XK_Left;
-    constexpr Key_t Right = XK_Right;
+    constexpr KeySym Tab   = GLFW_KEY_TAB;
+    constexpr KeySym Esc   = GLFW_KEY_ESCAPE;
+    constexpr KeySym Space = GLFW_KEY_SPACE;
+    constexpr KeySym Intro = GLFW_KEY_ENTER;
+    constexpr KeySym l     = GLFW_KEY_L;
+    constexpr KeySym o     = GLFW_KEY_O;
+    constexpr KeySym a     = GLFW_KEY_A;
+    constexpr KeySym s     = GLFW_KEY_S;
+    constexpr KeySym d     = GLFW_KEY_D;
+    constexpr KeySym w     = GLFW_KEY_W;
+    constexpr KeySym Up    = GLFW_KEY_UP;
+    constexpr KeySym Down  = GLFW_KEY_DOWN;
+    constexpr KeySym Left  = GLFW_KEY_LEFT;
+    constexpr KeySym Right = GLFW_KEY_RIGHT;
 #endif
     
 } // namespace ECS

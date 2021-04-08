@@ -4,25 +4,25 @@
 #include <game/cmp/input.hpp>
 
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::onkeypress(ECS::Key_t k) {
+void InputSystem_t<GameCTX_t>::onkeypress(ECS::KeySym k) {
     ms_Keyboard.keyPressed(k);
 }
 template<typename GameCTX_t>
-void InputSystem_t<GameCTX_t>::onkeyrelease(ECS::Key_t k) {
+void InputSystem_t<GameCTX_t>::onkeyrelease(ECS::KeySym k) {
     ms_Keyboard.keyReleased(k);
 }
 
 template<typename GameCTX_t>
 InputSystem_t<GameCTX_t>::InputSystem_t() {
-    ptc_set_on_keypress( onkeypress );
-    ptc_set_on_keyrelease( onkeyrelease );
-    ms_Keyboard.reset();
+    // ptc_set_on_keypress( onkeypress );
+    // ptc_set_on_keyrelease( onkeyrelease );
+    // ms_Keyboard.reset();
 }
 
 template<typename GameCTX_t>
 void InputSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
     if(!m_GOFactory) throw std::runtime_error("Missing game object factory.");
-    ptc_process_events();
+    // ptc_process_events();
 
     for(auto& inp : g.template getComponents<InputComponent_t>()) {
         auto phy = g.template getRequiredComponent<PhysicsComponent_t>(inp);
