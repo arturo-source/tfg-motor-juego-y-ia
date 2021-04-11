@@ -7,3 +7,4 @@ vgcore*
 CSVs/*
 imgui.ini
 imgui_main.tpp
+weights.csv

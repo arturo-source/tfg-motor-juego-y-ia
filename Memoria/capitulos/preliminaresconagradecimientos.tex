@@ -1,0 +1,91 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plantilla TFG/TFM
+% Escuela Politécnica Superior de la Universidad de Alicante
+% Realizado por: Jose Manuel Requena Plens
+% Contacto: info@jmrplens.com / Telegram:@jmrplens
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{Preámbulo}
+\thispagestyle{empty}
+Desde que entré en la carrera de \gls{ii} en la \gls{ua} y escribí mis primeras líneas de código en C++ en la asignatura de Programación 1 supe que lo que más me gustaba en toda mi vida estudiantil era programar. Simplemente ver ese ``Hola mundo'' en la terminal o que podía preguntar a un usuario por su edad y hacer cálculos con la misma, me parecía tan gratificante como el momento en el que aprendes a montar en bici.
+\\
+Ciertamente, los inicios fueron difíciles, como a cualquier persona que empieza a programar, tenía muchos errores de sintaxis al compilar, después el programa no emitía la salida que yo esperaba, pero como dice mi tutor del \gls{tfg}: el problema de un programa suele estar entre el teclado y la silla.
+\\
+Al poco tiempo de comprender las reglas más básicas de la programación, yo que rara vez había prestado atención por los videojuegos, me interesé por cómo estaban hechos por dentro, ya que con lo que había aprendido hasta ese momento me parecía imposible que se generase un videojuego. Pero era demasiado pronto, con los conocimientos que había adquirido era imposible entender el funcionamiento de los mismos. Así que continué con Programación 2 donde (al menos en el año en que yo la cursé), se crea algo que comienza a parecerse a un juego, pero con una interfaz de terminal. Pero todavía no era capaz de imaginarme cómo era que un personaje se movía por la pantalla, se emitían sonidos, etc.
+\\
+Así que continué aprendiendo lo que el la universidad nos enseñan, que son muchos más temás relacionados con la informática a parte de la programación, mientras me olvidaba de mi primer propósito. Pero en tercero de carrera de \gls{ii} imparten una asignatura llamada \gls{si} impartida entre otros, por la que fue mi maestra Mireia Luisa Sempere Tortosa. Ella fue la que me hizo conocer el mundo de la \gls{ia} y me pareció tan interesante, que sentí lo mismo que con aquel ``Hola mundo'' en Programación 1.
+\\
+Por esto último es que cuando tuve que escoger el tema para mi \gls{tfg} acudí a ella, le comenté mi idea de un videojuego cuyos rivales estén controlados mediante \gls{ia}, y me presentó a quien consideró la persona más apropiada para el tema, mi actual tutor: Francisco José Gallego Durán. Con él es con quien tuve una charla al respecto de lo que yo quería hacer, ya que él es una persona experimentada en el tema, y llegamos a una conclusión, que es el tema de mi \gls{tfg}.
+
+
+\chapter*{Resumen}
+Como no tengo todos los conocimientos necesarios para el desarrollo completo de este \gls{tfg}, parte de este será formación, y para ser directo y conciso dividiré el trabajo en tres partes.
+
+La primera será la creación de un motor gráfico para videojuegos desde cero, aprendiendo mediante el curso de mi tutor \cite{CursoMotorC++}, el cual es una de las asignaturas que imparte en la \gls{ua}, pero en una lista de vídeos para que cualquier persona que desee aprender a crearlo, pueda hacerlo mediante ese canal.
+
+La segunda parte es la creación del videojuego. Esta parte no requiere de aprendizaje, ya que el proceso de crearlo necesita de imaginación más que de conocimientos técnicos. Sin embargo, sí que hay que aprender cómo implementar las mecánicas de juego, algunas de ellas (como los saltos, por ejemplo) son enseñadas por mi tutor en su curso, mientras que otras serán de creación propia y se basarán en mis conocimientos de programación y de nuevo, la imaginación necesaria para tener una idea de cómo ha de ser jugable el juego.
+
+La tercera será generar un sistema de \gls{ia} que sea capaz de adaptar la dificultad, al nivel de juego del humano que está jugando. En esta última parte necesitaré aprender los conocimientos sobre \gls{ml} necesarios, como el uso del perceptrón, redes neuronales, y otros conceptos útiles para que los bots del juego tengan la capacidad de aprender  a jugar.
+
+Los objetivos que me he marcado en el \gls{tfg} son: conseguir crear un juego desde cero, al igual que una \gls{ia}, para así comprender la dificultad y, por qué no, cuán entretenido es hacer un videojuego. 
+\\
+Ya que la parte de la informática que más me gusta es la programación, he decidido tomarme este \gls{tfg} como un entretenimiento, y no solo como un trabajo más de la carrera, de esta manera será más llevadero este largo trabajo que me espera.
+
+Siendo más específico, mis objetivos personales son:
+\begin{itemize}
+    \item Aprender cómo funcionan los algoritmos de Inteligencia Artificial en profundidad, con el mínimo número de librerías externas, que ayudan en la productividad de un proyecto pero no ayudan a entender el verdadero funcionamiento de los mismos.
+    \item Crear un juego entretenido, y también educativo\footnote{El objetivo final es, que quien lo juegue aprenda cómo funciona la \gls{ia}, aún sin tener conocimientos de informática, simplemente jugando al juego}, el cual sirva como portfolio para demostrar mis conocimientos dentro del campo de los videojuegos y también en el mundo de la \gls{ia}, más concretamente en el \gls{ml}.
+    \item Una vez adquiridos los conocimientos, poder decidir si es este campo, al que quiero dedicar mi vida profesional.
+\end{itemize}
+
+
+\cleardoublepage %salta a nueva página impar
+\chapter*{Agradecimientos}
+
+\thispagestyle{empty}
+\vspace{1cm}
+
+Gracias, en primer lugar, a mi madre y mi abuela, que son las dos personas que me han criado y han confiado en mí desde el primer día. Sin su ánimo no podría haber llegado a entrar en la carrera que me permite hacer este \gls{tfg}.
+
+Gracias a mis compañeros de clase: Mateo Duque, Cayetano Manchón, Carlos Ascó y Antonio Macia. Ellos han hecho este trayecto de mi vida en la carrera mucho más ameno, y sin su ayuda en las épocas de estudio no podría haber llegado tan lejos. Entre nosotros nos hemos ayudado a estudiar y superar cada aspecto de las diferentes asignaturas durante toda la carrera. 
+
+Gracias a Jose Manuel Requena Plens, desarrollador de la plantilla\footnote{Se puede encontrar en \url{https://github.com/jmrplens/TFG-TFM\_EPS}} de este \gls{tfg}. Gracias a él, los estudiantes de la \gls{eps} de la \gls{ua} tienen a su alcance una plantilla que facilita la que es, posiblemente, la parte más tediosa del \gls{tfg}.
+
+Gracias a mi tutor, Francisco José Gallego Durán. Él me ayudó a dar forma a la idea difusa que tenía sobre lo que quería hacer para acabar la carrera, además de guiarme durante el desarrollo del \gls{tfg} con material para documentarme y más orientación de mis ideas prematuras, creadas desde el desconocimiento del tema. Y a mi profesora Mireia Luisa Sempere Tortosa, por despertarme este interés por la \gls{ia} y por presentarme a mi tutor cuando le pedí ayuda.
+
+Por último, gracias a mis dos amigos: José Moreno y Jordi Ferrández. Conocí a ambos durante el primer año de carrera, y probablemente sea lo mejor que me llevo de la universidad. Con ellos he compartido toda mi vida desde que empecé la universidad, tanto a nivel estudiantil como a nivel personal, ellos también son parte de que yo haya podido llegar hasta aquí.
+
+\cleardoublepage %salta a nueva página impar
+% Aquí va la dedicatoria si la hubiese. Si no, comentar la(s) linea(s) siguientes
+\chapter*{}
+\setlength{\leftmargin}{0.5\textwidth}
+\setlength{\parsep}{0cm}
+\addtolength{\topsep}{0.5cm}
+\begin{flushright}
+\small\em{
+Gracias a mi abuela Isabel,\\
+ella fue la primera persona en creer en mí como ingeniero informático,\\
+y la persona que me regaló este portátil con el que hoy trabajo
+}
+\end{flushright}
+
+
+\cleardoublepage %salta a nueva página impar
+% Aquí va la cita célebre si la hubiese. Si no, comentar la(s) linea(s) siguientes
+\chapter*{}
+\setlength{\leftmargin}{0.5\textwidth}
+\setlength{\parsep}{0cm}
+\addtolength{\topsep}{0.5cm}
+\begin{flushright}
+\small\em{
+Si consigo ver más lejos\\
+es porque he conseguido auparme\\ 
+a hombros de gigantes \todo{Elegir una cita}
+}
+\end{flushright}
+\begin{flushright}
+\small{
+Isaac Newton.
+}
+\end{flushright}
+\cleardoublepage %salta a nueva página impar
