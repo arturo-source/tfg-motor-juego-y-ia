@@ -1,42 +1,30 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include <array>
-#include <string>
+#include <game/cmp/neuralnetwork.hpp>
+#include <game/util/gameconfig.hpp>
 
-struct CurrentMatchState_t {
-    float y;
-    float vy;
-    float aceleration;
-    float ballx, bally;
-    float ballVx, ballVy;
-    bool  upPressed;
-    bool  downPressed;
-};
+struct AItrainer_t {
+    explicit AItrainer_t() = default;
+    using Vec_MatchStates = std::vector<VecDouble_t>;
 
-struct AI_trainer_t {
-    explicit AI_trainer_t() = default;
-    using float_array = std::array<float, 8>;
-    using Vec_MS      = std::vector<CurrentMatchState_t>;
+    void read_data_csv(const std::string& filename);
+    void prepareData(const GameConfig& gConfig);
+    double train(const int n_iter, const float learning_rate);
+    void export_weights_as_csv(const char* filename) const;
 
-    void train(const std::string& filename, const int32_t N);
+    uint32_t totalLinesRead() const noexcept { return dataInputs.size(); }
+    void infoFromData(uint32_t& data_without_touch, uint32_t& data_with_up, uint32_t& data_with_down) const noexcept {
+        data_without_touch = 0; data_with_up = 0; data_with_down;
+        for(const auto& output: dataOutputs) {
+            if(output[0] == 1.0) ++data_with_up;
+            if(output[1] == 1.0) ++data_with_down;
+            if(output[0] == 0.0 && output[1] == 0.0) ++data_without_touch;
+        }
+    }
+    
 private:
-    enum {
-        Up   = 0x01,
-        Down = 0x02
-    };
-
-    void train(float_array& weights, const int8_t usedKey, const int32_t N);
-    auto adjust_dataset(const Vec_MS& states, const int8_t usedKey) const;
-    void dumpWeights() const;
-    void readCSV(const std::string& filename);
-    constexpr float_array CurrentMatchState2array(const CurrentMatchState_t& ms) const;
-    constexpr int8_t calculateOutput(const float_array& weights, const float_array& inputs) const;
-    auto calculateErrors(const Vec_MS& dataset, float_array& weights, const int8_t usedKey) const;
-    constexpr void updateWeights(float_array& weights, const float_array& inputs, const int8_t addOrSubstract) const;
-    constexpr bool isKeyPressed(const CurrentMatchState_t& ms, const int8_t usedKey) const;
-
-    float_array weightsUp {};
-    float_array weightsDown {};
-    Vec_MS matchStates {};
+    Vec_MatchStates dataInputs {};
+    Vec_MatchStates dataOutputs {};
+    NeuralNetwork_t nn{0};
 };

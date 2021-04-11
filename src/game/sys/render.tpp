@@ -77,8 +77,3 @@ void RenderSystem_t<GameCTX_t>::update(const GameCTX_t& g) const {
     igUtils.renderFrameBuffer();
     igUtils.postrender();
 }
-
-template<typename GameCTX_t>
-void RenderSystem_t<GameCTX_t>::mainMenu(GameConfig& gConfig) const {
-    igUtils.mainMenu(gConfig);
-}

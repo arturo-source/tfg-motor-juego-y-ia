@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <filesystem>
 #include <game/man/state.hpp>
 #include <game/man/game.hpp>
@@ -22,7 +21,6 @@ protected:
     static constexpr uint64_t NSPF { 1000000000/FPS };
 
     uint8_t selected_option { 0 };
-    std::vector<std::string> options;
     GameConfig gConfig;
 
     StateManager_t& SM;
@@ -32,24 +30,99 @@ protected:
           InputSystem_t <ECS::EntityManager_t>& Input;
 };
 
+struct SaveFileMenu_t : MenuState_t {
+    explicit SaveFileMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const AItrainer_t& ai, const uint32_t scrW, const uint32_t scrH)
+    : MenuState_t(sm, ren, inp, scrW, scrH), AI{ai}
+    {}
+    void update() final {
+        GameTimer_t timer;
+
+        if(gConfig.saveFile) {
+            AI.export_weights_as_csv(gConfig.weight_filename);
+            m_Alive = false;
+        }
+
+        timer.timedCall("REN", [&](){ Render.getMenu().saveFileMenu(gConfig); });
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
+    }
+
+private:
+    const AItrainer_t& AI;
+};
+
+struct ResultOfTrainingMenu_t : MenuState_t {
+    explicit ResultOfTrainingMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const char* filename, const uint32_t scrW, const uint32_t scrH)
+    : MenuState_t(sm, ren, inp, scrW, scrH)
+    {
+        gConfig.data_filename = filename;
+        AI.read_data_csv(filename);
+    }
+    void update() final {
+        GameTimer_t timer;
+
+        if(gConfig.train && times_trained < gConfig.n_iter) {
+            times_trained += train_offset;
+            results.push_back(AI.train(train_offset, gConfig.learning_rate));
+        } else {
+            gConfig.train = false;
+        }
+
+        if(gConfig.setData) {
+            results = {};
+            times_trained = 0;
+            train_offset = gConfig.n_iter/1000;
+            gConfig.train = true;
+            gConfig.setData = false;
+            if(train_offset == 0) train_offset = 1;
+
+            AI.prepareData(gConfig);
+        }
+
+        if(gConfig.saveFile) {
+            SM.pushState<SaveFileMenu_t>(SM, Render, Input, AI, kSCRWIDTH, kSCRHEIGHT);
+            m_Alive = false;
+        }
+
+        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, results, AI.totalLinesRead()); });
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
+
+        if(gConfig.exit) {
+            m_Alive = false;
+        }
+    }
+private:
+    AItrainer_t AI;
+    
+    uint32_t train_offset;
+    uint32_t times_trained;
+    std::vector<float> results {};
+};
 
 struct TrainingMenu_t : MenuState_t {
     explicit TrainingMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH)
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
-        options = loadCSVFiles();
+        static std::vector<std::string> files_str;
+        files_str = loadCSVFiles();
+        for(auto& f: files_str)
+            files.push_back(f.c_str());
     }
     void update() final {
         GameTimer_t timer;
-        if(Input.isKeyPressed(ECS::Down) && selected_option < options.size()-1) ++selected_option;
-        if(Input.isKeyPressed(ECS::Up)   && selected_option > 0)                --selected_option;
-        if(Input.isKeyPressed(ECS::Esc)) m_Alive = false;
-        if(Input.isKeyPressed(ECS::Intro)) {
-            AI.train(options[selected_option], N_times);
+
+        if(gConfig.readFile && gConfig.data_filename != nullptr) {
+            gConfig.readFile = false;
+            SM.pushState<ResultOfTrainingMenu_t>(SM, Render, Input, gConfig.data_filename, kSCRWIDTH, kSCRHEIGHT);
             m_Alive = false;
         }
 
-        timer.timedCall("REN", [&](){ Render.mainMenu(gConfig); });
+        if(gConfig.exit) {
+            m_Alive = false;
+        }
+
+        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFile(gConfig, files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
@@ -58,32 +131,26 @@ struct TrainingMenu_t : MenuState_t {
         std::vector<std::string> options {};
         for (const auto & entry : std::filesystem::directory_iterator("CSVs"))
             options.push_back(entry.path().string());
+        
         return options;
     }
 private:
-    AI_trainer_t AI{};
+    std::vector<const char*> files;
 };
 
 
 struct MainMenu_t : MenuState_t {
     explicit MainMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
     : MenuState_t(sm, ren, inp, scrW, scrH)
-    {
-        options = {
-            "1. Play",
-            "2. Train",
-            "3. Play against AI",
-            "4. Exit"
-        };
-    }
+    {}
     void update() final {
         GameTimer_t timer;
 
-        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.train) SM.pushState<TrainingMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.exit) m_Alive = false;
 
-        timer.timedCall("REN", [&](){ Render.mainMenu(gConfig); });
+        timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }

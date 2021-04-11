@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <vector>
 
 #include <game/util/gameconfig.hpp>
 
@@ -9,12 +10,17 @@ struct ImGuiUtilities {
     ~ImGuiUtilities();
 
     void mainMenu(GameConfig& gConfig) const noexcept;
+    void trainMenu_selectFile(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept;
+    void trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& values, const uint32_t totalLinesRead) const noexcept;
+    void saveFileMenu(GameConfig& gConfig) const noexcept;
     void prerender() const noexcept;
     void postrender() const noexcept;
     void renderFrameBuffer() const noexcept;
 
 private:
+    void HelpMarker(const char* desc) const noexcept;
     void reverseYAxis() const noexcept;
+    void renderWithoutFlipFrameBuffer() const noexcept;
     void renderUI() const noexcept;
     
     const uint32_t m_w {0}, m_h{0};

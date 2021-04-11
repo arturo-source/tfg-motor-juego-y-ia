@@ -12,8 +12,9 @@ struct RenderSystem_t {
     explicit RenderSystem_t(uint32_t w, uint32_t h);
 
     void update(const GameCTX_t& g) const;
-    void mainMenu(GameConfig& gConfig) const;
     
+    const ImGuiUtilities& getMenu() const noexcept { return igUtils; }
+
     //Constantes
     static constexpr uint32_t backgroungColor = 0xff00897b;
 private:

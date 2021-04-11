@@ -1,13 +1,13 @@
 #include <game/util/gameobjectfactory.hpp>
 
-ECS::Entity_t& GameObjectFactory_t::createEntity(float x, float y, uint32_t w, uint32_t h, uint32_t color) const {
+ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t w, uint32_t h, uint32_t color) const {
     auto& e = m_EntMan.createEntity();
     auto& rn = m_EntMan.addComponent<RenderComponent_t>(e);
     auto& ph = m_EntMan.addComponent<PhysicsComponent_t>(e);
     auto& cl = m_EntMan.addComponent<ColliderComponent_t>(e);
     rn.loadFromWH(w, h, color);
-    ph.x  = x; ph.y  = y;
-    ph.vx = 0; ph.vy = 0;
+    // ph.x  = x; ph.y  = y;
+    // ph.vx = 0; ph.vy = 0;
     cl.box.xLeft  = 0;
     cl.box.xRight = rn.w;
     cl.box.yUp    = 0;
@@ -17,15 +17,14 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(float x, float y, uint32_t w, u
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPaletteAI(float x, float y, uint8_t side, uint32_t color) const {
-    auto& e = createPalette(x, y, side, color);
-    auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(e);
+void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity) const {
+    auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(entity);
     pc.setWeights();
-    return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side, uint32_t color) const {
-    auto& e = createPalette(x, y, paletteW, paletteH, color, side);
+
+ECS::Entity_t& GameObjectFactory_t::createPalette(uint8_t side, uint32_t color) const {
+    auto& e = createPalette(paletteW, paletteH, color, side);
     auto& sco = m_EntMan.addComponent<ScoreComponent_t>(e);
     auto& weap = m_EntMan.addComponent<WeaponComponent_t>(e);
 
@@ -40,27 +39,21 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint8_t side
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createMinionAI(float x, float y, uint8_t side, uint32_t color) const {
-    auto& e = createMinion(x, y, side, color);
-    auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(e);
-    pc.setWeights();
-    return e;
-}
-
-ECS::Entity_t& GameObjectFactory_t::createMinion(float x, float y, uint8_t side, uint32_t color) const {
+ECS::Entity_t& GameObjectFactory_t::createMinion(uint8_t side, uint32_t color) const {
     constexpr uint32_t w { paletteW }, h { paletteH/2 };
-    auto& e = createPalette(x, y, w, h, color, side);
+    auto& e = createPalette(w, h, color, side);
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
         if(side & InputComponent_t::S_Right) phy->x -= w/2;
         if(side & InputComponent_t::S_Left)  phy->x += w/2;
     }
+    addInteligence(e);
 
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createPalette(float x, float y, uint32_t w, uint32_t h, uint32_t color, uint8_t side) const {
-    auto& e = createEntity(x - w/2, y - h/2, w, h, color);
+ECS::Entity_t& GameObjectFactory_t::createPalette(uint32_t w, uint32_t h, uint32_t color, uint8_t side) const {
+    auto& e = createEntity(w, h, color);
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
         phy->friction = 0.97;
@@ -78,9 +71,11 @@ ECS::Entity_t& GameObjectFactory_t::createBullet(const PhysicsComponent_t& palet
     constexpr float vx { 5 };
     constexpr uint32_t color { 0xFFf44336 };
     
-    auto& e = createEntity(palette_phy.x, palette_phy.y + paletteH/2, w, h, color);
+    auto& e = createEntity(w, h, color);
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
+        phy->x = palette_phy.x;
+        phy->y = palette_phy.y + paletteH/2;
         if( side & InputComponent_t::S_Left ) {
             phy->vx = vx;
             phy->x += paletteW;
@@ -97,9 +92,9 @@ ECS::Entity_t& GameObjectFactory_t::createBullet(const PhysicsComponent_t& palet
     return e;
 }
 
-ECS::Entity_t& GameObjectFactory_t::createBall(float x, float y, const uint32_t color) const {
+ECS::Entity_t& GameObjectFactory_t::createBall(const uint32_t color) const {
     constexpr uint32_t w { 10 }, h { 10 };
-    auto& e = createEntity(x - w/2 , y - h/2, w, h, color);
+    auto& e = createEntity(w, h, color);
 
     auto* phy = e.getComponent<PhysicsComponent_t>();
     if(phy) {
@@ -131,12 +126,24 @@ void GameObjectFactory_t::createWalls(const uint32_t scrWidth, const uint32_t sc
 void GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const {
     for(uint32_t j = 0; j < wallsPerColumn; ++j) {
         uint32_t y { 10 + j * (wallHeight+3) };
-        auto& e = createEntity(x, y, wallWidth, wallHeight, color);
+        auto& e = createEntity(wallWidth, wallHeight, color);
+        
         auto* col = e.getComponent<ColliderComponent_t>();
         if(col) col->properties = ColliderComponent_t::P_IsWall | ColliderComponent_t::P_Bounces;
+        
+        auto* phy = e.getComponent<PhysicsComponent_t>();
+        if(phy) {
+            phy->x = x;
+            phy->y = y;
+        }
     }
 }
 
 void GameObjectFactory_t::createMiddleLine(const uint32_t scrWidth, const uint32_t scrHeight) const {
-    createEntity(scrWidth/2 - 1, 0, 2, scrHeight, 0xff002233);
+    auto& e = m_EntMan.createEntity();
+    auto& rn = m_EntMan.addComponent<RenderComponent_t>(e);
+    auto& ph = m_EntMan.addComponent<PhysicsComponent_t>(e);
+    ph.x = scrWidth/2 - 1;
+    ph.y = 0;
+    rn.loadFromWH(2, scrHeight, 0xff002233);
 }

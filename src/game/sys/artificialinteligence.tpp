@@ -15,10 +15,10 @@ void ArtificialInteligenceSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 
 template<typename GameCTX_t>
 constexpr bool ArtificialInteligenceSystem_t<GameCTX_t>::isKeyPressed(const PerceptronComponent_t &pc, const PhysicsComponent_t& playerPhysics, int8_t side) const {
-    if(!ballPhysics) throw std::runtime_error("Ball physics missing in game.");
+    if(!gameReferences.Lball) throw std::runtime_error("Ball physics missing in game.");
     std::array<float, 8> dataInputs {
         1, playerPhysics.y, playerPhysics.vy, playerPhysics.aceleration,
-        ballPhysics->x, ballPhysics->y, ballPhysics->vx, ballPhysics->vy
+        gameReferences.Lball->x, gameReferences.Lball->y, gameReferences.Lball->vx, gameReferences.Lball->vy
     };
 
     return pc.isKeyPressed(dataInputs, side);
