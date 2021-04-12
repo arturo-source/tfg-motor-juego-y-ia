@@ -17,15 +17,12 @@ struct GameReferences {
         
         ECS::Entity_t& Lplayer_entity = GOFact.createPalette(InputComponent_t::S_Left , leftTeamColor);
         ECS::Entity_t& Rplayer_entity = GOFact.createPalette(InputComponent_t::S_Right, rightTeamColor);
-                                        // GOFact.addInteligence(Lplayer_entity);
-                                        // GOFact.addInteligence(Rplayer_entity);
+        if(gameConfig.Lplayer_AI)       GOFact.addInteligence(Lplayer_entity, gameConfig.Lplayer_AI_file);
+        if(gameConfig.Rplayer_AI)       GOFact.addInteligence(Rplayer_entity, gameConfig.Rplayer_AI_file);
         ECS::Entity_t& Lball_entity   = GOFact.createBall(leftTeamColor2);
         ECS::Entity_t& Rball_entity   = GOFact.createBall(rightTeamColor2);
         ECS::Entity_t& Lminion_entity = GOFact.createMinion(InputComponent_t::S_Right | InputComponent_t::S_Center, rightTeamColor);
         ECS::Entity_t& Rminion_entity = GOFact.createMinion(InputComponent_t::S_Left  | InputComponent_t::S_Center, leftTeamColor);
-
-        if(gameConfig.Lplayer_AI) GOFact.addInteligence(Lplayer_entity); 
-        if(gameConfig.Rplayer_AI) GOFact.addInteligence(Rplayer_entity); 
 
         GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 1, leftTeamColor2, rightTeamColor2);
 
@@ -53,6 +50,8 @@ struct GameReferences {
     }
 
     void dumpCSV() const {
+        if(gameConfig.Lplayer_AI && gameConfig.Rplayer_AI) return;
+
         std::ofstream file(filename.c_str(), std::ios::app);
         if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
         if( !(Lball && Rball && Lplayer && Rplayer && Lminion && Rminion && Linputs && Rinputs) ) 
@@ -85,7 +84,7 @@ struct GameReferences {
         // Stop when data%d.csv doesnt exist
         while(fi_is_open) {
             filename.str("");
-            filename << "CSVs/data" << num << ".csv";
+            filename << "dataset_CSVs/data" << num << ".csv";
             fi.open(filename.str());
             fi_is_open = fi.is_open();
             num++;

@@ -26,9 +26,9 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t w, uint32_t h, uint32_
     return e;
 }
 
-void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity) const {
+void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity, const char* filename) const {
     auto& nn = m_EntMan.addComponent<NeuralNetwork_t>(entity);
-    nn.setNeurons("weights.csv");
+    nn.setNeurons(filename);
 }
 
 
@@ -63,7 +63,7 @@ ECS::Entity_t& GameObjectFactory_t::createMinion(uint8_t side, uint32_t color) c
         inp.key_shoot = ECS::Intro;
     }
     inp.side = side;
-    addInteligence(e);
+    addInteligence(e, "weights_CSVs/weights.csv");
 
     return e;
 }

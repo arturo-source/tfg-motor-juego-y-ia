@@ -13,6 +13,14 @@ struct MenuState_t : StateBase_t {
     virtual void update()  = 0;
 
     bool alive() final { return m_Alive; }
+
+    std::vector<std::string> loadCSVFiles(const std::string& dir) {
+        std::vector<std::string> options {};
+        for (const auto & entry : std::filesystem::directory_iterator(dir))
+            options.push_back(entry.path().string());
+        
+        return options;
+    }
 protected:
     const uint32_t kSCRWIDTH;
     const uint32_t kSCRHEIGHT;
@@ -105,7 +113,7 @@ struct TrainingMenu_t : MenuState_t {
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
         static std::vector<std::string> files_str;
-        files_str = loadCSVFiles();
+        files_str = loadCSVFiles("dataset_CSVs");
         for(auto& f: files_str)
             files.push_back(f.c_str());
     }
@@ -126,14 +134,6 @@ struct TrainingMenu_t : MenuState_t {
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
-    
-    std::vector<std::string> loadCSVFiles() {
-        std::vector<std::string> options {};
-        for (const auto & entry : std::filesystem::directory_iterator("CSVs"))
-            options.push_back(entry.path().string());
-        
-        return options;
-    }
 private:
     std::vector<const char*> files;
 };
@@ -142,7 +142,12 @@ private:
 struct MainMenu_t : MenuState_t {
     explicit MainMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
     : MenuState_t(sm, ren, inp, scrW, scrH)
-    {}
+    {
+        static std::vector<std::string> files_str;
+        files_str = loadCSVFiles("weights_CSVs");
+        for(auto& f: files_str)
+            files.push_back(f.c_str());
+    }
     void update() final {
         GameTimer_t timer;
 
@@ -150,8 +155,10 @@ struct MainMenu_t : MenuState_t {
         if(gConfig.train) SM.pushState<TrainingMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.exit) m_Alive = false;
 
-        timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig); });
+        timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig, files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
+private:
+    std::vector<const char*> files;
 };

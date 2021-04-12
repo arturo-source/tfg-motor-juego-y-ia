@@ -57,7 +57,7 @@ ImGuiUtilities::~ImGuiUtilities() {
     glfwTerminate();
 }
 
-void ImGuiUtilities::mainMenu(GameConfig& gConfig) const noexcept {
+void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
@@ -68,8 +68,27 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig) const noexcept {
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::Checkbox("Left player with AI", &gConfig.Lplayer_AI);
+    if(gConfig.Lplayer_AI) {
+        if(files.size() > 0) {
+            static int Lplayer_file = 0;
+            ImGui::ListBox("Left weight files", &Lplayer_file, files.data(), files.size(), 4);
+            gConfig.Lplayer_AI_file = files[Lplayer_file];
+        } else {
+            ImGui::Text("Must train first.");
+        }
+    }
+
     ImGui::TableSetColumnIndex(2);
     ImGui::Checkbox("Right player with AI", &gConfig.Rplayer_AI);
+    if(gConfig.Rplayer_AI) {
+        if(files.size() > 0) {
+            static int Rplayer_file = 0;
+            ImGui::ListBox("Right weight files", &Rplayer_file, files.data(), files.size(), 4);
+            gConfig.Rplayer_AI_file = files[Rplayer_file];
+        } else {
+            ImGui::Text("Must train first.");
+        }
+    }
 
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
@@ -103,7 +122,7 @@ void ImGuiUtilities::trainMenu_selectFile(GameConfig& gConfig, const std::vector
     ImGui::BeginTable("Menu table", 3);
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
-    static int item_current = 1;
+    static int item_current = 0;
     ImGui::ListBox("Training files", &item_current, files.data(), files.size(), 4);
     
     ImGui::TableNextRow();

@@ -4,7 +4,6 @@
 /game.exe
 vgcore*
 .vscode/*
-CSVs/*
+dataset_CSVs/*
+weights_CSVs/*
 imgui.ini
-imgui_main.tpp
-weights.csv

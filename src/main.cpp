@@ -7,6 +7,8 @@
 #include <game/man/menu.hpp>
 
 int main() {
+    std::filesystem::create_directory("dataset_CSVs");
+    std::filesystem::create_directory("weights_CSVs");
     constexpr uint32_t kSCRWIDTH  {900};
     constexpr uint32_t kSCRHEIGHT {500};
     
