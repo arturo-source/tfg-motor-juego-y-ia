@@ -1,9 +1,8 @@
 #pragma once
 #include <ecs/util/typealiases.hpp>
-#include <game/cmp/inteligence.hpp>
+#include <game/cmp/neuralnetwork.hpp>
 #include <game/cmp/physics.hpp>
 #include <game/cmp/input.hpp>
-#include <game/cmp/collider.hpp>
 #include <game/util/gamereferences.hpp>
 
 template<typename GameCTX_t>
@@ -13,6 +12,6 @@ struct ArtificialInteligenceSystem_t {
  
     void update(GameCTX_t& g) const;
 private:
-    constexpr bool isKeyPressed(const PerceptronComponent_t &pc, const PhysicsComponent_t& playerPhysics, int8_t side) const;
+    constexpr void keysPressed(NeuralNetwork_t& nn, const PhysicsComponent_t& phy, const InputComponent_t& inp, bool& keyUp, bool& keyDown) const noexcept;
     GameReferences& gameReferences;
 };

@@ -17,6 +17,8 @@ struct GameReferences {
         
         ECS::Entity_t& Lplayer_entity = GOFact.createPalette(InputComponent_t::S_Left , leftTeamColor);
         ECS::Entity_t& Rplayer_entity = GOFact.createPalette(InputComponent_t::S_Right, rightTeamColor);
+                                        // GOFact.addInteligence(Lplayer_entity);
+                                        // GOFact.addInteligence(Rplayer_entity);
         ECS::Entity_t& Lball_entity   = GOFact.createBall(leftTeamColor2);
         ECS::Entity_t& Rball_entity   = GOFact.createBall(rightTeamColor2);
         ECS::Entity_t& Lminion_entity = GOFact.createMinion(InputComponent_t::S_Right | InputComponent_t::S_Center, rightTeamColor);

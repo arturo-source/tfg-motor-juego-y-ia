@@ -1,4 +1,13 @@
 #include <game/util/gameobjectfactory.hpp>
+#include <game/cmp/neuralnetwork.hpp>
+#include <game/cmp/collider.hpp>
+#include <game/cmp/input.hpp>
+#include <game/cmp/render.hpp>
+#include <game/cmp/spawner.hpp>
+#include <game/cmp/health.hpp>
+#include <game/cmp/score.hpp>
+#include <game/cmp/weapon.hpp>
+
 
 ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t w, uint32_t h, uint32_t color) const {
     auto& e = m_EntMan.createEntity();
@@ -18,8 +27,8 @@ ECS::Entity_t& GameObjectFactory_t::createEntity(uint32_t w, uint32_t h, uint32_
 }
 
 void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity) const {
-    auto& pc = m_EntMan.addComponent<PerceptronComponent_t>(entity);
-    pc.setWeights();
+    auto& nn = m_EntMan.addComponent<NeuralNetwork_t>(entity);
+    nn.setNeurons("weights.csv");
 }
 
 
@@ -47,6 +56,13 @@ ECS::Entity_t& GameObjectFactory_t::createMinion(uint8_t side, uint32_t color) c
         if(side & InputComponent_t::S_Right) phy->x -= w/2;
         if(side & InputComponent_t::S_Left)  phy->x += w/2;
     }
+    auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
+    if(side & InputComponent_t::S_Right) {
+        inp.key_UP    = ECS::o;
+        inp.key_DOWN  = ECS::l;
+        inp.key_shoot = ECS::Intro;
+    }
+    inp.side = side;
     addInteligence(e);
 
     return e;

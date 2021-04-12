@@ -1,15 +1,6 @@
 #pragma once
-#include <string_view>
 #include <ecs/man/entitymanager.tpp>
-#include <game/cmp/collider.hpp>
-#include <game/cmp/input.hpp>
 #include <game/cmp/physics.hpp>
-#include <game/cmp/render.hpp>
-#include <game/cmp/spawner.hpp>
-#include <game/cmp/health.hpp>
-#include <game/cmp/score.hpp>
-#include <game/cmp/inteligence.hpp>
-#include <game/cmp/weapon.hpp>
 
 struct GameObjectFactory_t {
     explicit GameObjectFactory_t(ECS::EntityManager_t& EntityMan) :

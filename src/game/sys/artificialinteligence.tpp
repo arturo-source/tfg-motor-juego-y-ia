@@ -2,24 +2,53 @@
 
 template<typename GameCTX_t>
 void ArtificialInteligenceSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
-    for(auto& pc: g.template getComponents<PerceptronComponent_t>()) {
-        auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(pc);
-        if(!phy) continue;
+    for(auto& nn: g.template getComponents<NeuralNetwork_t>()) {
+        auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(nn);
+        if(!phy) throw std::runtime_error("The neural network does not have phisics.");
+        auto* inp = g.template getRequiredComponent<InputComponent_t>(nn);
+        if(!inp) throw std::runtime_error("The neural network does not have input.");
 
-        bool keyUP_pressed   = isKeyPressed(pc, *phy, PerceptronComponent_t::Up);
-        bool keyDOWN_pressed = isKeyPressed(pc, *phy, PerceptronComponent_t::Down);
+        bool keyUP_pressed = false,  keyDOWN_pressed = false;
+        keysPressed(nn, *phy, *inp, keyUP_pressed, keyDOWN_pressed);
+
         if( keyDOWN_pressed && !keyUP_pressed) phy->aceleration =  0.44;
         if(!keyDOWN_pressed &&  keyUP_pressed) phy->aceleration = -0.44;
     }
 }
 
 template<typename GameCTX_t>
-constexpr bool ArtificialInteligenceSystem_t<GameCTX_t>::isKeyPressed(const PerceptronComponent_t &pc, const PhysicsComponent_t& playerPhysics, int8_t side) const {
-    if(!gameReferences.Lball) throw std::runtime_error("Ball physics missing in game.");
-    std::array<float, 8> dataInputs {
-        1, playerPhysics.y, playerPhysics.vy, playerPhysics.aceleration,
-        gameReferences.Lball->x, gameReferences.Lball->y, gameReferences.Lball->vx, gameReferences.Lball->vy
+constexpr void ArtificialInteligenceSystem_t<GameCTX_t>::keysPressed(NeuralNetwork_t& nn, const PhysicsComponent_t& phy, const InputComponent_t& inp, bool& keyUp, bool& keyDown) const noexcept {
+    VecDouble_t input_data {
+        phy.x, phy.y, phy.vy, phy.aceleration
     };
-
-    return pc.isKeyPressed(dataInputs, side);
+    if(inp.side & InputComponent_t::S_Left) {
+        input_data.push_back(gameReferences.Lball->x);
+        input_data.push_back(gameReferences.Lball->y);
+        input_data.push_back(gameReferences.Lball->vx);
+        input_data.push_back(gameReferences.Lball->vy);
+        input_data.push_back(gameReferences.Rball->x);
+        input_data.push_back(gameReferences.Rball->y);
+        input_data.push_back(gameReferences.Rball->vx);
+        input_data.push_back(gameReferences.Rball->vy);
+        input_data.push_back(gameReferences.Lminion->x);
+        input_data.push_back(gameReferences.Lminion->y);
+        input_data.push_back(gameReferences.Lminion->vy);
+        input_data.push_back(gameReferences.Lminion->aceleration);
+    } else if(inp.side & InputComponent_t::S_Right) {
+        input_data.push_back(gameReferences.Rball->x);
+        input_data.push_back(gameReferences.Rball->y);
+        input_data.push_back(gameReferences.Rball->vx);
+        input_data.push_back(gameReferences.Rball->vy);
+        input_data.push_back(gameReferences.Lball->x);
+        input_data.push_back(gameReferences.Lball->y);
+        input_data.push_back(gameReferences.Lball->vx);
+        input_data.push_back(gameReferences.Lball->vy);
+        input_data.push_back(gameReferences.Rminion->x);
+        input_data.push_back(gameReferences.Rminion->y);
+        input_data.push_back(gameReferences.Rminion->vy);
+        input_data.push_back(gameReferences.Rminion->aceleration);
+    }
+    VecDouble_t result = nn.feedforward(input_data);
+    keyUp   = result[0] == 1.0;
+    keyDown = result[1] == 1.0;
 }
