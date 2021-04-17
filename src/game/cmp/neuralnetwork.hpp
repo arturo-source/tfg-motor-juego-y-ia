@@ -1,5 +1,6 @@
 #pragma once
 #include <ecs/cmp/component.hpp>
+#include <game/util/gameconfig.hpp>
 
 #include <vector>
 #include <cstdint>
@@ -12,7 +13,7 @@ struct Neuron_t {
     explicit Neuron_t(const VecDouble_t& weights, uint32_t position_in_layer, std::vector<Neuron_t>* output_neurons_pointer);
 
     double feedforward(const VecDouble_t& inputs);
-    void backpropagation(double expected_output, double learning_rate);
+    void backpropagation(double expected_output, double learning_rate, float importance);
     void update_weights();
     void export_as_csv(std::ofstream& file) const;
 
@@ -39,7 +40,7 @@ struct Layer_t {
     explicit Layer_t(std::vector<VecDouble_t> neurons_w, Layer_t* output_layer);
 
     VecDouble_t feedforward(const VecDouble_t& inputs);
-    void backpropagation(const VecDouble_t& expected_output, double learning_rate);
+    void backpropagation(const VecDouble_t& expected_output, double learning_rate, float importance);
     void update_weights();
     void export_as_csv(std::ofstream& file) const;
 private:
@@ -51,7 +52,7 @@ struct NeuralNetwork_t : public ECS::ComponentBase_t<NeuralNetwork_t> {
     {}
 
     VecDouble_t feedforward(const VecDouble_t& inputs);
-    void backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, double learning_rate);
+    void backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, const GameConfig& gConfig);
     void export_as_csv(const std::string& filename) const;
     void setNeurons(const std::vector<uint32_t>& layers);
     void setNeurons(const std::string& filename);

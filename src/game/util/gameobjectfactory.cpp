@@ -58,9 +58,9 @@ ECS::Entity_t& GameObjectFactory_t::createMinion(uint8_t side, uint32_t color) c
     }
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
     if(side & InputComponent_t::S_Right) {
-        inp.key_UP    = ECS::o;
-        inp.key_DOWN  = ECS::l;
-        inp.key_shoot = ECS::Intro;
+        inp.key_UP    = 0;
+        inp.key_DOWN  = 0;
+        inp.key_shoot = 0;
     }
     inp.side = side;
     addInteligence(e, "weights_CSVs/weights.csv");

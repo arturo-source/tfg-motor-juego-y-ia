@@ -4,13 +4,15 @@
 #include <sstream>
 #include <random>
 
-double AItrainer_t::train(const int n_iter, const float learning_rate) {
-    nn.backpropagation(dataInputs, dataOutputs, n_iter, learning_rate);
+double AItrainer_t::train(const int n_iter, const GameConfig& gConfig) {
+    nn.backpropagation(dataInputs, dataOutputs, n_iter, gConfig);
     return nn.average_error(dataInputs, dataOutputs);
 }
 
 void AItrainer_t::export_weights_as_csv(const char* filename) const {
-    nn.export_as_csv(filename);
+    std::string f {"weights_CSVs/"};
+    f += filename;
+    nn.export_as_csv(f);
 }
 
 void AItrainer_t::prepareData(const GameConfig& gConfig) {

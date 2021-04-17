@@ -4,6 +4,7 @@
 #include <imgui/src/imgui_impl_opengl3.h>
 #include <cstdio>
 #include <stdexcept>
+#include <game/util/aitrainer.hpp>
 
 ImGuiUtilities::ImGuiUtilities(uint32_t w, uint32_t h, uint32_t* framebuffer)
 : m_w{w}, m_h{h}, m_framebuffer{framebuffer}
@@ -71,7 +72,7 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*
     if(gConfig.Lplayer_AI) {
         if(files.size() > 0) {
             static int Lplayer_file = 0;
-            ImGui::ListBox("Left weight files", &Lplayer_file, files.data(), files.size(), 4);
+            ImGui::ListBox("##Left weight files", &Lplayer_file, files.data(), files.size(), 4);
             gConfig.Lplayer_AI_file = files[Lplayer_file];
         } else {
             ImGui::Text("Must train first.");
@@ -83,7 +84,7 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*
     if(gConfig.Rplayer_AI) {
         if(files.size() > 0) {
             static int Rplayer_file = 0;
-            ImGui::ListBox("Right weight files", &Rplayer_file, files.data(), files.size(), 4);
+            ImGui::ListBox("##Right weight files", &Rplayer_file, files.data(), files.size(), 4);
             gConfig.Rplayer_AI_file = files[Rplayer_file];
         } else {
             ImGui::Text("Must train first.");
@@ -164,33 +165,78 @@ void ImGuiUtilities::saveFileMenu(GameConfig& gConfig) const noexcept {
     postrender();
 }
 
-void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& values, const uint32_t totalLinesRead) const noexcept {
+void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& values, const AItrainer_t& AI) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
     ImGui::SetNextWindowSize(ImVec2(m_w, m_h));
     ImGui::Begin("Training menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     
-    ImGui::Text("File selected: %s, with %u lines of example.", gConfig.weight_filename, totalLinesRead);
+    static bool change_importance = false;
+    ImGui::Checkbox("Change importance of data", &change_importance);
+    ImGui::SameLine(); HelpMarker(
+        "The dataset is usually full of not pressing key examples. You may want to change the importance of pressing a key, doing it can cause bigger error but better results in game.");
 
-    ImGui::InputInt("Number of iterations", &gConfig.n_iter);
-    ImGui::InputInt("Number of hidden layers", &gConfig.n_layers);
-    ImGui::InputInt("Number of neurons per layer", &gConfig.neuron_per_layer);
-    ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0f, 2.0f, "rate -> %.3f");
+    {
+        uint32_t data_without_touch, data_with_up, data_with_down, total;
+        AI.infoFromData(data_without_touch, data_with_up, data_with_down, total);
+        ImGui::Text("File selected: %s, with %u lines of example.", gConfig.data_filename, total);
 
-    ImGui::BeginTable("Menu table", 3);
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(1);
-    gConfig.setData = ImGui::Button("Train with this parameters");
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(1);
-    gConfig.saveFile = ImGui::Button("Save data of neural network");
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(1);
-    gConfig.exit = ImGui::Button("Exit");
+        ImGui::BeginTable("Dataset table", 3);
 
-    ImGui::EndTable();
-    ImGui::PlotLines("% of error", values.data(), values.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
+        ImGui::TableSetupColumn("Examples with no touch");
+        ImGui::TableSetupColumn("Examples with up touch");
+        ImGui::TableSetupColumn("Examples with down touch");
+        ImGui::TableHeadersRow();
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("%u(%.2f%)", data_without_touch, (float)data_without_touch/(float)total*100);
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%u(%.2f%)", data_with_up, (float)data_with_up/(float)total*100);
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("%u(%.2f%)", data_with_down, (float)data_with_down/(float)total*100);
+
+        if( change_importance ) {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::VSliderFloat("##no touch", ImVec2(30, 120), &gConfig.no_touch_importance, 0.01f, 1.0f, "");
+            if (ImGui::IsItemActive() || ImGui::IsItemHovered())
+                ImGui::SetTooltip("%.2f", gConfig.no_touch_importance);
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::VSliderFloat("##up touch", ImVec2(30, 120), &gConfig.up_touch_importance, 0.01f, 1.0f, "");
+            if (ImGui::IsItemActive() || ImGui::IsItemHovered())
+                ImGui::SetTooltip("%.2f", gConfig.up_touch_importance);
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::VSliderFloat("##down touch", ImVec2(30, 120), &gConfig.down_touch_importance, 0.01f, 1.0f, "");
+            if (ImGui::IsItemActive() || ImGui::IsItemHovered())
+                ImGui::SetTooltip("%.2f", gConfig.down_touch_importance);
+        }
+        ImGui::EndTable();
+    }
+    {
+        ImGui::InputInt("Number of iterations", &gConfig.n_iter);
+        ImGui::InputInt("Number of hidden layers", &gConfig.n_layers);
+        ImGui::InputInt("Number of neurons per layer", &gConfig.neuron_per_layer);
+        ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0f, 2.0f, "learning rate -> %.3f");
+        ImGui::PlotLines("% of error", values.data(), values.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
+    }
+    {
+        ImGui::BeginTable("Menu table", 3);
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.setData = ImGui::Button("Train with this parameters");
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.saveFile = ImGui::Button("Save data of neural network");
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.exit = ImGui::Button("Exit");
+
+        ImGui::EndTable();
+    }
 
     ImGui::End();
 
@@ -257,13 +303,4 @@ void ImGuiUtilities::renderWithoutFlipFrameBuffer() const noexcept {
 void ImGuiUtilities::renderFrameBuffer() const noexcept {
     reverseYAxis();
     renderWithoutFlipFrameBuffer();
-}
-
-void ImGuiUtilities::renderUI() const noexcept {
-    auto& io { ImGui::GetIO() };
-    
-    ImGui::Begin("Window test");
-    ImGui::Text("Hola mundo, ImGui!");
-    ImGui::Text("FPS: %.2f", io.Framerate);
-    ImGui::End();
 }

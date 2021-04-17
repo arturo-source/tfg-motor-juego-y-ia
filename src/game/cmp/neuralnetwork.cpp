@@ -43,9 +43,9 @@ double Neuron_t::feedforward(const VecDouble_t& inputs) {
 
     return m_output;
 }
-void Neuron_t::backpropagation(double expected_output, double learning_rate) {
+void Neuron_t::backpropagation(double expected_output, double learning_rate, float importance) {
     if(m_output_neurons == nullptr) {
-        m_delta = (m_output - expected_output) * m_derivedSigmoid;
+        m_delta = (m_output - expected_output) * m_derivedSigmoid * importance * 10;
     } else {
         double delta_sum { 0 };
         for(const auto& output_neuron: *m_output_neurons)
@@ -95,9 +95,9 @@ VecDouble_t Layer_t::feedforward(const VecDouble_t& inputs) {
 
     return outputs;
 }
-void Layer_t::backpropagation(const VecDouble_t& expected_output, double learning_rate) {
+void Layer_t::backpropagation(const VecDouble_t& expected_output, double learning_rate, float importance) {
     for(std::size_t i=0; i < m_neurons.size(); ++i) 
-        m_neurons[i].backpropagation(expected_output[i], learning_rate);
+        m_neurons[i].backpropagation(expected_output[i], learning_rate, importance);
 }
 void Layer_t::update_weights() {
     for(auto& neuron: m_neurons)
@@ -123,19 +123,28 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
     
     return inputs_copy; 
 }
-void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, double learning_rate) {
+void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, const GameConfig& gConfig) {
     if(X.size() != y.size()) throw std::out_of_range("Given total inputs sample is different from given total outputs sample"); 
 
     for(std::size_t i=0; i < num_iterations; ++i) {
         int index = randInt(0,X.size()-1);
         // for(std::size_t j=0; j < X.size(); ++j) {
-            this->feedforward(X[index]);
+        this->feedforward(X[index]);
 
-            for(auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
-                it->backpropagation(y[index], learning_rate);
+        auto& realOutput = y[index];
+        float importance;
+        if(realOutput[0] == 1.0)
+            importance = gConfig.up_touch_importance;
+        else if(realOutput[0] == 1.0)
+            importance = gConfig.down_touch_importance;
+        else
+            importance = gConfig.no_touch_importance;
 
-            for(auto& layer: m_layers) 
-                layer.update_weights();
+        for(auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+            it->backpropagation(realOutput, gConfig.learning_rate, importance);
+
+        for(auto& layer: m_layers) 
+            layer.update_weights();
         // }
 
         // if(i%10000==0) {

@@ -71,7 +71,7 @@ struct ResultOfTrainingMenu_t : MenuState_t {
 
         if(gConfig.train && times_trained < gConfig.n_iter) {
             times_trained += train_offset;
-            results.push_back(AI.train(train_offset, gConfig.learning_rate));
+            results.push_back(AI.train(train_offset, gConfig));
         } else {
             gConfig.train = false;
         }
@@ -92,7 +92,7 @@ struct ResultOfTrainingMenu_t : MenuState_t {
             m_Alive = false;
         }
 
-        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, results, AI.totalLinesRead()); });
+        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, results, AI); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
@@ -143,21 +143,26 @@ struct MainMenu_t : MenuState_t {
     explicit MainMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
-        static std::vector<std::string> files_str;
-        files_str = loadCSVFiles("weights_CSVs");
-        for(auto& f: files_str)
-            files.push_back(f.c_str());
+        resetFilesPointers();
     }
     void update() final {
         GameTimer_t timer;
 
         if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.train) SM.pushState<TrainingMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.Lplayer_AI || gConfig.Rplayer_AI) resetFilesPointers();
         if(gConfig.exit) m_Alive = false;
 
         timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig, files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
+    }
+    void resetFilesPointers() {
+        static std::vector<std::string> files_str;
+        files_str = loadCSVFiles("weights_CSVs");
+        files = {};
+        for(auto& f: files_str)
+            files.push_back(f.c_str());
     }
 private:
     std::vector<const char*> files;
