@@ -14,6 +14,7 @@ struct RenderSystem_t {
     void update(const GameCTX_t& g) const;
     
     const ImGuiUtilities& getMenu() const noexcept { return igUtils; }
+    const bool            shouldClose() const noexcept{ return igUtils.shouldClose(); }
 
     //Constantes
     static constexpr uint32_t backgroungColor = 0xff00897b;

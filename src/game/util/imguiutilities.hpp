@@ -19,6 +19,7 @@ struct ImGuiUtilities {
     void prerender() const noexcept;
     void postrender() const noexcept;
     void renderFrameBuffer() const noexcept;
+    const bool shouldClose() const noexcept { return glfwWindowShouldClose(m_window); }
 
 private:
     void HelpMarker(const char* desc) const noexcept;
