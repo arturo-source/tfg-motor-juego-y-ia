@@ -1,0 +1,30 @@
+\ifglsentryexists{mlp}{}%
+{%
+\gls@defglossaryentry{mlp}%
+{%
+name={MLP},%
+sort={MLP},%
+type={acronym},%
+first={Multi Layer Perceptron\glsspace (MLP)},%
+firstplural={Multi Layer Perceptron\acrpluralsuffix \glsspace (MLP\acrpluralsuffix )},%
+text={MLP},%
+plural={MLP\acrpluralsuffix },%
+description={Multi Layer Perceptron},%
+descriptionplural={Multi Layer Perceptron\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Multi Layer Perceptron},%
+longplural={Multi Layer Perceptrons},%
+short={MLP},%
+shortplural={MLPs},%
+counter={page},%
+parent={},%
+%
+}%
+}%

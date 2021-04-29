@@ -6,20 +6,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Objetivos}
-\label{objetivos}
-El primer objetivo del proyecto es crear un motor, lo suficientemente genérico como para que pueda ser usado por otros videojuegos. Este motor estará separado de las mecánicas del juego como son el comportamiento de las físicas, las colisiones, o el renderizado, ya que todas estas funcionalidades son diferentes en cada juego, dependerá de si queremos hacer un renderizado 3D, 2D, si queremos un comportamiento distinto de las colisiones, etc. Por lo que crearé un motor para el videojuego, con los conocimientos que habré adquirido mediante la formación previa. 
-
-Luego, el principal objetivo de este proyecto es desarrollar un juego en el que la persona que se decida a jugarlo aprenda los conocimientos básicos sobre \gls{ml}. La tarea del jugador será entrenar a la \gls{ia} de manera que sirva como un oponente capaz de ganar a otros jugadores, y también a otras \gls{ia}.
-\\
-El usuario podrá tanto entrenar al agente en una arena de juego, como poner al agente a entrenar con los datos extraídos de alguna partida, o los datos extraídos de la arena, \todo{e incluso ajustar los parámetros de la \gls{ia} manualmente para experimentar con ellos??}. También, el jugador podrá enfrentarse contra el agente, y en última instancia, el objetivo final es enfrentar la \gls{ia} de un jugador contra la de otro jugador que ofrezca su \gls{ia} como rival. 
-\\
-El concepto de la idea es bastante sencillo, crearé el conocido juego Pong, un juego con mecánicas básicas y fácil de entender, y añadiré dificultades al mismo, que puede ser trivial para un humano superarlas, pero algo más difícil para una máquina. La motivación para añadir estas dificultades al juego es que el juego del Pong tiene tan pocos elementos (una pala rival, una pala que eres tú mismo, y la pelota) que hace muy sencillo que una \gls{ia} pueda aprender a jugar contra un humano a un nivel decente. Es tanto así, que en una parte del  desarrollo habré creado solo el Pong, y podré a entrenar a dos perceptrones, y veremos en los resultados si con sólo dos perceptrones es posible que una \gls{ia} aprenda a jugar al Pong.
-\\
-Posteriormente, cuando haya añadido dificultades al juego, programaré tecnologías más avanzadas que el perceptrón, como puede ser una red neuronal. Y entonces haré pruebas con estas nuevas dificultades añadidas, para ver si realmente el agente consigue aprender a jugar a este remix del juego del Pong.
-\\
-Y por último, añadiré una interfaz amigable, para que el producto final pueda ser manejado por un usuario sin necesidad de editar el código o ficheros de configuración, sino que pueda hacerlo todo desde la interfaz. Tanto entrenar, como seleccionar los conjuntos de datos para la \gls{ia}, como ajustar parámetros, como elegir la opción de jugar, todo desde la interfaz.
-
-Por último, he de remarcar algo más abstracto de los objetivos del proyecto en sí, no del juego: la mayor parte del software usado será de desarrollo propio, es decir, intentaré minimizar el uso de librerías de terceros (sólo usándolas para tareas menos relevantes en el proyecto). Así que el motor del videojuego, el videojuego y la \gls{ia} en sí serán desarrollados desde cero en el lenguaje C/C++. Esto es así porque el objetivo final no es obtener una productividad absoluta, utilizando tecnologías existentes que me permitirían terminar el proyecto en una cantidad de tiempo mucho menor, sino que tengo que estudiar estas tecnologías desde la raíz, analizarlas, y entender en profundidad cómo funcionan estos tres campos en los que se centra mi \gls{tfg}.
+\label{objetivos} 
+He de remarcar algo más abstracto sobre los objetivos del proyecto en sí, no del juego: la mayor parte del software usado será de desarrollo propio, es decir, intentaré minimizar el uso de librerías de terceros (sólo usándolas para tareas menos relevantes en el proyecto). Así que el motor del videojuego, el videojuego y la \gls{ia} en sí serán desarrollados desde cero en el lenguaje C/C++. Esto es así porque el objetivo final no es obtener una productividad absoluta, utilizando tecnologías existentes que me permitirían terminar el proyecto en una cantidad de tiempo mucho menor, sino que tengo que estudiar estas tecnologías desde la raíz, analizarlas, y entender en profundidad cómo funcionan estos tres campos en los que se centra mi \gls{tfg}. De esta manera trabajaré en el conocimiento de cómo está hecha cada tecnología y en un futuro, aportar desde las bases de cada una de ellas.
 
 Más concretamente, los objetivos son:
 \begin{itemize}
@@ -31,6 +19,7 @@ Más concretamente, los objetivos son:
 	\item Diseñar e implementar técnicas de \gls{ml} para que les sea fácilmente utilizable a los jugadores.
 	\item Diseñar métricas para poder medir si la \gls{ia} ha cumplido con los objetivos.
 	\item Crear una interfaz para que estas métricas sean visibles ajustables por los jugadores reales.
-	\item Diseñar diferentes modos de juego en los que el jugador real pueda entrenar a su \gls{ia}.
+	\item Crear un modo de juego para jugador contra jugador.
+	\item Diseñar diferentes modos de juego en los que el jugador real pueda entrenar a su \gls{ia} y captar los datos necesarios para el entrenamiento.
 	\item Crear un modo de juego en el que dos jugadores aporten su \gls{ia} y se visualice el enfrentamiento.
 \end{itemize}
