@@ -22,6 +22,14 @@ struct AItrainer_t {
         }
         total = dataOutputs.size();
     }
+    // void failedTouchesData(uint32_t& data_without_touch, uint32_t& data_with_up, uint32_t& data_with_down, uint32_t& total) {
+    //     data_without_touch = 0; data_with_up = 0; data_with_down = 0;
+    //     for (std::size_t i=0; i < dataOutputs.size(); ++i) {
+    //         const auto& output = nn.feedforward(dataInputs[i]);
+
+    //     }
+    //     total = dataOutputs.size();
+    // }
     
 private:
     Vec_MatchStates dataInputs {};

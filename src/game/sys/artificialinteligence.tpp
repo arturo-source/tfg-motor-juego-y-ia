@@ -49,6 +49,6 @@ constexpr void ArtificialInteligenceSystem_t<GameCTX_t>::keysPressed(NeuralNetwo
         input_data.push_back(gameReferences.Rminion->aceleration);
     }
     VecDouble_t result = nn.feedforward(input_data);
-    keyUp   = result[0] == 1.0;
-    keyDown = result[1] == 1.0;
+    keyUp   = result[0] > 0.5;
+    keyDown = result[1] > 0.5;
 }

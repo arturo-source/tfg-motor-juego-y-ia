@@ -132,13 +132,13 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(GameCTX_t& 
     auto b {move2ScreenCoords(c.box, p.x, p.y)};
     if(b.xLeft < 0 || b.xRight > m_w) { 
         if(c.properties & CP::P_IsBall) {
-            ScoreboardSystem_t<GameCTX_t>::scorePosX = p.x;
-            ScoreboardSystem_t<GameCTX_t>::scored = true;
-            
-            //Reubicate the ball
-            p.x = m_w/2;
-            p.y = m_h/2;
-            p.vy = 0;
+            if( (b.xLeft < 0 && c.properties & CP::P_BounceLeft) || 
+              (b.xRight > m_w && c.properties & CP::P_BounceRight) ) {
+                p.vx = -p.vx;
+            } else {
+                ScoreboardSystem_t<GameCTX_t>::scorePosX = p.x;
+                ScoreboardSystem_t<GameCTX_t>::scored = true;
+            }
         } else if(c.properties & CP::P_IsBullet) {
             g.destroyEntityByID(c.getEntityID());
         }

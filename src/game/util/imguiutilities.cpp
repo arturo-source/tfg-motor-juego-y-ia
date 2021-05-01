@@ -191,66 +191,37 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
 
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
-        ImGui::Text("%u(%.2f%)", data_without_touch, (float)data_without_touch/(float)total*100);
+        ImGui::Text("%u(%.2f%%)", data_without_touch, (float)data_without_touch/(float)total*100);
         ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%u(%.2f%)", data_with_up, (float)data_with_up/(float)total*100);
+        ImGui::Text("%u(%.2f%%)", data_with_up, (float)data_with_up/(float)total*100);
         ImGui::TableSetColumnIndex(2);
-        ImGui::Text("%u(%.2f%)", data_with_down, (float)data_with_down/(float)total*100);
+        ImGui::Text("%u(%.2f%%)", data_with_down, (float)data_with_down/(float)total*100);
 
         if( change_importance ) {
-            constexpr float minvalue = 0.00f;
-
+            float total_percentage = gConfig.no_touch_importance + gConfig.up_touch_importance + gConfig.down_touch_importance;
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            float last_no_touch = gConfig.no_touch_importance;
-            if( ImGui::VSliderFloat("##no touch", ImVec2(30, 120), &gConfig.no_touch_importance, minvalue, 1.0f, "") ) {
-                float changed = (gConfig.no_touch_importance - last_no_touch)/2;
-                if(gConfig.up_touch_importance > minvalue)
-                    gConfig.up_touch_importance -= changed;
-                else if(gConfig.down_touch_importance > minvalue)
-                    gConfig.down_touch_importance -= changed;
-                
-                if(gConfig.down_touch_importance > minvalue)
-                    gConfig.down_touch_importance -= changed;
-                else if(gConfig.up_touch_importance > minvalue)
-                    gConfig.up_touch_importance -= changed;
-            }
+            ImGui::VSliderFloat("##no touch", ImVec2(40, 110), &gConfig.no_touch_importance, 0.01f, 1.0f, "");
             if (ImGui::IsItemActive() || ImGui::IsItemHovered())
                 ImGui::SetTooltip("%.2f", gConfig.no_touch_importance);
 
             ImGui::TableSetColumnIndex(1);
-            float last_up_touch = gConfig.up_touch_importance;
-            if( ImGui::VSliderFloat("##up touch", ImVec2(30, 120), &gConfig.up_touch_importance, minvalue, 1.0f, "") ) {
-                float changed = (gConfig.up_touch_importance - last_up_touch)/2;
-                if(gConfig.no_touch_importance > minvalue)
-                    gConfig.no_touch_importance -= changed;
-                else if(gConfig.down_touch_importance > minvalue)
-                    gConfig.down_touch_importance -= changed;
-
-                if(gConfig.down_touch_importance > minvalue)
-                    gConfig.down_touch_importance -= changed;
-                else if(gConfig.no_touch_importance > minvalue)
-                    gConfig.no_touch_importance -= changed;
-            }
+            ImGui::VSliderFloat("##up touch", ImVec2(40, 110), &gConfig.up_touch_importance, 0.01f, 1.0f, "");
             if (ImGui::IsItemActive() || ImGui::IsItemHovered())
                 ImGui::SetTooltip("%.2f", gConfig.up_touch_importance);
 
             ImGui::TableSetColumnIndex(2);
-            float last_down_touch = gConfig.down_touch_importance;
-            if( ImGui::VSliderFloat("##down touch", ImVec2(30, 120), &gConfig.down_touch_importance, minvalue, 1.0f, "") ) {
-                float changed = (gConfig.down_touch_importance - last_down_touch)/2;
-                if(gConfig.no_touch_importance > minvalue)
-                    gConfig.no_touch_importance -= changed;
-                else if(gConfig.up_touch_importance > minvalue)
-                    gConfig.up_touch_importance -= changed;
-                    
-                if(gConfig.up_touch_importance > minvalue)
-                    gConfig.up_touch_importance -= changed;
-                else if(gConfig.no_touch_importance > minvalue)
-                    gConfig.no_touch_importance -= changed;
-            }
+            ImGui::VSliderFloat("##down touch", ImVec2(40, 110), &gConfig.down_touch_importance, 0.01f, 1.0f, "");
             if (ImGui::IsItemActive() || ImGui::IsItemHovered())
                 ImGui::SetTooltip("%.2f", gConfig.down_touch_importance);
+            
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%.2f%%", gConfig.no_touch_importance/total_percentage*100);
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%.2f%%", gConfig.up_touch_importance/total_percentage*100);
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text("%.2f%%", gConfig.down_touch_importance/total_percentage*100);
         }
         ImGui::EndTable();
     }

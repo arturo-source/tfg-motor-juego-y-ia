@@ -24,9 +24,9 @@
 #include <ecs/util/keys.hpp>
 
 struct GameManager_t : StateBase_t {
-    explicit GameManager_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, GameConfig& gConfig, const uint32_t scrW, const uint32_t scrH) 
+    explicit GameManager_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, GameConfig& gConfig, const uint8_t gameMode, const uint32_t scrW, const uint32_t scrH) 
     : SM{sm}, Render{ren}, Input{inp}, kSCRWIDTH{scrW}, kSCRHEIGHT{scrH}
-    , gameReferences{GOFact, gConfig, scrW, scrH}, ArtificialInteligence{gameReferences}
+    , gameReferences{GOFact, gConfig, gameMode, scrW, scrH}, ArtificialInteligence{gameReferences}
     {
         Input.setObjectFactory(GOFact);
         GOFact.createMiddleLine(kSCRWIDTH, kSCRHEIGHT);
@@ -53,7 +53,7 @@ struct GameManager_t : StateBase_t {
         }
     }
 
-    bool alive() final { return m_playing; }
+    bool alive() final { return m_playing && !Render.shouldClose(); }
 
     ECS::Keyboard_t& getKeyboard() { return Input.getKeyboard(); }
 private:

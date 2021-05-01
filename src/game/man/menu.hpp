@@ -12,7 +12,7 @@ struct MenuState_t : StateBase_t {
     virtual ~MenuState_t() = default;
     virtual void update()  = 0;
 
-    bool alive() final { return m_Alive; }
+    bool alive() final { return m_Alive && !Render.shouldClose();; }
 
     std::vector<std::string> loadCSVFiles(const std::string& dir) {
         std::vector<std::string> options {};
@@ -140,6 +140,8 @@ private:
 
 
 struct MainMenu_t : MenuState_t {
+    using GR = GameReferences;
+
     explicit MainMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
@@ -148,7 +150,8 @@ struct MainMenu_t : MenuState_t {
     void update() final {
         GameTimer_t timer;
 
-        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.arena) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainLeft, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.train) SM.pushState<TrainingMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.Lplayer_AI || gConfig.Rplayer_AI) resetFilesPointers();
         if(gConfig.exit) m_Alive = false;

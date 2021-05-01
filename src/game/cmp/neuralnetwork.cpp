@@ -1,5 +1,6 @@
 #include <game/cmp/neuralnetwork.hpp>
 #include <random>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -43,9 +44,9 @@ double Neuron_t::feedforward(const VecDouble_t& inputs) {
 
     return m_output;
 }
-void Neuron_t::backpropagation(double expected_output, double learning_rate, float importance) {
+void Neuron_t::backpropagation(double expected_output, double learning_rate) {
     if(m_output_neurons == nullptr) {
-        m_delta = (m_output - expected_output) * m_derivedSigmoid * importance * 10;
+        m_delta = (m_output - expected_output) * m_derivedSigmoid;
     } else {
         double delta_sum { 0 };
         for(const auto& output_neuron: *m_output_neurons)
@@ -95,9 +96,9 @@ VecDouble_t Layer_t::feedforward(const VecDouble_t& inputs) {
 
     return outputs;
 }
-void Layer_t::backpropagation(const VecDouble_t& expected_output, double learning_rate, float importance) {
+void Layer_t::backpropagation(const VecDouble_t& expected_output, double learning_rate) {
     for(std::size_t i=0; i < m_neurons.size(); ++i) 
-        m_neurons[i].backpropagation(expected_output[i], learning_rate, importance);
+        m_neurons[i].backpropagation(expected_output[i], learning_rate);
 }
 void Layer_t::update_weights() {
     for(auto& neuron: m_neurons)
@@ -126,41 +127,60 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
 void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, const GameConfig& gConfig) {
     if(X.size() != y.size()) throw std::out_of_range("Given total inputs sample is different from given total outputs sample"); 
 
+    float total = gConfig.no_touch_importance + gConfig.up_touch_importance + gConfig.down_touch_importance;
+    VecUInt_t no_touch_indexes {};
+    VecUInt_t up_touch_indexes {};
+    VecUInt_t down_touch_indexes {};
+    prepareData(y, no_touch_indexes, up_touch_indexes, down_touch_indexes);
+    uint32_t i_no = 0, i_up = 0, i_down = 0;
+    
     for(std::size_t i=0; i < num_iterations; ++i) {
-        int index = randInt(0,X.size()-1);
-        // for(std::size_t j=0; j < X.size(); ++j) {
-        this->feedforward(X[index]);
+        // Dataset is selected from real data but the percentage of type of data appearing is altered by the importance of each one
+        VecUInt_t dataSetModified {};
+        for(std::size_t j=0; j < X.size(); ++j) {
+            float randResult = randFloat(0.0, total);
+            if(randResult < gConfig.no_touch_importance) {
+                dataSetModified.push_back(no_touch_indexes[i_no%no_touch_indexes.size()]);
+                ++i_no;
+            } else if(randResult < gConfig.no_touch_importance + gConfig.up_touch_importance) {
+                dataSetModified.push_back(up_touch_indexes[i_up%up_touch_indexes.size()]);
+                ++i_up;
+            } else {
+                dataSetModified.push_back(down_touch_indexes[i_down%down_touch_indexes.size()]);
+                ++i_down;
+            }
+        }
+        std::random_shuffle(dataSetModified.begin(), dataSetModified.end());
+        
+        for(const uint32_t j: dataSetModified) {
+            this->feedforward(X[j]);
 
-        auto& realOutput = y[index];
-        float importance;
-        if(realOutput[0] == 1.0)
-            importance = gConfig.up_touch_importance;
-        else if(realOutput[0] == 1.0)
-            importance = gConfig.down_touch_importance;
-        else
-            importance = gConfig.no_touch_importance;
+            for(auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+                it->backpropagation(y[j], gConfig.learning_rate);
 
-        for(auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
-            it->backpropagation(realOutput, gConfig.learning_rate, importance);
-
-        for(auto& layer: m_layers) 
-            layer.update_weights();
-        // }
-
-        // if(i%10000==0) {
-        //     double avg_error { average_error(X, y) };
-        //     std::cout<< "Iteración " << i << " - error " << avg_error << "\n";
-        //     // if(avg_error > 0.2) {
-        //     //     if(learning_rate > 1) learning_rate /= 2;
-        //     //     else learning_rate *= 2;
-        //     // }
-        // }
+            for(auto& layer: m_layers) 
+                layer.update_weights();
+        }
+    }
+}
+void NeuralNetwork_t::prepareData(const std::vector<VecDouble_t>& y, VecUInt_t& no_touch_indexes, VecUInt_t& up_touch_indexes, VecUInt_t& down_touch_indexes) {
+    for(std::size_t i=0; i < y.size(); ++i) {
+        if(y[i][0] == 0.0 && y[i][1] == 0.0) no_touch_indexes.push_back(i);
+        if(y[i][0] == 1.0)                   up_touch_indexes.push_back(i);
+        if(y[i][1] == 1.0)                   down_touch_indexes.push_back(i);
     }
 }
 int NeuralNetwork_t::randInt(int min, int max) {
     static std::random_device dev;
     static std::mt19937 rng(dev());
     static std::uniform_int_distribution<int> dist(min, max);
+
+    return dist(rng);
+}
+float NeuralNetwork_t::randFloat(float min, float max) {
+    static std::random_device dev;
+    static std::mt19937 rng(dev());
+    static std::uniform_real_distribution<float> dist(min, max);
 
     return dist(rng);
 }

@@ -51,19 +51,17 @@ ECS::Entity_t& GameObjectFactory_t::createPalette(uint8_t side, uint32_t color) 
 ECS::Entity_t& GameObjectFactory_t::createMinion(uint8_t side, uint32_t color) const {
     constexpr uint32_t w { paletteW }, h { paletteH/2 };
     auto& e = createPalette(w, h, color, side);
-    auto* phy = e.getComponent<PhysicsComponent_t>();
-    if(phy) {
-        if(side & InputComponent_t::S_Right) phy->x -= w/2;
-        if(side & InputComponent_t::S_Left)  phy->x += w/2;
-    }
     auto& inp = m_EntMan.addComponent<InputComponent_t>(e);
-    if(side & InputComponent_t::S_Right) {
-        inp.key_UP    = 0;
-        inp.key_DOWN  = 0;
-        inp.key_shoot = 0;
+    if(side & InputComponent_t::S_Left) {
+        inp.key_UP    = ECS::o;
+        inp.key_DOWN  = ECS::l;
+        inp.key_shoot = ECS::Intro;
+    } else if(side & InputComponent_t::S_Right) {
+        inp.key_UP    = ECS::w;
+        inp.key_DOWN  = ECS::s;
+        inp.key_shoot = ECS::Tab;
     }
     inp.side = side;
-    addInteligence(e, "weights_CSVs/weights.csv");
 
     return e;
 }

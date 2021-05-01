@@ -13,7 +13,7 @@ struct Neuron_t {
     explicit Neuron_t(const VecDouble_t& weights, uint32_t position_in_layer, std::vector<Neuron_t>* output_neurons_pointer);
 
     double feedforward(const VecDouble_t& inputs);
-    void backpropagation(double expected_output, double learning_rate, float importance);
+    void backpropagation(double expected_output, double learning_rate);
     void update_weights();
     void export_as_csv(std::ofstream& file) const;
 
@@ -40,7 +40,7 @@ struct Layer_t {
     explicit Layer_t(std::vector<VecDouble_t> neurons_w, Layer_t* output_layer);
 
     VecDouble_t feedforward(const VecDouble_t& inputs);
-    void backpropagation(const VecDouble_t& expected_output, double learning_rate, float importance);
+    void backpropagation(const VecDouble_t& expected_output, double learning_rate);
     void update_weights();
     void export_as_csv(std::ofstream& file) const;
 private:
@@ -48,6 +48,8 @@ private:
 };
 
 struct NeuralNetwork_t : public ECS::ComponentBase_t<NeuralNetwork_t> {
+    using VecUInt_t = std::vector<uint32_t>;
+
     explicit NeuralNetwork_t(ECS::EntityID_t eid) : ComponentBase_t(eid) 
     {}
 
@@ -60,7 +62,9 @@ struct NeuralNetwork_t : public ECS::ComponentBase_t<NeuralNetwork_t> {
 
 private:
     std::vector<std::vector<VecDouble_t>> read_from_csv(const std::string& filename);
+    void prepareData(const std::vector<VecDouble_t>& y, VecUInt_t& no_touch_indexes, VecUInt_t& up_touch_indexes, VecUInt_t& down_touch_indexes);
     int randInt(int min, int max);
+    float randFloat(float min, float max);
 
     std::vector<Layer_t> m_layers;
 };
