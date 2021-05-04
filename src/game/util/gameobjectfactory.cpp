@@ -30,7 +30,9 @@ void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity, const char* file
     auto& nn = m_EntMan.addComponent<NeuralNetwork_t>(entity);
     nn.setNeurons(filename);
 }
-
+void GameObjectFactory_t::addInteligence(ECS::Entity_t& entity) const {
+    auto& nn = m_EntMan.addComponent<NeuralNetwork_t>(entity);
+}
 
 ECS::Entity_t& GameObjectFactory_t::createPalette(uint8_t side, uint32_t color) const {
     auto& e = createPalette(paletteW, paletteH, color, side);

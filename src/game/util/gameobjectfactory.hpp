@@ -14,6 +14,7 @@ struct GameObjectFactory_t {
     void           createWalls(const uint32_t scrWidth, const uint32_t scrHeight, const uint32_t columns, const uint32_t leftTeamColor, const uint32_t rightTeamColor) const;
     void           createMiddleLine(const uint32_t scrWidth, const uint32_t scrHeight) const;
     void           addInteligence(ECS::Entity_t& entity, const char* filename) const;
+    void           addInteligence(ECS::Entity_t& entity) const;
 private:
     ECS::EntityManager_t& m_EntMan;
     ECS::Entity_t& createEntity(uint32_t w, uint32_t h, uint32_t color) const;

@@ -19,7 +19,7 @@ struct GameReferences {
         if(gameMode & G_WithWall)
             GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 1, leftTeamColor2, rightTeamColor2);
         
-        if( !(gameMode & (G_TrainLeft | G_TrainRight)) ) {
+        if( !(gameMode & (G_TrainLeft | G_TrainRight)) ) { //Normal mode
             ECS::Entity_t& Lplayer_entity = GOFact.createPalette(InputComponent_t::S_Left , leftTeamColor);
             ECS::Entity_t& Rplayer_entity = GOFact.createPalette(InputComponent_t::S_Right, rightTeamColor);
             if(gameConfig.Lplayer_AI)       GOFact.addInteligence(Lplayer_entity, gameConfig.Lplayer_AI_file);
@@ -28,8 +28,8 @@ struct GameReferences {
             ECS::Entity_t& Rball_entity   = GOFact.createBall(rightTeamColor2);
             ECS::Entity_t& Lminion_entity = GOFact.createMinion(InputComponent_t::S_Left  | InputComponent_t::S_Center, rightTeamColor);
             ECS::Entity_t& Rminion_entity = GOFact.createMinion(InputComponent_t::S_Right | InputComponent_t::S_Center, leftTeamColor);
-                                            GOFact.addInteligence(Lminion_entity, "weights_CSVs/weights.csv");
-                                            GOFact.addInteligence(Rminion_entity, "weights_CSVs/weights.csv");
+                                            GOFact.addInteligence(Lminion_entity);
+                                            GOFact.addInteligence(Rminion_entity);
 
             Lball   = Lball_entity.getComponent<PhysicsComponent_t>();
             Rball   = Rball_entity.getComponent<PhysicsComponent_t>();
@@ -44,7 +44,7 @@ struct GameReferences {
             ECS::Entity_t& Lball_entity   = GOFact.createBall(leftTeamColor2);
             ECS::Entity_t& Rball_entity   = GOFact.createBall(rightTeamColor2);
             ECS::Entity_t& Lminion_entity = GOFact.createMinion(InputComponent_t::S_Left | InputComponent_t::S_Center, rightTeamColor);
-                                            GOFact.addInteligence(Lminion_entity, "weights_CSVs/weights.csv");
+                                            GOFact.addInteligence(Lminion_entity);
 
             auto Lcol = Lball_entity.getComponent<ColliderComponent_t>();
             auto Rcol = Rball_entity.getComponent<ColliderComponent_t>();
@@ -62,7 +62,7 @@ struct GameReferences {
             ECS::Entity_t& Lball_entity   = GOFact.createBall(leftTeamColor2);
             ECS::Entity_t& Rball_entity   = GOFact.createBall(rightTeamColor2);
             ECS::Entity_t& Rminion_entity = GOFact.createMinion(InputComponent_t::S_Right | InputComponent_t::S_Center, leftTeamColor);
-                                            GOFact.addInteligence(Rminion_entity, "weights_CSVs/weights.csv");
+                                            GOFact.addInteligence(Rminion_entity);
 
             auto Lcol = Lball_entity.getComponent<ColliderComponent_t>();
             auto Rcol = Rball_entity.getComponent<ColliderComponent_t>();

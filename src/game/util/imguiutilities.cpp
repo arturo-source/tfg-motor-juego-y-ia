@@ -124,7 +124,7 @@ void ImGuiUtilities::trainMenu_selectFile(GameConfig& gConfig, const std::vector
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int item_current = 0;
-    ImGui::ListBox("Training files", &item_current, files.data(), files.size(), 4);
+    ImGui::ListBox("Training files", &item_current, files.data(), files.size(), 8);
     
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);

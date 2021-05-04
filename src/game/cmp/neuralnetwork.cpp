@@ -115,14 +115,44 @@ void Layer_t::export_as_csv(std::ofstream& file) const {
 
 //-------------Neural network-------------
 VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
-    VecDouble_t inputs_copy(inputs);
+    if(m_layers.size() != 0) {
+        VecDouble_t inputs_copy(inputs);
 
-    for(auto& layer: m_layers) {
-        inputs_copy.insert(inputs_copy.begin(), 1.0); //Add bias to the inputs
-        inputs_copy = layer.feedforward(inputs_copy); //Layer feedforward returns the output of the neurons
+        for(auto& layer: m_layers) {
+            inputs_copy.insert(inputs_copy.begin(), 1.0); //Add bias to the inputs
+            inputs_copy = layer.feedforward(inputs_copy); //Layer feedforward returns the output of the neurons
+        }
+        
+        return inputs_copy; 
+    } else { //No neural network created; Generic algorithm;
+        VecDouble_t output(2);
+        double myx    = inputs[0];
+        double myy    = inputs[1];
+        double Lballx = inputs[4];
+        double Lbally = inputs[5];
+        double Rballx = inputs[8];
+        double Rbally = inputs[9];
+
+        if( (myx - Lballx)*(myx - Lballx) < (myx - Rballx)*(myx - Rballx) ) {
+            if((myy - Lbally + 10) > 0) {
+                output[0] = 1.0;
+                output[1] = 0.0;
+            } else {
+                output[0] = 0.0;
+                output[1] = 1.0;
+            }
+        } else {
+            if((myy - Rbally + 10) > 0) {
+                output[0] = 1.0;
+                output[1] = 0.0;
+            } else {
+                output[0] = 0.0;
+                output[1] = 1.0;
+            }
+        }
+
+        return output;
     }
-    
-    return inputs_copy; 
 }
 void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, const GameConfig& gConfig) {
     if(X.size() != y.size()) throw std::out_of_range("Given total inputs sample is different from given total outputs sample"); 
