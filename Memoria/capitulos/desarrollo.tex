@@ -15,7 +15,7 @@ Por lo tanto, este apartado será el más extendido del \gls{tfg}, ya que en él
 El \textbf{7 de julio de 2020} nos citamos por la herramienta Google Meet, y hablamos sobre cuál era mi objetivo con este \gls{tfg}, lo definimos y presentamos la propuesta. Además, como no tenía conocimientos sobre motores de videojuegos, me sugirió empezar viendo su curso para desarrollar un motor en C/C++. No concertamos una segunda cita ya que empezaba la época de verano, y quedamos en que cuando comenzara el curso y hubiera desarrollado mi motor volvería a ponerme en contacto con él.
 
 \subsection{Script de construcción del proyecto}
-Lo primero que hice fue, antes de ponerme a programar el motor, crear el archivo Makefile, este es el fichero que la herramienta Make ya mencionada en la página \pageref{herramientas} utiliza como Build Script. De esta forma no tendría que compilar todos los archivos uno a uno. Y además, separando las librerías del resto del código, así no tendrían que ser re-compiladas cada vez que necesite crear un ejecutable, ya que este es un proceso que tarda unos segundos pero se repite muchas veces, por lo que estos segundos ahorrados a lo largo del desarrollo podrían llegar a ser muchos minutos, incluso horas, de espera ahorrados.
+Lo primero que hice fue, antes de ponerme a programar el motor, crear el archivo Makefile, este es el fichero que la herramienta Make ya mencionada en el apartado \ref{herramientas} de herramientas, utiliza como Build Script. De esta forma no tendría que compilar todos los archivos uno a uno. Y además, separando las librerías del resto del código, así no tendrían que ser re-compiladas cada vez que necesite crear un ejecutable, ya que este es un proceso que tarda unos segundos pero se repite muchas veces, por lo que estos segundos ahorrados a lo largo del desarrollo podrían llegar a ser muchos minutos, incluso horas, de espera ahorrados.
 
 Como no voy a explicar todo el archivo línea por línea, lo haré con las partes más importantes del mismo. 
 \begin{itemize}
@@ -27,7 +27,7 @@ Como no voy a explicar todo el archivo línea por línea, lo haré con las parte
 		\item Dependencias
 		\item Flags para el compilador
 	\end{enumerate}
-	\begin{lstlisting}[style=C, caption={Macro Compile del Makefile},label=C_code]
+	\begin{lstlisting}[style=C, caption={Macro Compile del Makefile},label=macro-compile]
 		define COMPILE
 		$(2) : $(3) $(4)
 			$(1) -c -o $(2) $(3) $(5)
@@ -38,7 +38,7 @@ Como no voy a explicar todo el archivo línea por línea, lo haré con las parte
 		\item Depende de todos los objetos. 
 		\item Enlaza todos los objetos y librerías, y genera el ejecutable
 	\end{itemize}
-	\begin{lstlisting}[style=C, caption={Enlazado de los objetos y las librerísa para generar el ejecutable.},label=C_code]
+	\begin{lstlisting}[style=C, caption={Enlazado de los objetos y las librerías para generar el ejecutable.},label=library-linking]
 	$(APP) : $(OBJSUBDIRS) $(ALLOBJ)
 		$(CC) -o $(APP) $(ALLOBJ) $(LIB) $(CCFLAGS)
 	\end{lstlisting}
@@ -82,7 +82,7 @@ Algunas de las dificultades de crear un motor genérico, que pueda aceptar cualq
 Un segundo problema es que la clase Entity\_t almacena punteros a Component\_t, pero como ComponentBase\_t hereda de Component\_t es posible que trabaje con los componentes del juego. ¿Por qué añadir este nivel de indirección? El problema lo hemos mencionado antes: el tipo de un componente no es un tipo básico de C++. Por lo tanto, no podremos usar una estructura de mapa para almacenar los componentes del juego según el tipo de forma lineal en memoria.
 \\
 Lo solucionamos de la siguiente manera: la clase Entity\_t almacena un unordered\_map de ``tipo de componente'' a ``puntero a Component\_t''. Component\_t tiene un método estático getComponentTypeID() que devuelve un entero que será el identificador único del componente durante la ejecución del programa. De esta manera, el juego podrá añadir tantos tipos de componente distintos como quiera, sin tener que preocuparse por el identificador, que es tarea del motor.
-\begin{lstlisting}[style=C-color, caption={Cómo poder tener un número variable de componentes, sin tener que añadir un nuevo identificador con cada componente nuevo.},label=C_code-color]
+\begin{lstlisting}[style=C-color, caption={Cómo poder tener un número variable de componentes, sin tener que añadir un nuevo identificador con cada componente nuevo.},label=static-method]
 	static ComponentTypeID_t getComponentTypeID() noexcept {
 		static ComponentTypeID_t typeID { ++nextTypeID };
 		return typeID;
@@ -93,7 +93,7 @@ Pero, ¿qué significa el anterior código? Para entenderlo, hemos de saber para
 Pero esto ocasiona el problema de que todos los componentes devolverán el mismo identificador. ¿Cómo hacemos que cada componente tenga el suyo propio? C++ tiene templates, lo que significa que, en tiempo de compilación, un código template se replicará por cada tipo diferente que haya sido instanciado la clase template. Por lo tanto, cada componente del juego, deberá heredar de ComponentBase\_t, de esta manera se crearán tantos ComponentBase\_t con su método estático getComponentTypeID() como componentes distintos tenga el juego.
 
 Otro problema relacionado con la creación de un motor genérico es que, en algunos casos, las funciones del juego se usarán en un ámbito constante, y otras no, por lo que las funciones que queramos que sirvan para ambos casos, han de estar replicadas de forma que devuelvan un valor constante o no. El problema del código repetido que se solventa haciendo uso del las conversiones con static\_cast<>(), podemos ver un ejemplo a continuación:
-\begin{lstlisting}[style=C-color, caption={Ejemplo de conversion de un método constante a no constante},label=C_code-color]
+\begin{lstlisting}[style=C-color, caption={Ejemplo de conversion de un método constante a no constante},label=no-constant-conversion]
 	template<typename CMP_t>
 	const CMP_t* getComponent() const {
 		auto type = CMP_t::getComponentTypeID();
@@ -123,7 +123,7 @@ El \textbf{29 de octubre de 2020} tuvimos la segunda iteración donde le conté 
 \end{itemize}
 
 \subsection{Creación del juego}
-Al igual que, para continuar con el desarrollo del TFG, lo primero era crear un motor funcional, antes de poder implementar los conocimientos de \gls{ia} hay que crear un juego. Como mencioné en la introducción (página \pageref{introduccion}), esta es la parte más creativa, y puede que sea la parte que más tiempo me lleve pero no necesita prácticamente mucha formación. Por lo que, lo primero que voy a hacer es programar el clásico juego del Pong para que, posteriormente, la pala rival sea controlada por un perceptrón. 
+Al igual que, para continuar con el desarrollo del TFG, lo primero era crear un motor funcional, antes de poder implementar los conocimientos de \gls{ia} hay que crear un juego. Como mencioné en la introducción (apartado \ref{introduccion}), esta es la parte más creativa, y puede que sea la parte que más tiempo me lleve pero no necesita prácticamente mucha formación. Por lo que, lo primero que voy a hacer es programar el clásico juego del Pong para que, posteriormente, la pala rival sea controlada por un perceptrón. 
 \\
 El juego tiene una estética simple, hecha sin sprites, solo coloreando en la ventana un color uniforme para cada entidad:
 \begin{figure}[h]
@@ -214,7 +214,7 @@ El \textbf{14 de enero de 2020} tuvimos la siguiente iteración, los objetivos m
 	\item Desarrollar el Pong Plus, un juego inspirado en el Pong, pero con ciertos añadidos que lo hacen más complejo
 	\begin{itemize}
 		\item Minions en el centro del campo (pequeñas palas que ayudan a su compañero a ganar).
-		\item Los minions son capaces de parar la pelota, y su movimiento es solo en el eje y.
+		\item Los minions son capaces de rebotar la pelota, y su movimiento es solo en el eje y.
 		\item Los minion pueden morir a causa de un disparo, de ser así reaparecerán tras unos segundos.
 	\end{itemize}
 	\item Añadir un sistema de recogida de datos que tenga en cuenta los nuevos datos de la partida, y que también funcione para los minions.
@@ -252,7 +252,7 @@ Una vez acabado el menú, que además te permite seleccionar qué \gls{csv} quie
 \subsection{Compilación para Windows}
 Lo último que hice en este periodo fue compilar el juego para Windows. Mi tutor explica en el curso de videojuegos \cite{CursoMotorC++} cómo modificar el fichero de construcción (Makefile) para compilar para Windows desde una máquina con Linux (comúnmente conocido como cross-compiling), y en la librería de TinyPTC descargable, también hay unos ficheros de código específicos para Windows, por lo que la única tarea que me quedaba por hacer era modificar las partes del código donde se incluye la versión de TinyPTC de Linux e incluir la versión de Windows, y recompilar el proyecto. 
 \\
-Pero cuando probé el juego en Windows, se ejecutaba correctamente, pero no respondía ante la entrada por teclado. Y es que la codificación del teclado en Windows no es la misma que la de X11, por lo que creé un fichero en el que definí los valores de la variable dependiendo de si la compilación está activada para Windows o para Linux.
+Pero cuando probé el juego en Windows, se ejecutaba correctamente, pero no respondía ante la entrada por teclado. Y es que la codificación del teclado en Windows no es la misma que la de X11, por lo que creé un fichero en el que definí los valores de la variable dependiendo de si la compilación está activada para Windows o para Linux. Posteriormente usé ``\#ifdef'' que hace que el compilador use esa parte del código sólo se compile si la macro está presente en la linea de compilación, o si está definida previamente en otro fichero incluido por este, de esta manera lo podía combinar con ``\#else'' para definir las teclas del juego para Windows cuando construya el juego para Windows, y las teclas de Linux cuando compile para este sistema operativo.
 
 \section{Sexta iteración: aprendizaje mediante backpropagation}
 El \textbf{11 de febrero de 2021} tuvimos una nueva reunión, en la cual los objetivos marcados fueron:
@@ -275,6 +275,7 @@ Comencé la iteración con ilusión, viendo documentación de Dear ImGui y estud
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/Algoritmo-red-neuronal-aleatorio.png}
 	\caption{Algoritmo de aprendizaje aleatorio.}
+	\label{Algoritmo aleatorio}
 \end{figure}
 Es un algoritmo que podría funcionar en algunos casos, pero requiere de un número mucho más alto de iteraciones, así que no es lo suficientemente eficiente. Por lo que me dispuse a desarrollar el algoritmo de backpropagation.
 
@@ -284,6 +285,7 @@ Como ya he mencionado en el apartado de herramientas de trabajo, yo he desarroll
 No voy a contar cómo fue la recuperación del sistema operativo ya que no procede en esta memoria, pero esto juntado con los trabajos de las asignaturas de la universidad, me hizo perder más de una semana, por lo que esta iteración quedó prácticamente en nada.
 
 \subsection{Explicación de backpropagation}
+\todo{¿Puede que me haya pasado en este apartado del desarrollo, y esto pegue más en el Marco Teórico?}
 Después de recuperar todo el sistema operativo, continué con el desarrollo del algoritmo. El mayor problema de este es entender cómo funciona teóricamente este, ya que en código no es muy complicado de hacer una vez entiendes los índices que componen el algoritmo. Puedes ver un esquema  del funcionamiento del algoritmo en la figura \ref{Algoritmo de backpropagation}
 \begin{figure}[h]
 	\centering
@@ -364,7 +366,7 @@ Para entender mejor de forma visual cómo se calcula el delta de la capa l, pued
 
 Haremos esta operación para cada peso de cada neurona de esta capa, a ese peso le aplicaremos el gradiente como en la fórmula \ref{eq:descenso del gradiente}, y avanzaremos hacia la capa de atrás hasta que no queden más capas.
 
-Para ver las ventajas de backpropagation de forma empírica respecto al algoritmo aleatorio, ir al apartado de resultados.....\todo{Añadir referencia al apartado resultados cuando exista}
+Para ver las ventajas de backpropagation de forma empírica respecto al algoritmo aleatorio, ir al apartado de resultados (\ref{resultados}).
 
 \section{Séptima iteración: creación de menús}
 El día \textbf{11 de marzo de 2021} volvimos a tener una llamada de revisión de trabajo y nuevas propuestas, pero según se desarrolló la anterior iteración, mi tutor y yo acordamos que para esta acabaría lo ya acordado, prestando especial atención en el desarrollo de la memoria, ya que era lo que más trabajo requería en la situación en la que estaba, y conociendo que ya quedaba poco tiempo para la entrega del \gls{tfg}.
@@ -373,14 +375,35 @@ El día \textbf{11 de marzo de 2021} volvimos a tener una llamada de revisión d
 Por lo tanto, comencé a implementar Dear ImGui en el proyecto. El primer paso era sustituir TinyPTC por OpenGL3, así que eso hice: fui al sistema de Render, que se encarga de abrir la ventana y dibujar sobre ella, y cambié todo el código necesario en este punto. Ahora la ventana la abriría con OpenGL3 y cada frame dibujado por software mediante el sistema de render se pasaría a OpenGL3 también, de esta manera Dear ImGui solo tendrá que dibujar las ventanas encima de mi interfaz.
 \\
 El siguiente paso fue aprender a dibujar una ventana dentro del juego, y así fue, algo bastante sencillo porque aparece en el código de ejemplo que ellos tienen en el proyecto.
-\missingfigure{Añadir imagen de una ventana sobre el juego}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{archivos/imagenes/ventana-dentro-del-juego.png}
+	\caption{Ventana dentro del juego.}
+\end{figure}
 Pero como los menús de los juego no suelen ser en una ventana, decidí hacerlo en pantalla completa. No es el mejor diseño, pero ya servía para poder manejarse  dentro del juego.
-\missingfigure{Añadir imagen del menu del juego}
-Ahora ya, teniendo las herramientas que nos da Dear ImGui, me dispuse a desarrollar un menú en el cuál el jugador, pueda decidir cómo entrenar a su \gls{ia}, y además que pueda ver de manera gráfica cómo va aprendiendo y cuáles son las consecuencias de cambiar los parámetros de entrenamiento de la \gls{ia}.
-\missingfigure{Añadir  imagen del menu de entrenamiento}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{archivos/imagenes/menu-del-juego.png}
+	\caption{Menú del juego.}
+	\label{Menu del juego}
+\end{figure}
+Ahora ya, teniendo las herramientas que nos da Dear ImGui, me dispuse a desarrollar un menú en el cuál el jugador, pueda decidir cómo entrenar a su \gls{ia}, y además que pueda ver de manera gráfica cómo va aprendiendo y cuáles son las consecuencias de cambiar los parámetros de entrenamiento de la \gls{ia}. Puedes ver el menú de entrenamiento en la figura \ref{Menu de entrenamiento}.
 
 \subsection{Campo de entrenamiento}
-\todo{Explicar el campo de entrenamiento}
+El campo de entrenamiento es el apartado de arena que puedes ver en la figura \ref{Menu del juego}, que te pondrá a jugar en el mismo campo de siempre, pero sin rival, cuando la pelota llega a la pared del rival rebotará, de esta manera el jugador podrá reaccionar a diferentes situaciones de partida (con el minion rival en una posición, las bolas en otras posiciones, con una velocidad, etc.) que servirán como dataset para un posterior entrenamiento en el menú de entrenamiento.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{archivos/imagenes/arena-de-entrenamiento.png}
+	\caption{Arena de entrenamiento.}
+\end{figure}
+
+Después de obtener todos los datos podremos ir al siguiente menú donde el jugador elegirá los parámetros que considere oportunos para entrenar la \gls{ia}, como vemos en la figura \ref{Menu de entrenamiento}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{archivos/imagenes/menu-de-entrenamiento.png}
+	\caption{Menú de entrenamiento del juego.}
+	\label{Menu de entrenamiento}
+\end{figure}
 
 \section{Octava iteración: perfilando el proyecto}
 El \textbf{13 de abril de 2021} ya solo quedaba un mes para la confirmación de la entrega del proyecto en el C3, por lo que ya tendríamos que tener todo acabado para esta fecha, o a punto de acabar para confirmar. Los objetivos para esta iteración, por lo tanto, fueron los siguientes:
@@ -391,5 +414,49 @@ El \textbf{13 de abril de 2021} ya solo quedaba un mes para la confirmación de 
 	\item Añadir un algoritmo básico para cuando no exista un fichero de pesos pero que se pueda jugar contra una \gls{ia}.
 \end{enumerate}
 
+\subsection{Arreglo del entrenamiento}
+Cuando desarrollé el algoritmo de aprendizaje de la red neuronal inicialmente, decidí añadir un factor de importancia a cada acción (pulsar arriba, abajo, o no pulsar). Esto fue porque ya tuve problemas inicialmente con el perceptrón y sé que la cantidad de ejemplos de cada tipo está desproporcionada, ya que existe mayor cantidad de ejemplos de no pulsar, respecto a los que sí hay una pulsación de tecla.
+\\
+Como el algoritmo de Backpropagation ya estaba programado, decidí que en la última capa el delta se multiplicase por el porcentaje de importancia que le diera el usuario, pero aparentemente no funcionaba. En la reunión con mi tutor me explicó que multiplicar el delta destrozaba el aprendizaje, que lo que tendría que hacer realmente era escoger de forma aleatoria, con una probabilidad (la que el usuario ha asignado en el menú de entrenamiento). Posteriormente, desordenar el vector de frames obtenido para que la red neuronal no aprenda, por culpa de la corrección de Backpropagation, los últimos movimientos de la partida.
+
+Además, la gráfica que representaba el porcentaje de error de la red neuronal de forma genérica era poco representativa, porque como vemos en la figura \ref{Comparacion alto vs bajo error}, cuando intentas que la red neuronal se comporte mejor en partida, aumentando la importancia de pulsar, el error aumenta desde el 50\% hasta el 70\%. Mientras que, si lo que aumento es la importancia de no tocar (teniendo en cuenta que representa el 75\% del dataset), el error de la red permanece entre el 20\% y el 23\%. Esto puede dar una falsa imagen al usuario de que la red no está aprendiendo, por eso he separado en dos gráficas, el error que comete respecto a los ejemplos de no tocar, y el error que comete respecto a los ejemplos de sí hacerlo.
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=15cm]{archivos/imagenes/menu-de-entrenamiento-alto-error.png}
+		\caption{Alta importancia a pulsar.}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=15cm]{archivos/imagenes/menu-de-entrenamiento-bajo-error.png}
+		\caption{Baja importancia a pulsar.}
+	\end{subfigure}
+	\caption{Comparación entre las importancias de pulsar o no pulsar.}
+	\label{Comparacion alto vs bajo error}
+\end{figure}
+\subsection{Algoritmo básico de seguimiento}
+Como el usuario no tendrá ningún fichero de pesos, este necesitará un algoritmo para poder jugar contra la máquina, para poder entrenar a su bot. Por lo tanto, mi tutor y yo tuvimos la idea de darle un algoritmo por defecto a los caracteres controlados por la máquina. Escribiré un pseudocódigo para una mayor facilidad de comprensión del mismo:
+\begin{lstlisting}[style=C-color, caption={Macro Compile del Makefile},label=macro-compile]
+	Entity myself     = getMyself();
+	Entity leftBall    = getLeftBall();
+	Entity rightBall = getRightBall();
+	
+	if( (myself.x - leftBall.x)*(myself.x - leftBall.x) < 
+		  (myself.x - rightBall.x)*(myself.x - rightBall.x)) { //leftBall is closer
+		if((myself.y - leftBall.y) > 0)
+			pressDown();
+		else
+			pressUp();
+	} else {
+		if((myself.y - rightBall.y) > 0)
+			pressDown();
+		else
+			pressUp();
+	}
+\end{lstlisting}
+Aunque el código consta de varias lineas, es extremadamente sencillo de explicar: busca la pelota más cercana, y si está por encima en el eje y, pulsa hacia arriba. En caso contrario, hacia abajo. Desde luego no es el algoritmo más eficiente, entre otros problemas porque cuando pulsas no te mueves, sino que aceleras, pero es un sencillo algoritmo que servirá para responder algunas de las bolas antes de que el usuario haya entrenado su primera red neuronal.
+ 
 \section{Novena iteración: ...}
 El día \textbf{6 de mayo de 2021} fue la última iteración antes de decidir si entregaríamos el \gls{tfg} ..........
