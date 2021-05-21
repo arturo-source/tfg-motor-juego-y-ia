@@ -58,7 +58,7 @@ ImGuiUtilities::~ImGuiUtilities() {
     glfwTerminate();
 }
 
-void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept {
+void ImGuiUtilities::mainMenu(GameConfig& gConfig) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
@@ -66,30 +66,6 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*
     ImGui::Begin("Menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     
     ImGui::BeginTable("Menu table", 3);
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(0);
-    ImGui::Checkbox("Left player with AI", &gConfig.Lplayer_AI);
-    if(gConfig.Lplayer_AI) {
-        if(files.size() > 0) {
-            static int Lplayer_file = 0;
-            ImGui::ListBox("##Left weight files", &Lplayer_file, files.data(), files.size(), 4);
-            gConfig.Lplayer_AI_file = files[Lplayer_file];
-        } else {
-            ImGui::Text("Must train first.");
-        }
-    }
-
-    ImGui::TableSetColumnIndex(2);
-    ImGui::Checkbox("Right player with AI", &gConfig.Rplayer_AI);
-    if(gConfig.Rplayer_AI) {
-        if(files.size() > 0) {
-            static int Rplayer_file = 0;
-            ImGui::ListBox("##Right weight files", &Rplayer_file, files.data(), files.size(), 4);
-            gConfig.Rplayer_AI_file = files[Rplayer_file];
-        } else {
-            ImGui::Text("Must train first.");
-        }
-    }
 
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
@@ -155,6 +131,69 @@ void ImGuiUtilities::editweightsMenu(GameConfig& gConfig, AItrainer_t& ai) const
     ImGui::SameLine();
     gConfig.exit = ImGui::Button("Exit");
 
+    ImGui::End();
+
+    renderWithoutFlipFrameBuffer();
+    postrender();
+}
+
+void ImGuiUtilities::playModeMenu(GameConfig& gConfig, const std::vector<const char*>& files, const bool train) const noexcept {
+    prerender();
+
+    ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
+    ImGui::SetNextWindowSize(ImVec2(m_w, m_h));
+    ImGui::Begin("Choose mode", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+    
+    ImGui::BeginTable("Mode table", 3);
+    if(!train) {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Checkbox("Choose left AI", &gConfig.Lplayer_AI);
+        if(gConfig.Lplayer_AI) {
+            if(files.size() > 0) {
+                static int Lplayer_file = 0;
+                ImGui::ListBox("##Left weight files", &Lplayer_file, files.data(), files.size(), 8);
+                gConfig.Lplayer_AI_file = files[Lplayer_file];
+            } else {
+                ImGui::Text("Must train first.");
+            }
+        }
+
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Checkbox("Choose right AI", &gConfig.Rplayer_AI);
+        if(gConfig.Rplayer_AI) {
+            if(files.size() > 0) {
+                static int Rplayer_file = 0;
+                ImGui::ListBox("##Right weight files", &Rplayer_file, files.data(), files.size(), 8);
+                gConfig.Rplayer_AI_file = files[Rplayer_file];
+            } else {
+                ImGui::Text("Must train first.");
+            }
+        }
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.play = ImGui::Button("Play");
+    } else {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.trainLside = ImGui::Button("Train as left player");
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.trainRside = ImGui::Button("Train as right player");
+        // ImGui::TableNextRow();
+        // ImGui::TableSetColumnIndex(1);
+        // gConfig.play = ImGui::Button("Train as left minion");
+        // ImGui::TableNextRow();
+        // ImGui::TableSetColumnIndex(1);
+        // gConfig.play = ImGui::Button("Train as right minion");
+    }
+
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
+    gConfig.exit = ImGui::Button("Back");
+
+    ImGui::EndTable();
     ImGui::End();
 
     renderWithoutFlipFrameBuffer();
@@ -384,7 +423,7 @@ void ImGuiUtilities::renderScoreboard(const uint32_t left_score, const uint32_t 
     ImGui::TableSetupColumn("Right team score");
     ImGui::TableHeadersRow();
 
-    ImGui::Indent(105);
+    ImGui::Indent(100);
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::Text("%d", left_score);

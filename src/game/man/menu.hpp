@@ -210,38 +210,51 @@ private:
     std::vector<const char*> files;
 };
 
-struct MainMenu_t : MenuState_t {
+struct PlayModeMenu_t : MenuState_t {
     using GR = GameReferences;
 
+    explicit PlayModeMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, bool train_, const uint32_t scrW, const uint32_t scrH)
+    : MenuState_t(sm, ren, inp, scrW, scrH), train{train_}
+    {
+        static std::vector<std::string> files_str;
+        files_str = loadCSVFiles("weights_CSVs");
+        for(auto& f: files_str)
+            files.push_back(f.c_str());
+    }
+    void update() final {
+        GameTimer_t timer;
+        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.trainLside) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainLeft, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.trainRside) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainRight, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.play || gConfig.trainLside || gConfig.trainRside || gConfig.exit) m_Alive = false;
+
+        timer.timedCall("REN", [&](){ Render.getMenu().playModeMenu(gConfig, files, train); });
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
+    }
+private:
+    std::vector<const char*> files;
+    bool train { false };
+};
+
+struct MainMenu_t : MenuState_t {
     explicit MainMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH) 
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
-        resetFilesPointers();
     }
     void update() final {
         GameTimer_t timer;
 
-        if(gConfig.play) {
+        if(gConfig.play | gConfig.arena) {
             ScoreboardSystem_t<ECS::EntityManager_t>::end_game = false;
-            SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
-        }
-        if(gConfig.arena) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainLeft, kSCRWIDTH, kSCRHEIGHT);
+            SM.pushState<PlayModeMenu_t>(SM, Render, Input, gConfig.arena, kSCRWIDTH, kSCRHEIGHT);
+        } 
         if(gConfig.train) SM.pushState<SelectFileMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.editweights) SM.pushState<SelectFileMenu2_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
-        if(gConfig.Lplayer_AI || gConfig.Rplayer_AI) resetFilesPointers();
         if(gConfig.exit) m_Alive = false;
 
-        timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig, files); });
+        timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
-    void resetFilesPointers() {
-        static std::vector<std::string> files_str;
-        files_str = loadCSVFiles("weights_CSVs");
-        files = {};
-        for(auto& f: files_str)
-            files.push_back(f.c_str());
-    }
-private:
-    std::vector<const char*> files;
 };

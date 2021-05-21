@@ -12,11 +12,12 @@ struct ImGuiUtilities {
     explicit ImGuiUtilities(uint32_t w, uint32_t h, uint32_t* framebuffer);
     ~ImGuiUtilities();
 
-    void mainMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept;
+    void mainMenu(GameConfig& gConfig) const noexcept;
     void selectFileMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept;
     void selectFileMenu2(GameConfig& gConfig, const std::vector<const char*>& train_files, const std::vector<const char*>& weight_files) const noexcept;
     void trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& failed_press_up, const std::vector<float>& failed_press_down, const std::vector<float>& failed_nopress, const AItrainer_t& AI) const noexcept;
     void editweightsMenu(GameConfig& gConfig, AItrainer_t& ai) const noexcept;
+    void playModeMenu(GameConfig& gConfig, const std::vector<const char*>& files, const bool train) const noexcept;
     void saveFileMenu(GameConfig& gConfig) const noexcept;
     void prerender() const noexcept;
     void postrender() const noexcept;

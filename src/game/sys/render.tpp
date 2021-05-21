@@ -25,7 +25,7 @@ constexpr uint32_t* RenderSystem_t<GameCTX_t>::getScreenXY(float x, float y) con
 template<typename GameCTX_t>
 void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
-    uint32_t left_score, right_score;
+    uint32_t left_score = 0, right_score = 0;
 
     auto drawEntity = [&](const RenderComponent_t& ren) {
         const auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(ren);
@@ -36,8 +36,8 @@ void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
             
             drawSprite(screen, sprite, ren.w, ren.h);
             if(sco) {
-                if(phy->x < m_w/2) left_score  = sco->score;
-                else               right_score = sco->score;
+                if(phy->x < m_w/2)      left_score  = sco->score;
+                else if(phy->x > m_w/2) right_score = sco->score;
             }
         }
     };

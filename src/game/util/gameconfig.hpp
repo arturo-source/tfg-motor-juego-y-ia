@@ -11,6 +11,8 @@ struct GameConfig {
     bool setData          = false;
     bool saveFile         = false;
     bool editweights      = false;
+    bool trainLside       = false;
+    bool trainRside       = false;
     int  n_iter           = 2000;
     int  n_layers         = 2;
     int  neuron_per_layer = 4;
