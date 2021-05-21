@@ -47,7 +47,7 @@ struct GameManager_t : StateBase_t {
         std::cout << "\n";
 
         m_playing = !Input.isKeyPressed(ECS::Esc) && !ScoreboardSystem_t<ECS::EntityManager_t>::end_game;
-        if(ScoreboardSystem_t<ECS::EntityManager_t>::scored && m_playing) {
+        if(ScoreboardSystem_t<ECS::EntityManager_t>::scored) {
             ScoreboardSystem_t<ECS::EntityManager_t>::scored = false;
             gameReferences.resetGame();
         }
