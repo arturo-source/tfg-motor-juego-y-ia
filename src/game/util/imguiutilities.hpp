@@ -21,6 +21,7 @@ struct ImGuiUtilities {
     void prerender() const noexcept;
     void postrender() const noexcept;
     void renderFrameBuffer() const noexcept;
+    void renderScoreboard(const uint32_t left_score, const uint32_t right_score) const noexcept;
     const bool shouldClose() const noexcept { return glfwWindowShouldClose(m_window); }
 
 private:

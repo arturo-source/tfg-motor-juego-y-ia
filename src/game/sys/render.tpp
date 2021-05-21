@@ -25,19 +25,26 @@ constexpr uint32_t* RenderSystem_t<GameCTX_t>::getScreenXY(float x, float y) con
 template<typename GameCTX_t>
 void RenderSystem_t<GameCTX_t>::drawAllEntities(const GameCTX_t& g) const {
     auto screen = m_framebuffer.get();
+    uint32_t left_score, right_score;
 
     auto drawEntity = [&](const RenderComponent_t& ren) {
         const auto* phy = g.template getRequiredComponent<PhysicsComponent_t>(ren);
+        const auto* sco = g.template getRequiredComponent<ScoreComponent_t>(ren);
         if(phy) { //phy != null
             auto screen = getScreenXY(phy->x, phy->y);
             auto sprite = ren.sprite.data();
             
             drawSprite(screen, sprite, ren.w, ren.h);
+            if(sco) {
+                if(phy->x < m_w/2) left_score  = sco->score;
+                else               right_score = sco->score;
+            }
         }
     };
     auto& rencmps = g.template getComponents<RenderComponent_t>();
     
     std::for_each(begin(rencmps), end(rencmps), drawEntity);
+    igUtils.renderScoreboard(left_score, right_score);
 }
 
 template<typename GameCTX_t>

@@ -371,6 +371,30 @@ void ImGuiUtilities::HelpMarker(const char* desc) const noexcept {
     }
 }
 
+void ImGuiUtilities::renderScoreboard(const uint32_t left_score, const uint32_t right_score) const noexcept {
+    constexpr float window_width  = 250;
+    constexpr float window_height = 100;
+    ImGui::SetNextWindowPos(ImVec2((m_w-window_width)/2, 0.0));
+    ImGui::SetNextWindowSize(ImVec2(window_width, window_height));
+    ImGui::Begin("Scoreboard", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
+    
+    ImGui::BeginTable("Score table", 2);
+
+    ImGui::TableSetupColumn("Left team score");
+    ImGui::TableSetupColumn("Right team score");
+    ImGui::TableHeadersRow();
+
+    ImGui::Indent(105);
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(0);
+    ImGui::Text("%d", left_score);
+    ImGui::TableSetColumnIndex(1);
+    ImGui::Text("%d", right_score);
+
+    ImGui::EndTable();
+    ImGui::End();
+}
+
 void ImGuiUtilities::prerender() const noexcept {
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
