@@ -134,6 +134,7 @@ constexpr void CollisionSystem_t<GameCTX_t>::checkBoundaryCollisions(GameCTX_t& 
         if(c.properties & CP::P_IsBall) {
             if( (b.xLeft < 0 && c.properties & CP::P_BounceLeft) || 
               (b.xRight > m_w && c.properties & CP::P_BounceRight) ) {
+                p.x -= p.vx;
                 p.vx = -p.vx;
             } else {
                 ScoreboardSystem_t<GameCTX_t>::scorePosX = p.x;
