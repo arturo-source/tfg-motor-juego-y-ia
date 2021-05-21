@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cassert>
+#include <iostream>
 
 //-------------Neuron-------------
 Neuron_t::Neuron_t(uint32_t number_of_imputs, uint32_t position_in_layer, std::vector<Neuron_t>* output_neurons_pointer)
@@ -157,30 +158,13 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
 void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, uint32_t num_iterations, const GameConfig& gConfig) {
     if(X.size() != y.size()) throw std::out_of_range("Given total inputs sample is different from given total outputs sample"); 
 
-    float total = gConfig.no_touch_importance + gConfig.up_touch_importance + gConfig.down_touch_importance;
     VecUInt_t no_touch_indexes {};
     VecUInt_t up_touch_indexes {};
     VecUInt_t down_touch_indexes {};
-    prepareData(y, no_touch_indexes, up_touch_indexes, down_touch_indexes);
-    uint32_t i_no = 0, i_up = 0, i_down = 0;
+    prepare_data(y, no_touch_indexes, up_touch_indexes, down_touch_indexes);
     
     for(std::size_t i=0; i < num_iterations; ++i) {
-        // Dataset is selected from real data but the percentage of type of data appearing is altered by the importance of each one
-        VecUInt_t dataSetModified {};
-        for(std::size_t j=0; j < X.size(); ++j) {
-            float randResult = randFloat(0.0, total);
-            if(randResult < gConfig.no_touch_importance) {
-                dataSetModified.push_back(no_touch_indexes[i_no%no_touch_indexes.size()]);
-                ++i_no;
-            } else if(randResult < gConfig.no_touch_importance + gConfig.up_touch_importance) {
-                dataSetModified.push_back(up_touch_indexes[i_up%up_touch_indexes.size()]);
-                ++i_up;
-            } else {
-                dataSetModified.push_back(down_touch_indexes[i_down%down_touch_indexes.size()]);
-                ++i_down;
-            }
-        }
-        std::random_shuffle(dataSetModified.begin(), dataSetModified.end());
+        VecUInt_t dataSetModified = adjust_data(no_touch_indexes, up_touch_indexes, down_touch_indexes, X.size(), gConfig);
         
         for(const uint32_t j: dataSetModified) {
             this->feedforward(X[j]);
@@ -193,11 +177,34 @@ void NeuralNetwork_t::backpropagation(const std::vector<VecDouble_t>& X, const s
         }
     }
 }
-void NeuralNetwork_t::prepareData(const std::vector<VecDouble_t>& y, VecUInt_t& no_touch_indexes, VecUInt_t& up_touch_indexes, VecUInt_t& down_touch_indexes) {
+NeuralNetwork_t::VecUInt_t NeuralNetwork_t::adjust_data(const VecUInt_t& no_touch_indexes, const VecUInt_t& up_touch_indexes, const VecUInt_t& down_touch_indexes, const size_t size, const GameConfig& gConfig) {
+    float total = gConfig.no_touch_importance + gConfig.up_touch_importance + gConfig.down_touch_importance;
+    uint32_t i_no = 0, i_up = 0, i_down = 0;
+
+    // Dataset is selected from real data but the percentage of type of data appearing is altered by the importance of each one
+    VecUInt_t dataSetModified {};
+    for(std::size_t j=0; j < size; ++j) {
+        float randResult = randFloat(0.0, total);
+        if(randResult < gConfig.no_touch_importance) {
+            dataSetModified.push_back(no_touch_indexes[i_no%no_touch_indexes.size()]);
+            ++i_no;
+        } else if(randResult < gConfig.no_touch_importance + gConfig.up_touch_importance) {
+            dataSetModified.push_back(up_touch_indexes[i_up%up_touch_indexes.size()]);
+            ++i_up;
+        } else {
+            dataSetModified.push_back(down_touch_indexes[i_down%down_touch_indexes.size()]);
+            ++i_down;
+        }
+    }
+    std::random_shuffle(dataSetModified.begin(), dataSetModified.end());
+
+    return dataSetModified;
+}
+void NeuralNetwork_t::prepare_data(const std::vector<VecDouble_t>& y, VecUInt_t& no_touch_indexes, VecUInt_t& up_touch_indexes, VecUInt_t& down_touch_indexes) {
     for(std::size_t i=0; i < y.size(); ++i) {
-        if(y[i][0] == 0.0 && y[i][1] == 0.0) no_touch_indexes.push_back(i);
-        if(y[i][0] == 1.0)                   up_touch_indexes.push_back(i);
-        if(y[i][1] == 1.0)                   down_touch_indexes.push_back(i);
+        if(y[i][0] < 0.5 && y[i][1] < 0.5) no_touch_indexes.push_back(i);
+        if(y[i][0] > 0.5)                  up_touch_indexes.push_back(i);
+        if(y[i][1] > 0.5)                  down_touch_indexes.push_back(i);
     }
 }
 int NeuralNetwork_t::randInt(int min, int max) {
@@ -227,6 +234,34 @@ double NeuralNetwork_t::average_error(const std::vector<VecDouble_t>& X, const s
     }
 
     return avg_error/X.size();
+}
+void NeuralNetwork_t::failed_keys(const std::vector<VecDouble_t>& X, const std::vector<VecDouble_t>& y, float& failed_press_up, float& failed_press_down, float& failed_nopress) {
+    failed_press_up = 0; failed_press_down = 0; failed_nopress = 0;
+    float total_press_up = 0, total_press_down = 0, total_nopress = 0;
+
+    for(std::size_t i=0; i < X.size(); ++i) {
+        auto output = this->feedforward(X[i]);
+        if(output.size() != y[i].size()) throw std::out_of_range("Number of neural network outputs is diffetent than given sample outputs.");
+
+        if(y[i][0] > 0.5) {
+            ++total_press_up;
+            if( output[0] < 0.5 ) ++failed_press_up;
+        } else {
+            ++total_nopress;
+            if( output[0] > 0.5 ) ++failed_nopress;
+        }
+        if(y[i][1] > 0.5) {
+            ++total_press_down;
+            if( output[1] < 0.5 ) ++failed_press_down;
+        } else {
+            ++total_nopress;
+            if( output[1] > 0.5 ) ++failed_nopress;
+        }
+    }
+
+    failed_press_up /= total_press_up;
+    failed_press_down /= total_press_down;
+    failed_nopress /= total_nopress;
 }
 void NeuralNetwork_t::export_as_csv(const std::string& filename) const {
     std::ofstream file(filename, std::ios::trunc);
@@ -286,12 +321,16 @@ void NeuralNetwork_t::setNeurons(const std::vector<uint32_t>& layers) {
     m_layers = {};
 
     Layer_t* output_layer { nullptr };
+    uint32_t next_layer_pos = 1;
     m_layers.reserve(layers.size()-1);
 
-    auto input_size_it = layers.end() - 2;
-    for(auto it = layers.end() - 1; it != layers.begin(); --it) {
-        m_layers.insert(m_layers.begin(), Layer_t(*it, *input_size_it, output_layer));
-        output_layer = &(m_layers[0]);
-        --input_size_it;
+    for(auto it = layers.begin(); it != layers.end() - 1; ++it) {
+        uint16_t num_neurons = *(it+1);
+        uint16_t num_input_per_neuron = *it;
+        if(next_layer_pos < layers.size() - 1) output_layer = &(m_layers[next_layer_pos]);
+        else                                   output_layer = nullptr;
+
+        m_layers.push_back(Layer_t(num_neurons, num_input_per_neuron, output_layer));
+        next_layer_pos++;
     }
 }

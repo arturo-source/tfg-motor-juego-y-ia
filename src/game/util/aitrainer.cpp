@@ -4,9 +4,15 @@
 #include <sstream>
 #include <random>
 
-double AItrainer_t::train(const int n_iter, const GameConfig& gConfig) {
+void AItrainer_t::train(const int n_iter, const GameConfig& gConfig, float& failed_press_up, float& failed_press_down, float& failed_nopress) {
+    nn.print();
     nn.backpropagation(dataInputs, dataOutputs, n_iter, gConfig);
-    return nn.average_error(dataInputs, dataOutputs);
+    // nn.average_error(dataInputs, dataOutputs);
+    failed_keys(failed_press_up, failed_press_down, failed_nopress);
+}
+
+void AItrainer_t::failed_keys(float& failed_press_up, float& failed_press_down, float& failed_nopress) {
+    nn.failed_keys(dataInputs, dataOutputs, failed_press_up, failed_press_down, failed_nopress);
 }
 
 void AItrainer_t::export_weights_as_csv(const char* filename) const {

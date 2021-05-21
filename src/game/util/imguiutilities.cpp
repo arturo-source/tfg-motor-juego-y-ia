@@ -104,6 +104,9 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*
     gConfig.train = ImGui::Button("Train");
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
+    gConfig.editweights = ImGui::Button("Edit neural network");
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
     gConfig.exit = ImGui::Button("Exit");
 
     ImGui::EndTable();
@@ -113,23 +116,104 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig, const std::vector<const char*
     postrender();
 }
 
-void ImGuiUtilities::trainMenu_selectFile(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept {
+void ImGuiUtilities::editweightsMenu(GameConfig& gConfig, AItrainer_t& ai) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
     ImGui::SetNextWindowSize(ImVec2(m_w, m_h));
-    ImGui::Begin("Training menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Editing menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+    static int32_t layer_pos { 0 };
+    ImGui::Text("Editing layer %d", layer_pos);
+    ImGui::SameLine();
+    if( ImGui::Button("Previous") ) {
+        layer_pos = (layer_pos - 1)%ai.nn.m_layers.size();
+    }
+    ImGui::SameLine();
+    if( ImGui::Button("Next") ) {
+        layer_pos = (layer_pos + 1)%ai.nn.m_layers.size();
+    }
+
+    float failed_press_up, failed_press_down, failed_nopress;
+    ai.failed_keys(failed_press_up, failed_press_down, failed_nopress);
+
+    Layer_t& layer = ai.nn.m_layers[layer_pos];
+
+    size_t id_num = 0;
+    for(size_t i = 0; i < layer.m_neurons.size(); ++i) {
+        ImGui::Text("Press up fail %.3f%% | Press down fail %.3f%% | No press fail %.3f%%", failed_press_up*100, failed_press_down*100, failed_nopress*100);
+        ImGui::Text("Neuron %d", i);
+        for(auto& w: layer.m_neurons[i].m_weights) {
+            float w_fake = w;
+            std::string id {"##" + std::to_string(id_num++)};
+            if( ImGui::SliderFloat(id.c_str(), &w_fake, -2.5f, 2.5f, "%.3f") ) 
+                w = w_fake;
+        }
+    }
+
+    gConfig.saveFile = ImGui::Button("Save");
+    ImGui::SameLine();
+    gConfig.exit = ImGui::Button("Exit");
+
+    ImGui::End();
+
+    renderWithoutFlipFrameBuffer();
+    postrender();
+}
+
+void ImGuiUtilities::selectFileMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept {
+    prerender();
+
+    ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
+    ImGui::SetNextWindowSize(ImVec2(m_w, m_h));
+    ImGui::Begin("Select menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     
     ImGui::BeginTable("Menu table", 3);
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int item_current = 0;
-    ImGui::ListBox("Training files", &item_current, files.data(), files.size(), 8);
+    ImGui::ListBox("Select a file", &item_current, files.data(), files.size(), 8);
     
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
-    if( ImGui::Button("Train with this file") ) {
+    if( ImGui::Button("Select") ) {
         gConfig.data_filename = files[item_current];
+        gConfig.readFile = true;
+    }
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
+    gConfig.exit = ImGui::Button("Exit");
+
+    ImGui::EndTable();
+    ImGui::End();
+
+    renderWithoutFlipFrameBuffer();
+    postrender();
+}
+
+void ImGuiUtilities::selectFileMenu2(GameConfig& gConfig, const std::vector<const char*>& train_files, const std::vector<const char*>& weight_files) const noexcept {
+    prerender();
+
+    ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
+    ImGui::SetNextWindowSize(ImVec2(m_w, m_h));
+    ImGui::Begin("Select menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+    
+    ImGui::BeginTable("Menu table", 3);
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
+    static int train_item_current = 0;
+    ImGui::ListBox("Select dataset file", &train_item_current, train_files.data(), train_files.size(), 8);
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
+    static int weight_item_current = 0;
+    ImGui::ListBox("Select weights file", &weight_item_current, weight_files.data(), weight_files.size(), 8);
+
+
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(1);
+    if( ImGui::Button("Select") ) {
+        gConfig.data_filename   = train_files[train_item_current];
+        gConfig.editweight_filename = weight_files[weight_item_current];
         gConfig.readFile = true;
     }
     ImGui::TableNextRow();
@@ -165,7 +249,7 @@ void ImGuiUtilities::saveFileMenu(GameConfig& gConfig) const noexcept {
     postrender();
 }
 
-void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& values, const AItrainer_t& AI) const noexcept {
+void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vector<float>& failed_press_up, const std::vector<float>& failed_press_down, const std::vector<float>& failed_nopress, const AItrainer_t& AI) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
@@ -173,10 +257,33 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
     ImGui::Begin("Training menu", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     
     static bool change_importance = false;
+    static bool show_graphics = false;
     ImGui::Checkbox("Change importance of data", &change_importance);
     ImGui::SameLine(); HelpMarker(
         "The dataset is usually full of not pressing key examples. You may want to change the importance of pressing a key, doing it can cause bigger error but better results in game.");
 
+    {
+        if(gConfig.n_iter <= 0) gConfig.n_iter = 1;
+        if(gConfig.n_layers <= 0) gConfig.n_layers = 0;
+        if(gConfig.neuron_per_layer <= 0) gConfig.neuron_per_layer = 0;
+        
+        ImGui::InputInt("Number of iterations", &gConfig.n_iter);
+        ImGui::SliderInt("Number of hidden layers", &gConfig.n_layers, 1, 10);
+        ImGui::SliderInt("Number of neurons per layer", &gConfig.neuron_per_layer, 1, 10);
+        ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0001f, 1.0f, "learning rate -> %.5f");
+    }
+    {
+        constexpr uint32_t input_neurons {16};
+        constexpr uint32_t output_neurons {2};
+        uint32_t total_weights { 0 };
+        total_weights += input_neurons*gConfig.neuron_per_layer;
+        for(size_t i = 0; i < gConfig.n_layers-1; ++i) {
+            total_weights += gConfig.neuron_per_layer*gConfig.neuron_per_layer;
+        }
+        total_weights += gConfig.neuron_per_layer*output_neurons;
+        ImGui::Text("Actual weights are %d input neuron, %d hidden layer, %d neuron per each hidden layer, and %d output neuron. Total %d weights.", input_neurons, gConfig.n_layers, gConfig.neuron_per_layer, output_neurons, total_weights);
+        ImGui::Text("You'll need %d examples from each learnable action (up, down and no press) to be able to make the neural network learn.", total_weights*10);
+    }
     {
         uint32_t data_without_touch, data_with_up, data_with_down, total;
         AI.infoFromData(data_without_touch, data_with_up, data_with_down, total);
@@ -217,22 +324,19 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
             
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%.2f%%", gConfig.no_touch_importance/total_percentage*100);
+            ImGui::Text("%.2f%% selected", gConfig.no_touch_importance/total_percentage*100);
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%.2f%%", gConfig.up_touch_importance/total_percentage*100);
+            ImGui::Text("%.2f%% selected", gConfig.up_touch_importance/total_percentage*100);
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%.2f%%", gConfig.down_touch_importance/total_percentage*100);
+            ImGui::Text("%.2f%% selected", gConfig.down_touch_importance/total_percentage*100);
         }
         ImGui::EndTable();
     }
     {
-        ImGui::InputInt("Number of iterations", &gConfig.n_iter);
-        ImGui::InputInt("Number of hidden layers", &gConfig.n_layers);
-        ImGui::InputInt("Number of neurons per layer", &gConfig.neuron_per_layer);
-        ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0f, 2.0f, "learning rate -> %.3f");
-        ImGui::PlotLines("% of error", values.data(), values.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
-    }
-    {
+        ImGui::PlotLines("% of error pressing up key", failed_press_up.data(), failed_press_up.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
+        ImGui::PlotLines("% of error pressing down key", failed_press_down.data(), failed_press_down.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
+        ImGui::PlotLines("% of error no pressing key", failed_nopress.data(), failed_nopress.size(), 0, NULL, 0.0f, 1.0f, ImVec2(0, 100.0f));
+
         ImGui::BeginTable("Menu table", 3);
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);

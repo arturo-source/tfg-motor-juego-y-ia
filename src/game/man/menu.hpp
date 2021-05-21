@@ -71,15 +71,22 @@ struct ResultOfTrainingMenu_t : MenuState_t {
 
         if(gConfig.train && times_trained < gConfig.n_iter) {
             times_trained += train_offset;
-            results.push_back(AI.train(train_offset, gConfig));
+            float f_press_up, f_press_down, f_nopress;
+            AI.train(train_offset, gConfig, f_press_up, f_press_down, f_nopress);
+
+            failed_press_up.push_back(f_press_up);
+            failed_press_down.push_back(f_press_down);
+            failed_nopress.push_back(f_nopress);
         } else {
             gConfig.train = false;
         }
 
         if(gConfig.setData) {
-            results = {};
+            failed_press_up = {};
+            failed_press_down = {};
+            failed_nopress = {};
             times_trained = 0;
-            train_offset = gConfig.n_iter/1000;
+            train_offset = gConfig.n_iter/200;
             gConfig.train = true;
             gConfig.setData = false;
             if(train_offset == 0) train_offset = 1;
@@ -92,7 +99,7 @@ struct ResultOfTrainingMenu_t : MenuState_t {
             m_Alive = false;
         }
 
-        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, results, AI); });
+        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, failed_press_up, failed_press_down, failed_nopress, AI); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
 
@@ -105,11 +112,76 @@ private:
     
     uint32_t train_offset;
     uint32_t times_trained;
-    std::vector<float> results {};
+    std::vector<float> failed_press_up {};
+    std::vector<float> failed_press_down {};
+    std::vector<float> failed_nopress {};
 };
 
-struct TrainingMenu_t : MenuState_t {
-    explicit TrainingMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH)
+struct EditWeightsMenu_t : MenuState_t {
+    explicit EditWeightsMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const char* train_file, const char* weights_file, const uint32_t scrW, const uint32_t scrH)
+    : MenuState_t(sm, ren, inp, scrW, scrH)
+    {
+        AI.nn.setNeurons(weights_file);
+        AI.read_data_csv(train_file);
+    }
+    void update() final {
+        GameTimer_t timer;
+
+        if(gConfig.saveFile) {
+            SM.pushState<SaveFileMenu_t>(SM, Render, Input, AI, kSCRWIDTH, kSCRHEIGHT);
+            m_Alive = false;
+        }
+
+        if(gConfig.exit) {
+            m_Alive = false;
+        }
+
+        timer.timedCall("REN", [&](){ Render.getMenu().editweightsMenu(gConfig, AI); });
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
+    }
+private:
+    AItrainer_t AI;
+};
+
+struct SelectFileMenu2_t : MenuState_t {
+    explicit SelectFileMenu2_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH)
+    : MenuState_t(sm, ren, inp, scrW, scrH)
+    {
+        static std::vector<std::string> train_files_str;
+        train_files_str = loadCSVFiles("dataset_CSVs");
+        for(auto& f: train_files_str)
+            train_files.push_back(f.c_str());
+        
+        static std::vector<std::string> weight_files_str;
+        weight_files_str = loadCSVFiles("weights_CSVs");
+        for(auto& f: weight_files_str)
+            weight_files.push_back(f.c_str());
+    }
+    void update() final {
+        GameTimer_t timer;
+
+        if(gConfig.readFile && gConfig.data_filename != nullptr) {
+            gConfig.readFile = false;
+            SM.pushState<EditWeightsMenu_t>(SM, Render, Input, gConfig.data_filename, gConfig.editweight_filename, kSCRWIDTH, kSCRHEIGHT);
+            m_Alive = false;
+        }
+
+        if(gConfig.exit) {
+            m_Alive = false;
+        }
+
+        timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu2(gConfig, train_files, weight_files); });
+        timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
+        std::cout << "\n";
+    }
+private:
+    std::vector<const char*> train_files;
+    std::vector<const char*> weight_files;
+};
+
+struct SelectFileMenu_t : MenuState_t {
+    explicit SelectFileMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH)
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
         static std::vector<std::string> files_str;
@@ -130,14 +202,13 @@ struct TrainingMenu_t : MenuState_t {
             m_Alive = false;
         }
 
-        timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFile(gConfig, files); });
+        timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu(gConfig, files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
 private:
     std::vector<const char*> files;
 };
-
 
 struct MainMenu_t : MenuState_t {
     using GR = GameReferences;
@@ -152,7 +223,8 @@ struct MainMenu_t : MenuState_t {
 
         if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.arena) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainLeft, kSCRWIDTH, kSCRHEIGHT);
-        if(gConfig.train) SM.pushState<TrainingMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.train) SM.pushState<SelectFileMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.editweights) SM.pushState<SelectFileMenu2_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.Lplayer_AI || gConfig.Rplayer_AI) resetFilesPointers();
         if(gConfig.exit) m_Alive = false;
 
