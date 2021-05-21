@@ -221,7 +221,10 @@ struct MainMenu_t : MenuState_t {
     void update() final {
         GameTimer_t timer;
 
-        if(gConfig.play) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
+        if(gConfig.play) {
+            ScoreboardSystem_t<ECS::EntityManager_t>::end_game = false;
+            SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_Playing|GR::G_WithWall, kSCRWIDTH, kSCRHEIGHT);
+        }
         if(gConfig.arena) SM.pushState<GameManager_t>(SM, Render, Input, gConfig, GR::G_TrainLeft, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.train) SM.pushState<SelectFileMenu_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
         if(gConfig.editweights) SM.pushState<SelectFileMenu2_t>(SM, Render, Input, kSCRWIDTH, kSCRHEIGHT);
