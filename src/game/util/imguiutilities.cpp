@@ -78,6 +78,8 @@ void ImGuiUtilities::mainMenu(GameConfig& gConfig) const noexcept {
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     gConfig.train = ImGui::Button("Train");
+    ImGui::SameLine(); HelpMarker(
+            "Train is where you take dataset to apply backpropagation.");
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     gConfig.editweights = ImGui::Button("Edit neural network");
@@ -155,7 +157,7 @@ void ImGuiUtilities::playModeMenu(GameConfig& gConfig, const std::vector<const c
                 ImGui::ListBox("##Left weight files", &Lplayer_file, files.data(), files.size(), 8);
                 gConfig.Lplayer_AI_file = files[Lplayer_file];
             } else {
-                ImGui::Text("Must train first.");
+                ImGui::Text("Must train if want choose AI.");
             }
         }
 
@@ -167,13 +169,14 @@ void ImGuiUtilities::playModeMenu(GameConfig& gConfig, const std::vector<const c
                 ImGui::ListBox("##Right weight files", &Rplayer_file, files.data(), files.size(), 8);
                 gConfig.Rplayer_AI_file = files[Rplayer_file];
             } else {
-                ImGui::Text("Must train first.");
+                ImGui::Text("Must train if want choose AI.");
             }
         }
 
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);
-        gConfig.play = ImGui::Button("Play");
+        if(files.size() > 0)
+            gConfig.play = ImGui::Button("Play");
     } else {
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);
@@ -211,13 +214,18 @@ void ImGuiUtilities::selectFileMenu(GameConfig& gConfig, const std::vector<const
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int item_current = 0;
-    ImGui::ListBox("Select a file", &item_current, files.data(), files.size(), 8);
+    if(files.size() > 0)
+        ImGui::ListBox("Select a file", &item_current, files.data(), files.size(), 8);
+    else
+        ImGui::Text("Must play arena first.");
     
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(1);
-    if( ImGui::Button("Select") ) {
-        gConfig.data_filename = files[item_current];
-        gConfig.readFile = true;
+    if(files.size() > 0) {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        if( ImGui::Button("Select") ) {
+            gConfig.data_filename = files[item_current];
+            gConfig.readFile = true;
+        }
     }
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
@@ -241,19 +249,26 @@ void ImGuiUtilities::selectFileMenu2(GameConfig& gConfig, const std::vector<cons
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int train_item_current = 0;
-    ImGui::ListBox("Select dataset file", &train_item_current, train_files.data(), train_files.size(), 8);
+    if(train_files.size() > 0)
+        ImGui::ListBox("Select dataset file", &train_item_current, train_files.data(), train_files.size(), 8);
+    else
+        ImGui::Text("Must play arena first.");
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int weight_item_current = 0;
-    ImGui::ListBox("Select weights file", &weight_item_current, weight_files.data(), weight_files.size(), 8);
+    if(weight_files.size() > 0)
+        ImGui::ListBox("Select weights file", &weight_item_current, weight_files.data(), weight_files.size(), 8);
+    else
+        ImGui::Text("Must train first.");
 
-
-    ImGui::TableNextRow();
-    ImGui::TableSetColumnIndex(1);
-    if( ImGui::Button("Select") ) {
-        gConfig.data_filename   = train_files[train_item_current];
-        gConfig.editweight_filename = weight_files[weight_item_current];
-        gConfig.readFile = true;
+    if(train_files.size() > 0 && weight_files.size() > 0) {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        if( ImGui::Button("Select") ) {
+            gConfig.data_filename   = train_files[train_item_current];
+            gConfig.editweight_filename = weight_files[weight_item_current];
+            gConfig.readFile = true;
+        }
     }
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
@@ -307,9 +322,17 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
         if(gConfig.neuron_per_layer <= 0) gConfig.neuron_per_layer = 0;
         
         ImGui::InputInt("Number of iterations", &gConfig.n_iter);
+        ImGui::SameLine(); HelpMarker(
+            "Arround 10000 iterations work ok.");
         ImGui::SliderInt("Number of hidden layers", &gConfig.n_layers, 1, 10);
+        ImGui::SameLine(); HelpMarker(
+            "Arround 3 layers work ok.");
         ImGui::SliderInt("Number of neurons per layer", &gConfig.neuron_per_layer, 1, 10);
-        ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0001f, 1.0f, "learning rate -> %.5f");
+        ImGui::SameLine(); HelpMarker(
+            "Arround 6 neurons per layer work ok.");
+        ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0001f, 1.0f, "learning rate -> %.5f", ImGuiSliderFlags_Logarithmic);
+        ImGui::SameLine(); HelpMarker(
+            "Learning rate lower than 0.001 work better.");
     }
     {
         constexpr uint32_t input_neurons {16};
@@ -330,44 +353,44 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
 
         ImGui::BeginTable("Dataset table", 3);
 
-        ImGui::TableSetupColumn("Examples with no touch");
-        ImGui::TableSetupColumn("Examples with up touch");
-        ImGui::TableSetupColumn("Examples with down touch");
+        ImGui::TableSetupColumn("Up touch");
+        ImGui::TableSetupColumn("Down touch");
+        ImGui::TableSetupColumn("No touch");
         ImGui::TableHeadersRow();
 
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
-        ImGui::Text("%u(%.2f%%)", data_without_touch, (float)data_without_touch/(float)total*100);
-        ImGui::TableSetColumnIndex(1);
         ImGui::Text("%u(%.2f%%)", data_with_up, (float)data_with_up/(float)total*100);
-        ImGui::TableSetColumnIndex(2);
+        ImGui::TableSetColumnIndex(1);
         ImGui::Text("%u(%.2f%%)", data_with_down, (float)data_with_down/(float)total*100);
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("%u(%.2f%%)", data_without_touch, (float)data_without_touch/(float)total*100);
 
         if( change_importance ) {
             float total_percentage = gConfig.no_touch_importance + gConfig.up_touch_importance + gConfig.down_touch_importance;
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            ImGui::VSliderFloat("##no touch", ImVec2(40, 110), &gConfig.no_touch_importance, 0.01f, 1.0f, "");
-            if (ImGui::IsItemActive() || ImGui::IsItemHovered())
-                ImGui::SetTooltip("%.2f", gConfig.no_touch_importance);
-
-            ImGui::TableSetColumnIndex(1);
             ImGui::VSliderFloat("##up touch", ImVec2(40, 110), &gConfig.up_touch_importance, 0.01f, 1.0f, "");
             if (ImGui::IsItemActive() || ImGui::IsItemHovered())
-                ImGui::SetTooltip("%.2f", gConfig.up_touch_importance);
+                ImGui::SetTooltip("%.2f%% of train dataset is up touch", gConfig.up_touch_importance/total_percentage*100);
 
-            ImGui::TableSetColumnIndex(2);
+            ImGui::TableSetColumnIndex(1);
             ImGui::VSliderFloat("##down touch", ImVec2(40, 110), &gConfig.down_touch_importance, 0.01f, 1.0f, "");
             if (ImGui::IsItemActive() || ImGui::IsItemHovered())
-                ImGui::SetTooltip("%.2f", gConfig.down_touch_importance);
+                ImGui::SetTooltip("%.2f%% of train dataset is down touch", gConfig.down_touch_importance/total_percentage*100);
             
+            ImGui::TableSetColumnIndex(2);
+            ImGui::VSliderFloat("##no touch", ImVec2(40, 110), &gConfig.no_touch_importance, 0.01f, 1.0f, "");
+            if (ImGui::IsItemActive() || ImGui::IsItemHovered())
+                ImGui::SetTooltip("%.2f%% of train dataset is no touch", gConfig.no_touch_importance/total_percentage*100);
+
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%.2f%% selected", gConfig.no_touch_importance/total_percentage*100);
+            ImGui::Text("%.0f samples used in train", gConfig.up_touch_importance/total_percentage*total);
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%.2f%% selected", gConfig.up_touch_importance/total_percentage*100);
+            ImGui::Text("%.0f samples used in train", gConfig.down_touch_importance/total_percentage*total);
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%.2f%% selected", gConfig.down_touch_importance/total_percentage*100);
+            ImGui::Text("%.0f samples used in train", gConfig.no_touch_importance/total_percentage*total);
         }
         ImGui::EndTable();
     }

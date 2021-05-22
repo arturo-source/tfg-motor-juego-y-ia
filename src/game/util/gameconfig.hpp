@@ -13,10 +13,10 @@ struct GameConfig {
     bool editweights      = false;
     bool trainLside       = false;
     bool trainRside       = false;
-    int  n_iter           = 2000;
-    int  n_layers         = 2;
-    int  neuron_per_layer = 4;
-    float learning_rate         = 0.5;
+    int  n_iter           = 10000;
+    int  n_layers         = 3;
+    int  neuron_per_layer = 6;
+    float learning_rate         = 0.001;
     float no_touch_importance   = 0.33;
     float up_touch_importance   = 0.33;
     float down_touch_importance = 0.33;

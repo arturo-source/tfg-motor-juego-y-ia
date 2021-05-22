@@ -86,7 +86,7 @@ struct ResultOfTrainingMenu_t : MenuState_t {
             failed_press_down = {};
             failed_nopress = {};
             times_trained = 0;
-            train_offset = gConfig.n_iter/200;
+            train_offset = gConfig.n_iter/500;
             gConfig.train = true;
             gConfig.setData = false;
             if(train_offset == 0) train_offset = 1;
