@@ -59,7 +59,7 @@ Los resultados de este test son que el que supuestamente debería ser más lento
 \end{figure}
 
 El siguiente ejemplo que se me ocurrió es el típico problema de orden de lectura de datos de una matriz. He simplificado un ejemplo con el cual demostrar que el orden en el que se lee la memoria es importante. El siguiente código es una matriz, la cual se lee primero de manera "cache-friendly", y después no.
-\begin{lstlisting}[style=C-color, caption={Caché optimizada vs sin optimizar. Segundo intento},label=cache-optimization]
+\begin{lstlisting}[style=C-color, caption={Caché optimizada vs sin optimizar. Segundo intento},label=cache-optimization-second]
 size_t bench_optimized(size_t v[][width], size_t times) {
 	size_t result = 0;
 	

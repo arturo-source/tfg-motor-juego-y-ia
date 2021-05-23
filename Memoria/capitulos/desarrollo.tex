@@ -296,12 +296,6 @@ El algoritmo aleatorio consigue aprender más rápido que el de backpropagation 
 	 \label{problema aprendizaje red neuronal}
 \end{figure}
 
-\subsection{Graves problemas durante el desarrollo}
-\todo{Añadirlo en un anexo.}
-Como ya he mencionado en el apartado de herramientas de trabajo, yo he desarrollado este proyecto con Linux, pero por motivos relacionados con la carrera, es necesario que también tenga instalado Windows en el ordenador. Después de una actualización, este último dejó de funcionar, y cuando opté por solucionar el error, se cargó la partición de Linux. Por suerte, todo el trabajo de este \gls{tfg} estaba bajo el control de Git, y en la nube de GitHub, por lo que los daños en ese sentido eran mínimos. Pero tenía que recuperar el resto de cosas.
-
-No voy a contar cómo fue la recuperación del sistema operativo ya que no procede en esta memoria, pero esto juntado con los trabajos de las asignaturas de la universidad, me hizo perder más de una semana, por lo que esta iteración quedó prácticamente en nada.
-
 \section{Séptima iteración: creación de menús}
 El día \textbf{11 de marzo de 2021} volvimos a tener una llamada de revisión de trabajo y nuevas propuestas, pero según se desarrolló la anterior iteración, mi tutor y yo acordamos que para esta acabaría lo ya acordado, prestando especial atención en el desarrollo de la memoria, ya que era lo que más trabajo requería en la situación en la que estaba, y conociendo que ya quedaba poco tiempo para la entrega del \gls{tfg}.
 
@@ -383,7 +377,7 @@ Además, la gráfica que representaba el porcentaje de error de la red neuronal 
 
 \subsection{Algoritmo básico de seguimiento}
 Como el usuario no tendrá ningún fichero de pesos, este necesitará un algoritmo para poder jugar contra la máquina, para poder entrenar a su bot. Por lo tanto, mi tutor y yo tuvimos la idea de darle un algoritmo por defecto a los caracteres controlados por la máquina. Escribiré un pseudocódigo para una mayor facilidad de comprensión del mismo:
-\begin{lstlisting}[style=C-color, caption={Pseudocódigo de algoritmo de IA diseñada},label=macro-compile]
+\begin{lstlisting}[style=C-color, caption={Pseudocódigo de algoritmo de IA diseñada},label=pseudo-code-ia-designed]
 	Entity myself     = getMyself();
 	Entity leftBall    = getLeftBall();
 	Entity rightBall = getRightBall();
