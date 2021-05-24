@@ -129,10 +129,10 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
         VecDouble_t output(2);
         double myx    = inputs[0];
         double myy    = inputs[1];
-        double Lballx = inputs[4];
-        double Lbally = inputs[5];
-        double Rballx = inputs[8];
-        double Rbally = inputs[9];
+        double Lballx = inputs[3];
+        double Lbally = inputs[4];
+        double Rballx = inputs[7];
+        double Rbally = inputs[8];
 
         if( (myx - Lballx)*(myx - Lballx) < (myx - Rballx)*(myx - Rballx) ) {
             if((myy - Lbally + 10) > 0) {

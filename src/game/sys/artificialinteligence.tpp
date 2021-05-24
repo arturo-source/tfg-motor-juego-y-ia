@@ -19,7 +19,7 @@ void ArtificialInteligenceSystem_t<GameCTX_t>::update(GameCTX_t& g) const {
 template<typename GameCTX_t>
 constexpr void ArtificialInteligenceSystem_t<GameCTX_t>::keysPressed(NeuralNetwork_t& nn, const PhysicsComponent_t& phy, const InputComponent_t& inp, bool& keyUp, bool& keyDown) const noexcept {
     VecDouble_t input_data {
-        phy.x, phy.y, phy.vy, phy.aceleration
+        phy.x, phy.y, phy.vy
     };
     if(inp.side & InputComponent_t::S_Left) {
         input_data.push_back(gameReferences.Lball->x);
@@ -33,7 +33,6 @@ constexpr void ArtificialInteligenceSystem_t<GameCTX_t>::keysPressed(NeuralNetwo
         input_data.push_back(gameReferences.Lminion->x);
         input_data.push_back(gameReferences.Lminion->y);
         input_data.push_back(gameReferences.Lminion->vy);
-        input_data.push_back(gameReferences.Lminion->aceleration);
     } else if(inp.side & InputComponent_t::S_Right) {
         input_data.push_back(gameReferences.Rball->x);
         input_data.push_back(gameReferences.Rball->y);
@@ -46,7 +45,6 @@ constexpr void ArtificialInteligenceSystem_t<GameCTX_t>::keysPressed(NeuralNetwo
         input_data.push_back(gameReferences.Rminion->x);
         input_data.push_back(gameReferences.Rminion->y);
         input_data.push_back(gameReferences.Rminion->vy);
-        input_data.push_back(gameReferences.Rminion->aceleration);
     }
     VecDouble_t result = nn.feedforward(input_data);
     keyUp   = result[0] > 0.5;

@@ -110,23 +110,25 @@ struct GameReferences {
         if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
         
         if(!gameConfig.Lplayer_AI && gameMode & (G_TrainLeft|G_Playing)) {
+        // if(gameMode & G_TrainLeft) {
             if( !(Lball && Rball && Lplayer && Lminion && Linputs) ) 
                 throw std::runtime_error("Missing player or ball or minion pointer"); 
 
-            file << Lplayer->x << ";" << Lplayer->y << ";" << Lplayer->vy << ";" << Lplayer->aceleration << ";";
+            file << Lplayer->x << ";" << Lplayer->y << ";" << Lplayer->vy << ";";
             file << Lball->x << ";" << Lball->y << ";" << Lball->vx << ";" << Lball->vy << ";";
             file << Rball->x << ";" << Rball->y << ";" << Rball->vx << ";" << Rball->vy << ";";
-            file << Lminion->x << ";" << Lminion->y << ";" << Lminion->vy << ";" << Lminion->aceleration << ";";
+            file << Lminion->x << ";" << Lminion->y << ";" << Lminion->vy << ";";
             file << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Linputs->key_UP) << ";" << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Linputs->key_DOWN) << "\n";
         }
         if(!gameConfig.Rplayer_AI && gameMode & (G_TrainRight|G_Playing)) {
+        // if(gameMode & G_TrainRight) {
             if( !(Lball && Rball && Rplayer && Rminion && Rinputs) ) 
                 throw std::runtime_error("Missing player or ball or minion pointer"); 
 
-            file << Rplayer->x << ";" << Rplayer->y << ";" << Rplayer->vy << ";" << Rplayer->aceleration << ";";
+            file << Rplayer->x << ";" << Rplayer->y << ";" << Rplayer->vy << ";";
             file << Rball->x << ";" << Rball->y << ";" << Rball->vx << ";" << Rball->vy << ";";
             file << Lball->x << ";" << Lball->y << ";" << Lball->vx << ";" << Lball->vy << ";";
-            file << Rminion->x << ";" << Rminion->y << ";" << Rminion->vy << ";" << Rminion->aceleration << ";";
+            file << Rminion->x << ";" << Rminion->y << ";" << Rminion->vy << ";";
             file << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Rinputs->key_UP) << ";" << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Rinputs->key_DOWN) << "\n";
         }
     
