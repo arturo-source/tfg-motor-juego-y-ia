@@ -5,6 +5,7 @@
 #include <game/sys/input.hpp>
 #include <game/util/gameobjectfactory.hpp>
 #include <game/util/gameconfig.hpp>
+#include <random>
 
 struct GameReferences {
     explicit GameReferences(GameObjectFactory_t& GOFactory, GameConfig& gConfig, const uint8_t gMode, const uint32_t scrW, const uint32_t scrH)
@@ -94,8 +95,8 @@ struct GameReferences {
     void resetGame() {
         const uint32_t avgheight { kSCRHEIGHT/2 };
         const uint32_t avgwidth { kSCRWIDTH/2 };
-        Lball->vx = -3; Lball->vy = 0; Lball->x =             200; Lball->y = avgheight; Lball->aceleration = 0;
-        Rball->vx =  3; Rball->vy = 0; Rball->x = kSCRWIDTH - 200; Rball->y = avgheight; Rball->aceleration = 0;
+        Lball->vx = -3; Lball->vy = randFloat(-3, 3); Lball->x =             200; Lball->y = avgheight; Lball->aceleration = 0;
+        Rball->vx =  3; Rball->vy = randFloat(-3, 3); Rball->x = kSCRWIDTH - 200; Rball->y = avgheight; Rball->aceleration = 0;
         if(Lplayer) {Lplayer->vx = 0; Lplayer->vy = 0; Lplayer->y = avgheight; Lplayer->x =             10; Lplayer->aceleration = 0;}
         if(Rplayer) {Rplayer->vx = 0; Rplayer->vy = 0; Rplayer->y = avgheight; Rplayer->x = kSCRWIDTH - 20; Rplayer->aceleration = 0;}
         if(Lminion) {Lminion->vx = 0; Lminion->vy = 0; Lminion->y = avgheight; Lminion->x = avgwidth - 60; Lminion->aceleration = 0;}
@@ -149,6 +150,14 @@ struct GameReferences {
         }
 
         return filename.str();
+    }
+
+    float randFloat(float min, float max) {
+        static std::random_device dev;
+        static std::mt19937 rng(dev());
+        static std::uniform_real_distribution<float> dist(min, max);
+
+        return dist(rng);
     }
 
     PhysicsComponent_t* Lball   {nullptr};
