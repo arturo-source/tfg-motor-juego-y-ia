@@ -20,6 +20,7 @@ ImGuiUtilities::ImGuiUtilities(uint32_t w, uint32_t h, uint32_t* framebuffer)
     constexpr const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
@@ -172,11 +173,15 @@ void ImGuiUtilities::playModeMenu(GameConfig& gConfig, const std::vector<const c
                 ImGui::Text("Must train if want choose AI.");
             }
         }
-
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);
-        if(files.size() > 0)
-            gConfig.play = ImGui::Button("Play");
+        ImGui::Text("Default AI play");
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("if you don't choose any weight file.");
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        gConfig.play = ImGui::Button("Play");
     } else {
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);
