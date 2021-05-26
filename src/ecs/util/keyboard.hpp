@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include <optional>
 #include <ecs/util/keys.hpp>
 
 namespace ECS {
