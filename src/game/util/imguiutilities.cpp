@@ -208,7 +208,7 @@ void ImGuiUtilities::playModeMenu(GameConfig& gConfig, const std::vector<const c
     postrender();
 }
 
-void ImGuiUtilities::selectFileMenu(GameConfig& gConfig, const std::vector<const char*>& files) const noexcept {
+void ImGuiUtilities::selectFileMenu(GameConfig& gConfig, const std::vector<const char*>& data_files, const std::vector<const char*>& weight_files) const noexcept {
     prerender();
 
     ImGui::SetNextWindowPos(ImVec2(0.0, 0.0));
@@ -219,17 +219,31 @@ void ImGuiUtilities::selectFileMenu(GameConfig& gConfig, const std::vector<const
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(1);
     static int item_current = 0;
-    if(files.size() > 0)
-        ImGui::ListBox("Select a file", &item_current, files.data(), files.size(), 8);
+    if(data_files.size() > 0)
+        ImGui::ListBox("Select data file", &item_current, data_files.data(), data_files.size(), 8);
     else
         ImGui::Text("Must play arena first.");
     
-    if(files.size() > 0) {
+    static int w_item_current = 0;
+    ImGui::Checkbox("Use previous trained weights file", &gConfig.editweights);
+    if(gConfig.editweights) {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(1);
+        if(weight_files.size() > 0)
+            ImGui::ListBox("Select weights file", &w_item_current, weight_files.data(), weight_files.size(), 8);
+        else
+            ImGui::Text("Must train first.");
+    }
+    
+    if(data_files.size() > 0) {
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(1);
         if( ImGui::Button("Select") ) {
-            gConfig.data_filename = files[item_current];
+            gConfig.data_filename = data_files[item_current];
             gConfig.readFile = true;
+            
+            if(gConfig.editweights) 
+                gConfig.editweight_filename = weight_files[w_item_current];
         }
     }
     ImGui::TableNextRow();
@@ -329,17 +343,19 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
         ImGui::InputInt("Number of iterations", &gConfig.n_iter);
         ImGui::SameLine(); HelpMarker(
             "Arround 10000 iterations work ok.");
-        ImGui::SliderInt("Number of hidden layers", &gConfig.n_layers, 1, 10);
-        ImGui::SameLine(); HelpMarker(
-            "Arround 3 layers work ok.");
-        ImGui::SliderInt("Number of neurons per layer", &gConfig.neuron_per_layer, 1, 10);
-        ImGui::SameLine(); HelpMarker(
-            "Arround 6 neurons per layer work ok.");
+        if(!gConfig.editweights) {
+            ImGui::SliderInt("Number of hidden layers", &gConfig.n_layers, 1, 10);
+            ImGui::SameLine(); HelpMarker(
+                "Arround 3 layers work ok.");
+            ImGui::SliderInt("Number of neurons per layer", &gConfig.neuron_per_layer, 1, 10);
+            ImGui::SameLine(); HelpMarker(
+                "Arround 6 neurons per layer work ok.");
+        }
         ImGui::SliderFloat("Learning rate", &gConfig.learning_rate, 0.0001f, 1.0f, "learning rate -> %.5f", ImGuiSliderFlags_Logarithmic);
         ImGui::SameLine(); HelpMarker(
             "Learning rate lower than 0.001 work better.");
     }
-    {
+    if(!gConfig.editweights) {
         constexpr uint32_t input_neurons {16};
         constexpr uint32_t output_neurons {2};
         uint32_t total_weights { 0 };

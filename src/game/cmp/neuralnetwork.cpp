@@ -127,26 +127,12 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
         return inputs_copy; 
     } else { //No neural network created; Generic algorithm;
         VecDouble_t output(2);
-        // double myx    = inputs[0];
-        // double myy    = inputs[1];
-        // double Lballx = inputs[4];
-        // double Lbally = inputs[5];
-        // double Rballx = inputs[8];
-        // double Rbally = inputs[9];
-        
-        // double myx    = inputs[0];
-        // double myy    = inputs[1];
-        // double Lballx = inputs[3];
-        // double Lbally = inputs[4];
-        // double Rballx = inputs[7];
-        // double Rbally = inputs[8];
-
         double myx    = inputs[0];
         double myy    = inputs[1];
-        double Lballx = inputs[2];
-        double Lbally = inputs[3];
-        double Rballx = inputs[4];
-        double Rbally = inputs[5];
+        double Lballx = inputs[4];
+        double Lbally = inputs[5];
+        double Rballx = inputs[8];
+        double Rbally = inputs[9];
 
         if( (myx - Lballx)*(myx - Lballx) < (myx - Rballx)*(myx - Rballx) ) {
             if((myy - Lbally + 10) > 0) {
@@ -320,10 +306,12 @@ void NeuralNetwork_t::setNeurons(const std::string& filename) {
     
     Layer_t* output_layer { nullptr };
     m_layers.reserve(weights.size());
+    uint32_t output_layer_i = weights.size() - 1;
 
     for(auto layer_w = weights.rbegin(); layer_w != weights.rend(); ++layer_w) {
         m_layers.insert(m_layers.begin(), Layer_t(*layer_w, output_layer));
-        output_layer = &(m_layers[0]);
+        output_layer = &(m_layers[output_layer_i]);
+        --output_layer_i;
     }
 }
 void NeuralNetwork_t::setNeurons(const std::vector<uint32_t>& layers) {

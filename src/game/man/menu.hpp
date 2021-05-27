@@ -60,11 +60,14 @@ private:
 };
 
 struct ResultOfTrainingMenu_t : MenuState_t {
-    explicit ResultOfTrainingMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const char* filename, const uint32_t scrW, const uint32_t scrH)
+    explicit ResultOfTrainingMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const GameConfig& gameConfig, const uint32_t scrW, const uint32_t scrH)
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
-        gConfig.data_filename = filename;
-        AI.read_data_csv(filename);
+        gConfig.data_filename = gameConfig.data_filename;
+        gConfig.editweights = gameConfig.editweights;
+        AI.read_data_csv(gameConfig.data_filename);
+        if(gConfig.editweights)
+            AI.nn.setNeurons(gameConfig.editweight_filename);
     }
     void update() final {
         GameTimer_t timer;
@@ -91,7 +94,8 @@ struct ResultOfTrainingMenu_t : MenuState_t {
             gConfig.setData = false;
             if(train_offset == 0) train_offset = 1;
 
-            AI.prepareData(gConfig);
+            if(!gConfig.editweights)
+                AI.prepareData(gConfig);
         }
 
         if(gConfig.saveFile) {
@@ -184,17 +188,22 @@ struct SelectFileMenu_t : MenuState_t {
     explicit SelectFileMenu_t(StateManager_t& sm, const RenderSystem_t<ECS::EntityManager_t>& ren, InputSystem_t<ECS::EntityManager_t>& inp, const uint32_t scrW, const uint32_t scrH)
     : MenuState_t(sm, ren, inp, scrW, scrH)
     {
-        static std::vector<std::string> files_str;
-        files_str = loadCSVFiles("dataset_CSVs");
-        for(auto& f: files_str)
-            files.push_back(f.c_str());
+        static std::vector<std::string> train_files_str;
+        train_files_str = loadCSVFiles("dataset_CSVs");
+        for(auto& f: train_files_str)
+            train_files.push_back(f.c_str());
+        
+        static std::vector<std::string> weight_files_str;
+        weight_files_str = loadCSVFiles("weights_CSVs");
+        for(auto& f: weight_files_str)
+            weight_files.push_back(f.c_str());
     }
     void update() final {
         GameTimer_t timer;
 
         if(gConfig.readFile && gConfig.data_filename != nullptr) {
             gConfig.readFile = false;
-            SM.pushState<ResultOfTrainingMenu_t>(SM, Render, Input, gConfig.data_filename, kSCRWIDTH, kSCRHEIGHT);
+            SM.pushState<ResultOfTrainingMenu_t>(SM, Render, Input, gConfig, kSCRWIDTH, kSCRHEIGHT);
             m_Alive = false;
         }
 
@@ -202,12 +211,13 @@ struct SelectFileMenu_t : MenuState_t {
             m_Alive = false;
         }
 
-        timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu(gConfig, files); });
+        timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu(gConfig, train_files, weight_files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
         std::cout << "\n";
     }
 private:
-    std::vector<const char*> files;
+    std::vector<const char*> train_files;
+    std::vector<const char*> weight_files;
 };
 
 struct PlayModeMenu_t : MenuState_t {
