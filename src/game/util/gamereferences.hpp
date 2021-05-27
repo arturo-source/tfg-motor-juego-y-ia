@@ -104,32 +104,32 @@ struct GameReferences {
     }
 
     void dumpCSV() const {
-        if(gameConfig.Lplayer_AI && gameConfig.Rplayer_AI) return;
+        if(! (gameMode & (G_TrainLeft|G_TrainRight)) ) return;
 
         std::ofstream file(filename.c_str(), std::ios::app);
         if(!file) throw std::runtime_error("Can't open data CSV file for write\n");
         
-        if(!gameConfig.Lplayer_AI && gameMode & (G_TrainLeft|G_Playing)) {
-        // if(gameMode & G_TrainLeft) {
+        if(gameMode & G_TrainLeft) {
             if( !(Lball && Rball && Lplayer && Lminion && Linputs) ) 
                 throw std::runtime_error("Missing player or ball or minion pointer"); 
 
-            file << Lplayer->x << ";" << Lplayer->y << ";" << Lplayer->vy << ";";
+            file << Lplayer->x << ";" << Lplayer->y << ";" << Lplayer->vy << ";" << Lplayer->aceleration << ";";
             file << Lball->x << ";" << Lball->y << ";" << Lball->vx << ";" << Lball->vy << ";";
             file << Rball->x << ";" << Rball->y << ";" << Rball->vx << ";" << Rball->vy << ";";
-            file << Lminion->x << ";" << Lminion->y << ";" << Lminion->vy << ";";
+            file << Lminion->x << ";" << Lminion->y << ";" << Lminion->vy << ";" << Lminion->aceleration << ";";
             file << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Linputs->key_UP) << ";" << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Linputs->key_DOWN) << "\n";
+            // file << Lplayer->aceleration << ";" << Lplayer->aceleration << "\n";
         }
-        if(!gameConfig.Rplayer_AI && gameMode & (G_TrainRight|G_Playing)) {
-        // if(gameMode & G_TrainRight) {
+        if(gameMode & G_TrainRight) {
             if( !(Lball && Rball && Rplayer && Rminion && Rinputs) ) 
                 throw std::runtime_error("Missing player or ball or minion pointer"); 
 
-            file << Rplayer->x << ";" << Rplayer->y << ";" << Rplayer->vy << ";";
+            file << Rplayer->x << ";" << Rplayer->y << ";" << Rplayer->vy << ";" << Rplayer->aceleration << ";";
             file << Rball->x << ";" << Rball->y << ";" << Rball->vx << ";" << Rball->vy << ";";
             file << Lball->x << ";" << Lball->y << ";" << Lball->vx << ";" << Lball->vy << ";";
-            file << Rminion->x << ";" << Rminion->y << ";" << Rminion->vy << ";";
+            file << Rminion->x << ";" << Rminion->y << ";" << Rminion->vy << ";" << Rminion->aceleration << ";";
             file << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Rinputs->key_UP) << ";" << InputSystem_t<ECS::EntityManager_t>::getKeyboard().isKeyPressed(Rinputs->key_DOWN) << "\n";
+            // file << Rplayer->aceleration << ";" << Rplayer->aceleration << "\n";
         }
     
         file.close();

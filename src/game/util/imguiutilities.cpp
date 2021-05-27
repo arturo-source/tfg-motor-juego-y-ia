@@ -340,7 +340,7 @@ void ImGuiUtilities::trainMenu_selectFilters(GameConfig& gConfig, const std::vec
             "Learning rate lower than 0.001 work better.");
     }
     {
-        constexpr uint32_t input_neurons {14};
+        constexpr uint32_t input_neurons {16};
         constexpr uint32_t output_neurons {2};
         uint32_t total_weights { 0 };
         total_weights += input_neurons*gConfig.neuron_per_layer;

@@ -26,7 +26,6 @@ struct AItrainer_t {
 
     NeuralNetwork_t nn{0};
 private:
-    std::vector<uint32_t> neurons;
     Vec_MatchStates dataInputs {};
     Vec_MatchStates dataOutputs {};
 };

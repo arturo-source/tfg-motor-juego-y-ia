@@ -127,12 +127,26 @@ VecDouble_t NeuralNetwork_t::feedforward(const VecDouble_t& inputs) {
         return inputs_copy; 
     } else { //No neural network created; Generic algorithm;
         VecDouble_t output(2);
+        // double myx    = inputs[0];
+        // double myy    = inputs[1];
+        // double Lballx = inputs[4];
+        // double Lbally = inputs[5];
+        // double Rballx = inputs[8];
+        // double Rbally = inputs[9];
+        
+        // double myx    = inputs[0];
+        // double myy    = inputs[1];
+        // double Lballx = inputs[3];
+        // double Lbally = inputs[4];
+        // double Rballx = inputs[7];
+        // double Rbally = inputs[8];
+
         double myx    = inputs[0];
         double myy    = inputs[1];
-        double Lballx = inputs[3];
-        double Lbally = inputs[4];
-        double Rballx = inputs[7];
-        double Rbally = inputs[8];
+        double Lballx = inputs[2];
+        double Lbally = inputs[3];
+        double Rballx = inputs[4];
+        double Rbally = inputs[5];
 
         if( (myx - Lballx)*(myx - Lballx) < (myx - Rballx)*(myx - Rballx) ) {
             if((myy - Lbally + 10) > 0) {
@@ -246,16 +260,12 @@ void NeuralNetwork_t::failed_keys(const std::vector<VecDouble_t>& X, const std::
         if(y[i][0] > 0.5) {
             ++total_press_up;
             if( output[0] < 0.5 ) ++failed_press_up;
-        } else {
-            ++total_nopress;
-            if( output[0] > 0.5 ) ++failed_nopress;
-        }
-        if(y[i][1] > 0.5) {
+        } else if(y[i][1] > 0.5) {
             ++total_press_down;
             if( output[1] < 0.5 ) ++failed_press_down;
         } else {
             ++total_nopress;
-            if( output[1] > 0.5 ) ++failed_nopress;
+            if( output[0] > 0.5 || output[1] > 0.5 ) ++failed_nopress;
         }
     }
 
