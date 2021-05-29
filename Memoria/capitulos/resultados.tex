@@ -44,7 +44,7 @@ Los resultados de este test son que el que supuestamente debería ser más lento
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}
-			[ymin=0,ymax=35000, 
+			[ymin=0,ymax=10000, 
 			xmin=0,xmax=10000, 
 			ylabel= Tiempo(ms), 
 			xlabel= Nº de veces] 
@@ -58,7 +58,7 @@ Los resultados de este test son que el que supuestamente debería ser más lento
 	\caption{Comparación de optimización vs sin optimización. Primer intento.}
 \end{figure}
 
-El siguiente ejemplo que se me ocurrió es el típico problema de orden de lectura de datos de una matriz. He simplificado un ejemplo con el cual demostrar que el orden en el que se lee la memoria es importante. El siguiente código es una matriz, la cual se lee primero de manera "cache-friendly", y después no.
+El siguiente ejemplo que se me ocurrió fue el típico problema de orden de lectura de datos de una matriz. He simplificado un ejemplo con el cual demostrar que el orden en el que se lee la memoria es importante. El siguiente código es una matriz, la cual se lee primero de manera "cache-friendly", y después no.
 \begin{lstlisting}[style=C-color, caption={Caché optimizada vs sin optimizar. Segundo intento},label=cache-optimization-second]
 size_t bench_optimized(size_t v[][width], size_t times) {
 	size_t result = 0;
@@ -84,7 +84,7 @@ size_t bench_unoptimized(size_t v[][width], size_t times) {
 }
 \end{lstlisting}
 
-La diferencia en ambos métodos está en los dos for anidados. Una vez tenemos los dos métodos, procedo a hacer una comparación, y el resultado es el de la siguiente figura:
+La diferencia en ambos métodos está en los dos for anidados. Una vez programados los dos métodos, procedo a hacer una comparación, y el resultado es el de la siguiente figura:
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
@@ -107,11 +107,11 @@ El resultado es claro, en cualquier caso acceder a la memoria de forma desordena
 \\
 Un apunte final que me veo obligado a hacer es que, tanto con el compilador de clang++, como el de g++, no hay que usar el flag ``-O3''. De ser así, al ser un test tan simple, el compilador es capaz de optimizar el código máquina y los resultados de ambos test son los mismos.
 
-\section{Aprendizaje aleatorio vs Backpropagation}
+\section{Aprendizaje aleatorio vs \textit{backpropagation}}
 \label{aleatorio vs backpropagation resultados}
-Como quiero comparar las ventajas de usar Backpropagation, lo voy a hacer contra el algoritmo más sencillo, el que tenía inicialmente, que es el algoritmo aleatorio explicado en la figura \ref{Algoritmo aleatorio}. El problema que se tratará de resolver con el algoritmo es el de la XOR, y la arquitectura que va a tener la red neuronal es dos neuronas de entrada, una capa oculta con cuatro neuronas, y una neurona de salida que dice si la entrada ha producido verdadero o falso. 
+Como quiero comparar las ventajas de usar \textit{backpropagation}, lo voy a hacer contra el algoritmo más sencillo, el que tenía inicialmente, que es el algoritmo aleatorio explicado en la figura \ref{Algoritmo aleatorio}. El problema que se tratará de resolver con el algoritmo es el de la XOR, y la arquitectura que va a tener la red neuronal es dos neuronas de entrada, una capa oculta con cuatro neuronas, y una neurona de salida que dice si la entrada ha producido verdadero o falso. 
 \\
-Como vemos en la siguiente figura, la linea roja representa el error que tiene la red cada 10 iteraciones, y la linea azul representa cómo va mejorando el error cuando el algoritmo se guarda el mejor resultado hasta el momento. Hay que tener en cuenta que, al ser cuatro soluciones las que tiene que dar (falso y falso, falso y verdadero, verdadero y falso, verdadero y verdadero), pero hay que representar el verdadero y el false numéricamente para calcular el error de la red, un error menor al 25\% significa que ha ajustado los pesos de la red para que los cuatro casos coincidan con la solución.
+Como se puede apreciar en la siguiente figura, la linea roja representa el error que tiene la red cada 10 iteraciones, y la linea azul representa cómo va mejorando el error cuando el algoritmo se guarda el mejor resultado hasta el momento. Hay que tener en cuenta que, al ser cuatro soluciones las que tiene que dar (falso y falso, falso y verdadero, verdadero y falso, verdadero y verdadero), pero hay que representar el verdadero y el false numéricamente para calcular el error de la red, un error menor al 25\% significa que ha ajustado los pesos de la red para que los cuatro casos coincidan con la solución.
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
@@ -132,9 +132,7 @@ Como vemos en la siguiente figura, la linea roja representa el error que tiene l
 
 Otro dato interesante a conocer es en qué iteración el algoritmo encuentra una solución válida para resolver la XOR. El algoritmo itera 1000 veces. Después de ejecutar el algoritmo durante 10000 intentos, llego a la conclusión empírica de que el algoritmo encuentra una solución en la iteración 354.16 de media, siempre que lo encuentra. Sin embargo, hay un 19.83\% de las veces que el algoritmo aleatorio no es capaz de encontrar la solución. 
 \\
-Y no sólo vamos a fijarnos en el número de iteraciones que necesita el algoritmo, sino también en el tiempo, para después poder comparar con cuánto tiempo tarda contra Backpropagation. El algoritmo aleatorio tarda 12 segundos, en entrenar 10000 veces en mi máquina con optimizaciones, lo que quiere decir que de media tarda 0.0012 segundos en resolver el problema.
-
-En la figura \ref{Resultados XOR backpropagation} veremos, con una estructura de la red neuronal equivalente (dos neuronas de entrada, una capa oculta con cuatro neuronas, y una neurona de salida). Como veremos a continuación, el número de iteraciones que hay que hacer para alcanzar una solución válida es mayor.
+Y no sólo vamos a fijarnos en el número de iteraciones que necesita el algoritmo, sino también en el tiempo, para después poder comparar con cuánto tiempo tarda contra \textit{backpropagation}. El algoritmo aleatorio tarda 12 segundos, en entrenar 10000 veces en mi máquina con optimizaciones, lo que quiere decir que de media tarda 0.0012 segundos en resolver el problema.
 
 \begin{figure}[H]
 	\centering
@@ -148,13 +146,15 @@ En la figura \ref{Resultados XOR backpropagation} veremos, con una estructura de
 			{(0,29.4812) (10,25.2339) (20,25.2867) (30,25.3076) (40,25.2606) (50,25.1305) (60,24.9177) (70,24.63) (80,24.28) (90,23.8848) (100,23.4652) (110,23.0428) (120,22.6349) (130,22.2486) (140,21.8801) (150,21.5146) (160,21.1258) (170,20.6836) (180,20.1719) (190,19.6021) (200,19.0071) (210,18.4247) (220,17.8803) (230,17.3789) (240,16.9021) (250,16.4006) (260,15.7806) (270,14.905) (280,13.6765) (290,12.1482) (300,10.4941) (310,08.91017) (320,07.5336) (330,06.40639) (340,05.50272) (350,04.77621) (360,04.18526) (370,03.69856) (380,03.2934) (390,02.95306) (400,02.66494) (410,02.41928) (420,02.20841) (430,02.02622) (440,01.86781) (450,01.72924) (460,01.60728) (470,01.49934) (480,01.40327) (490,01.31734) (500,01.24009) (510,01.17033) (520,01.10706) (530,01.04946) (540,0.996808) (550,0.94853) (560,0.904119) (570,0.863146) (580,0.825243) (590,0.790093) (600,0.757419) (610,0.726983) (620,0.698574) (630,0.672007) (640,0.647119) (650,0.623765) (660,0.601818) (670,0.581161) (680,0.561692) (690,0.543317) (700,0.525955) (710,0.509528) (720,0.493969) (730,0.479216) (740,0.465212) (750,0.451905) (760,0.439248) (770,0.427198) (780,0.415716) (790,0.404765) (800,0.394311) (810,0.384324) (820,0.374776) (830,0.365639) (840,0.356891) (850,0.348507) (860,0.340468) (870,0.332753) (880,0.325345) (890,0.318227) (900,0.311384) (910,0.3048) (920,0.298463) (930,0.292358) (940,0.286476) (950,0.280803) (960,0.275331) (970,0.270048) (980,0.264947) (990,0.260017)};
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Resultados del aprendizaje con el algoritmo Backpropagation.}
+	\caption{Resultados del aprendizaje con el algoritmo \textit{backpropagation}.}
 	\label{Resultados XOR backpropagation}
 \end{figure}
 
-De los 10.000 intentos de que el algoritmo solucione el problema en 1000 iteraciones,  se consigue el 96\% de las veces, a diferencia del 80,17\% que conseguía el algoritmo aleatorio. Mientras que el tiempo que tarda el algoritmo de Backpropagation es 12 segundos, es decir, el tiempo que tarda es equivalente. Por lo tanto se demuestra que backpropagation tiene un mayor porcentaje de acierto. De media acierta en la iteración 426, esto significa que tarda más iteraciones, sin embargo, consigue un porcentaje de acierto más alto.
+En la figura \ref{Resultados XOR backpropagation} se puede ver el número de iteraciones que hay que hacer para alcanzar una solución válida es mayor, con una estructura de la red neuronal equivalente (dos neuronas de entrada, una capa oculta con cuatro neuronas, y una neurona de salida).
 
-La gráfica \ref{Backpropagation cambiando learning rate} muestra, ya que Backpropagation tiene un parámetro para ajustar la velocidad de aprendizaje, una comparación entre diferentes posibles valores del mismo. 
+De los 10.000 intentos de que el algoritmo solucione el problema en 1000 iteraciones,  se consigue el 96\% de las veces, a diferencia del 80,17\% que conseguía el algoritmo aleatorio. Mientras que el tiempo que tarda el algoritmo de \textit{backpropagation} es 12 segundos, es decir, el tiempo que tarda es equivalente. Por lo tanto se demuestra que \textit{backpropagation} tiene un mayor porcentaje de acierto. De media acierta en la iteración 426, esto significa que tarda más iteraciones, sin embargo, consigue un porcentaje de acierto más alto.
+
+La gráfica \ref{Backpropagation cambiando learning rate} muestra, ya que \textit{backpropagation} tiene un parámetro para ajustar el ratio de aprendizaje, una comparación entre diferentes posibles valores del mismo. 
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
@@ -176,16 +176,16 @@ La gráfica \ref{Backpropagation cambiando learning rate} muestra, ya que Backpr
 			\legend{0.05, 0.5, 1, 5, 15}
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Resultados del aprendizaje con el algoritmo Backpropagation, según el learning rate.}
+	\caption{Resultados del aprendizaje con el algoritmo \textit{backpropagation}, según el learning rate.}
 	\label{Backpropagation cambiando learning rate}
 \end{figure}
 
 Se aprecia que ratios de aprendizaje extremadamente bajos y extremadamente altos hacen que la red no aprenda bien, por diferentes motivos. No se puede decir un ratio que sea común para todos los problemas, por eso en el juego dejo experimentar al usuario con distintos ratios para que encuentre el mejor. 
 
-\section{Backpropagation en el juego}
-Como ya he comentado, he tenido problemas en el aprendizaje dentro del juego. La red neuronal no aprendía tan bien como en el problema de la XOR, y finalmente descubrí que era a causa, entre otras cosas, del learning rate mayormente. Y como se puede ver en la figura \ref{error erratico}, valores cercanos a uno provocan que la red no sea capaz de aprender. Pero depurando más profundamente, detecto lo que puede ser la explicación al error.
+\section{\textit{Backpropagation} en el juego}
+Como ya he comentado, he tenido problemas en el aprendizaje dentro del juego. La red neuronal no aprendía tan bien como en el problema de la XOR, y finalmente descubrí que era a causa, entre otras cosas, del \textit{learning rate} mayormente. Y como se puede ver en la figura \ref{error erratico}, valores cercanos a uno provocan que la red no sea capaz de aprender. Pero depurando más profundamente, detecto lo que puede ser la explicación al error.
 
-Con una arquitectura de la red de 16 entradas, una capa intermedia de 4 neuronas y 2 salidas, para un valor de learning rate alto (cercano a uno) sucede lo que puedes ver en la figura \ref{alto learning rate arquitectura simple}. Los pesos de la primera capa (la que conecta las 16 neuronas con las 4) mantienen los valores obtenidos aleatoriamente, no varían en todo el entrenamiento, mientras que los de la segunda capa (la que conecta las 4 neuronas con las 2 de salida) sí que lo hacen. Sin embargo, si uso un ratio de aprendizaje menor a 0.001, ambas capas de pesos cambian, pero sigo sin conseguir un resultado satisfactorio, una arquitectura tan simple no es capaz de aprender a jugar, pero sí que varían los parámetros de la primera capa.
+Con una arquitectura de la red de 16 entradas, una capa intermedia de 4 neuronas y 2 salidas, para un valor de \textit{learning rate} alto (cercano a uno) sucede lo que se puede ver en la figura \ref{alto learning rate arquitectura simple}. Los pesos de la primera capa (la que conecta las 16 neuronas con las 4) mantienen los valores obtenidos aleatoriamente, no varían en todo el entrenamiento, mientras que los de la segunda capa (la que conecta las 4 neuronas con las 2 de salida) sí que lo hacen. Sin embargo, si uso un ratio de aprendizaje menor a 0.001, ambas capas de pesos cambian, pero sigo sin conseguir un resultado satisfactorio, una arquitectura tan simple no es capaz de aprender a jugar, pero sí que varían los parámetros de la primera capa.
 
 \begin{figure}[H]
 	\centering
@@ -196,8 +196,6 @@ Con una arquitectura de la red de 16 entradas, una capa intermedia de 4 neuronas
 
 Ahora pruebo con una arquitectura más compleja, 16 neuronas de entrada, 4 capas ocultas de 6 neuronas cada una, y 2 neuronas de salida. Además un total de 10000 iteraciones, y la distribución de la muestra es aproximadamente 40\% muestras de tocar arriba, 40\% muestras de tocar abajo, y 20\% muestras de no tocar. Para valores cercanos a uno sigue sucediendo lo visto en la figura \ref{error erratico}, y además, sucede lo mismo que en la figura \ref{alto learning rate arquitectura simple}, que la primera capa no varía, mientras que el resto sí que lo hace. Sin embargo, para un valor del ratio de aprendizaje menor a 0.001, la red si que aprende y sucede lo que puedes ver en la figura \ref{error concordante}, obtenemos errores bajos corregidos a lo largo de las 10000 iteraciones en los tres gráficos, y cuando ponemos la red resultante a jugar, lo hace de manera satisfactoria. 
 
-Por último, pongo a entrenar a la red más compleja que permite el juego. Será una arquitectura de 16 neuronas de entrada, 10 capas ocultas con 10 neuronas cada una, y con 2 neuronas de salida.  Diez mil iteraciones como antes, y un ratio de aprendizaje del 0.743. Lo que pasa en este caso es que, sorprendentemente, cambian todos los pesos de todas las capas (incluida la primera capa), pero las últimas capas cambian mucho más rápido que las primeras (como ha sucedido también en los anteriores ejemplos). Los resultados de las gráficas son muy parecidos a los ya comentados antes con learning rate alto, pero he tomado otra captura que puedes ver en la figura \ref{alto learning rate arquitectura compleja} para dejarlo demostrado.
-
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/arquitectura-compleja-learning-rate-alto.png}
@@ -205,10 +203,16 @@ Por último, pongo a entrenar a la red más compleja que permite el juego. Será
 	\label{alto learning rate arquitectura compleja}
 \end{figure}
 
-Ahora pongo a entrenar la misma arquitectura, pero con un learning rate de 0.0074 durante diez mil iteraciones, y una distribución de los datos 40-40-20 como ya he comentado antes. Todos los pesos  de todas las capas están variando, pero con una velocidad de cambio menor. El resultado final de esta red tan compleja es el que se puede ver en la figura \ref{bajo learning rate arquitectura compleja}. Backpropagation no es capaz de corregir el error con este número de iteraciones, y lo más normal será que se quede con un 0\% de error ``no pulsar'' y 100\% ``pulsar'', porque al generar la red de manera aleatoria, es lo más probable. Los resultados son los mismos con un valor de learning rate intermedio como 0.359.
+Por último, pongo a entrenar a la red más compleja que permite el juego. Será una arquitectura de 16 neuronas de entrada, 10 capas ocultas con 10 neuronas cada una, y con 2 neuronas de salida.  Diez mil iteraciones como antes, y un ratio de aprendizaje del 0.743. Lo que pasa en este caso es que, sorprendentemente, cambian todos los pesos de todas las capas (incluida la primera capa), pero las últimas capas cambian mucho más rápido que las primeras (como ha sucedido también en los anteriores ejemplos). Los resultados de las gráficas son muy parecidos a los ya comentados antes con learning rate alto, pero he tomado otra captura que puedes ver en la figura \ref{alto learning rate arquitectura compleja} para dejarlo demostrado.
+
+Lo siguiente que hago es poner a entrenar la misma arquitectura, pero con un learning rate de 0.0074 durante diez mil iteraciones, y una distribución de los datos 40-40-20 como ya he comentado antes. Todos los pesos  de todas las capas están variando, pero con una velocidad de cambio menor. El resultado final de esta red tan compleja es el que se puede ver en la figura \ref{bajo learning rate arquitectura compleja}, \textit{backpropagation} no es capaz de corregir el error con este número de iteraciones, y lo más normal será que se quede con un 0\% de error ``no pulsar'' y 100\% ``pulsar'', porque al generar la red de manera aleatoria, es lo más probable. Los resultados son los mismos con un valor de learning rate intermedio como 0.359.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/arquitectura-compleja-learning-rate-bajo.png}
 	\caption{Porcentaje de acierto con arquitectura compleja y learning rate bajo.}
 	\label{bajo learning rate arquitectura compleja}
 \end{figure}
+
+En última instancia he querido comprobar si la red se comportaba mejor con un número menor de entradas. En principio esto no debería afectar mucho según la teoría de la dimensión Vapnik-Chervonenkis porque el número de términos independientes es prácticamente el mismo, sin embargo, los resultados no dicen lo mismo. Los datos que se le pasan a la red original del juego son, la posición x e y, velocidades x e y, y la aceleración tanto del agente, como de las pelotas, como del minion mas cercano. La aceleración sólo al minion y el agente, que son los que la aplican al pulsar para moverse.
+\\
+El primer intento fue quitar la aceleración como entrada, comprobé que durante el entrenamiento se cometía menos fallos, pero a la hora de jugar era similar. El segundo intento fue quitar también los valores del minion, mismo resultado que al principio. Y por último decidí dejar sólo como entrada la posición x e y del agente y las dos pelotas. En este último intento sí que noté algo de mejoría en la forma de jugar, el agente había aprendido a jugar casi tan acertado como cuando solo había dos perceptrones. Y aunque el número de términos independientes sea prácticamente el mismo, sí que hay una explicación para este suceso: el agente aprende mejor porque las posiciones x e y son los datos más relevantes de la muestra, aunque se puede extraer información interesante del resto de datos, el agente será capaz de extraer más fácilmente el ruido de la muestra si sólo pongo los datos más relevantes como entradas a la red.

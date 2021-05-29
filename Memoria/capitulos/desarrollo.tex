@@ -71,7 +71,7 @@ Todas las clases del motor están dentro del espacio de nombres \textbf{ECS}.
 	\label{diagrama entitymanager}
 \end{figure}
 
-Como vemos en la figura \ref{diagrama entitymanager}, la clase EntityManager\_t es la clase que usará el juego para comunicarse con el motor. Tiene los métodos necesarios para almacenar, solicitar y borrar tanto entidades como un componente de una entidad. Estos componentes son almacenados en m\_components, así que EntityManager\_t tiene un fuerte acoplamiento con ComponentStorage\_t, y si quisiéramos otra implementación del motor donde los componentes no sean parte de las entidades, haría falta aplicar cambios sobre este acoplamiento.
+Como se puede ver en la figura \ref{diagrama entitymanager}, la clase EntityManager\_t es la clase que usará el juego para comunicarse con el motor. Tiene los métodos necesarios para almacenar, solicitar y borrar tanto entidades como un componente de una entidad. Estos componentes son almacenados en m\_components, así que EntityManager\_t tiene un fuerte acoplamiento con ComponentStorage\_t, y si quisiéramos otra implementación del motor donde los componentes no sean parte de las entidades, haría falta aplicar cambios sobre este acoplamiento.
 
 La clase Entity\_t tiene un vector de punteros hacia sus componentes, la ventaja de esto es que no hace falta que el componente tenga un ID, y por lo tanto, la búsqueda del componente es más rápida. El inconveniente es que hay que tener mucho cuidado con dónde está almacenado el componente, ya que el encargado de darle una zona en la memoria es ComponentStorage\_t, y si este modifica la posición del componente, el puntero en Entity\_t no apuntará a la zona correcta de la memoria. 
 
@@ -118,7 +118,7 @@ El \textbf{29 de octubre de 2020} tuvimos la segunda iteración donde le conté 
   \item Aprender a usar \LaTeX.
   \item Comenzar la estructura de la memoria.
   \item Ver el curso de Yaser Abu-Mostafa sobre \gls{ml}.
-  \item Crear un pong donde las palas se controlen aplicando aceleración y no velocidad.
+  \item Crear un Pong donde las palas se controlen aplicando aceleración y no velocidad.
   \item Almacenar los datos de la partida en \gls{csv}.
   \item Programar un perceptrón.
 \end{itemize}
@@ -180,7 +180,7 @@ Lo que hace el perceptrón es recibir los datos relevantes de la partida, como s
 	\sum_{i=0}^NX_{i}*W_{i}
 	\label{suma ponderada}
 \end{equation}
-El resultado de ese sumatorio será positivo o negativo, y no es necesario añadir en la fórmula el límite, sino que el límite es 0 ya que entre los datos se ha añadido el threshold como una entrada con valor 1, y entre los pesos se ha añadido uno extra al principio para que se ajuste al igual que el resto de pesos. En el caso de dar positivo, significará que la suma ha superado el threshold (representado como $w_o(t)$ en la figura \ref{perceptron}), lo que significa que la \gls{ia} manda al juego pulsar esa tecla de la pala, y en caso de ser negativo no. A cada tecla (arriba y abajo) le corresponde un perceptrón, que es el que decide si esta es pulsada o no.
+El resultado de ese sumatorio será positivo o negativo, y no es necesario añadir en la fórmula el límite, sino que el límite es 0 ya que entre los datos se ha añadido el \textit{threshold} como una entrada con valor constante (siempre 1), y entre los pesos se ha añadido uno extra al principio para que se ajuste al igual que el resto de pesos. En el caso de dar positivo, significará que la suma ha superado el \textit{threshold} (representado como $w_o(t)$ en la figura \ref{perceptron}), lo que significa que la \gls{ia} manda al juego pulsar esa tecla de la pala, y en caso de ser negativo no. A cada tecla (arriba y abajo) le corresponde un perceptrón, que es el que decide si esta es pulsada o no.
 
 Para entrenar al perceptrón, paso previo para jugar contra él porque sino, no existirá un fichero con la configuración del mismo, lo que hago es:
 \begin{enumerate}
@@ -200,7 +200,7 @@ El perceptrón ya funcionaba correctamente después de ver las primeras clases d
 \subsection{Desarrollo de una red neuronal}
 Además, en las clases de Razonamiento Automático, Francisco J. Gallego-Durán explica cómo funciona una red neuronal y cómo programarla, incluso, invita a los alumnos a crearla de tal forma que sea diferente a la ya creada por él, sin el uso de la librería vector de C++ para conseguir una mayor eficiencia en lo que se refiere a los tiempos de ejecución. Por lo que después de aprender los conceptos con sus clases, me dispuse a programar mi propia red neuronal para después introducirla en el juego cuando este se convirtiera en algo más complejo que una pala rebotando una bola, sin embargo, no era consciente de las facilidades que aporta la clase vector, y me topé con varios problemas durante el desarrollo.
 \\
-Algunos de estos problemas fueron, tener que sobrescribir el constructor de copia por no comportarse cómo deseaba, tener que manejar el puntero de los datos según si se quería contar el threshold o no (recordemos que uno de los motivos por los que haría una implementación propia de la clase vector sería para obtener más eficiencia a la hora de leer los datos), etc.
+Algunos de estos problemas fueron, tener que sobrescribir el constructor de copia por no comportarse cómo deseaba, tener que manejar el puntero de los datos según si se quería contar el \textit{threshold} o no (recordemos que uno de los motivos por los que haría una implementación propia de la clase vector sería para obtener más eficiencia a la hora de leer los datos), etc.
 \\
 El hecho de tener que detenerme a estudiar cómo funcionan algunas de las facilidades que aporta vector, y escribir las partes de la memoria que faltaban me llevó todo el tiempo que quedaba hasta esta quinta iteración. Ya había solventado los problemas de la anterior y había alcanzado los objetivos propuestos, por lo que llegué con todo el trabajo hecho a esta.
 
@@ -235,7 +235,7 @@ Lo primero que hice esta vez fue: cambiar los colores del juego, añadir un marc
 	\label{primera vista del pong plus}
 \end{figure}
 
-Lo que hice en segunda instancia, no estaba dentro de los objetivos que nos habíamos marcado pero decidí hacer un menú, pensando que sería algo sencillo, pero me llevó más tiempo del que imaginaba. Para hacer el menú necesitaba renderizar texto, y para no alargar más el desarrollo, decidí añadir una librería que se usa para renderizar texto en formato true type llamada stb\_truetype\footnote{La librería es del tipo conocido como only-header, se encuentra en github junto con otras utilidades \url{https://github.com/nothings/stb}}. De esta manera, también podría usar los números del marcador como texto. Para moverte por el menú se usarán las flechas del teclado de arriba y abajo. El resultado lo puedes ver en la figura \ref{primer menu del juego}.
+Lo que hice en segunda instancia, no estaba dentro de los objetivos que nos habíamos marcado pero decidí hacer un menú, pensando que sería algo sencillo, pero me llevó más tiempo del que imaginaba. Para hacer el menú necesitaba renderizar texto, y para no alargar más el desarrollo, decidí añadir una librería que se usa para renderizar texto en formato true type llamada stb\_truetype\footnote{La librería es del tipo conocido como only-header, se encuentra en github junto con otras utilidades \url{https://github.com/nothings/stb}}. De esta manera, también podría usar los números del marcador como texto. Para moverte por el menú se usarán las flechas del teclado de arriba y abajo. El resultado puede ser visto en la figura \ref{primer menu del juego}.
 
 \begin{figure}[H]
 	\centering
@@ -255,9 +255,9 @@ Una vez acabado el menú, que además te permite seleccionar qué \gls{csv} quie
 \subsection{Compilación para Windows}
 Lo último que hice en este periodo fue compilar el juego para Windows. Mi tutor explica en el curso de videojuegos \cite{CursoMotorC++} cómo modificar el fichero de construcción (Makefile) para compilar para Windows desde una máquina con Linux (comúnmente conocido como cross-compiling), y en la librería de TinyPTC descargable, también hay unos ficheros de código específicos para Windows, por lo que la única tarea que me quedaba por hacer era modificar las partes del código donde se incluye la versión de TinyPTC de Linux e incluir la versión de Windows, y recompilar el proyecto. 
 \\
-Pero cuando probé el juego en Windows, se ejecutaba correctamente, pero no respondía ante la entrada por teclado. Y es que la codificación del teclado en Windows no es la misma que la de X11, por lo que creé un fichero en el que definí los valores de la variable dependiendo de si la compilación está activada para Windows o para Linux. Posteriormente usé ``\#ifdef''\todo{Aquí tampoco sé si usar cursiva, comillas... o qué usar} que hace que el compilador use esa parte del código sólo se compile si la macro está presente en la linea de compilación, o si está definida previamente en otro fichero incluido por este, de esta manera lo podía combinar con ``\#else'' para definir las teclas del juego para Windows cuando construya el juego para Windows, y las teclas de Linux cuando compile para este sistema operativo.
+Pero cuando probé el juego en Windows, se ejecutaba correctamente, pero no respondía ante la entrada por teclado. Y es que la codificación del teclado en Windows no es la misma que la de X11, por lo que creé un fichero en el que definí los valores de la variable dependiendo de si la compilación está activada para Windows o para Linux. Posteriormente usé \texttt{\#ifdef} que hace que el compilador use esa parte del código sólo se compile si la macro está presente en la linea de compilación, o si está definida previamente en otro fichero incluido por este, de esta manera lo podía combinar con \texttt{\#else} para definir las teclas del juego para Windows cuando construya el juego para Windows, y las teclas de Linux cuando compile para este sistema operativo.
 
-\section{Sexta iteración: aprendizaje mediante backpropagation}
+\section{Sexta iteración: aprendizaje mediante \textit{backpropagation}}
 \label{sexta iteracion}
 El \textbf{11 de febrero de 2021} tuvimos una nueva reunión, en la cual los objetivos marcados fueron:
 \begin{enumerate}
@@ -265,10 +265,10 @@ El \textbf{11 de febrero de 2021} tuvimos una nueva reunión, en la cual los obj
 	\item Implementar Dear ImGui en el proyecto
 	\begin{itemize}
 		\item Estudiar cómo se usa.
-		\item Sustituir TinyPTC por OpenGL3 para poder renderizar tanto el juego como las ventanas.
+		\item Sustituir TinyPTC por GLFW con OpenGL3 para poder tanto renderizar el juego como abrir las ventanas.
 		\item Diseñar menús para manejar el juego.
 	\end{itemize}
-	\item Programar el algoritmo de backpropagation.
+	\item Programar el algoritmo de \textit{backpropagation}.
 	\item Poder elegir tanto los ficheros de datos de entrenamientos como los ficheros de pesos para el juego.
 	\item Añadir un campo de entrenamiento para que no sea necesario que haya dos jugadores para recoger datos de entrenamiento.
 	\item Añadir un algoritmo básico para cuando no exista un fichero de pesos pero que se pueda jugar contra una \gls{ia}.
@@ -281,20 +281,22 @@ Comencé la iteración con ilusión, viendo documentación de Dear ImGui y estud
 	\caption{Algoritmo de aprendizaje aleatorio. Esquema de construcción propia.}
 	\label{Algoritmo aleatorio}
 \end{figure}
-Es un algoritmo que podría funcionar en algunos casos, pero requiere de un número mucho más alto de iteraciones de media, así que no es lo suficientemente eficiente. Por lo que me dispuse a desarrollar el algoritmo de backpropagation.
+Es un algoritmo que podría funcionar en algunos casos, pero requiere de un número mucho más alto de iteraciones de media, así que no es lo suficientemente eficiente. Por lo que me dispuse a desarrollar el algoritmo de \textit{backpropagation}.
 
-\subsection{Desarrollo de Backpropagation}
-Durante esta iteración apliqué Backpropagation a la red neuronal ya creada antes, como puedes ver en el apartado \ref{marco teorico backpropagation}, y me di cuenta de un grave error que cometí desarrollando la red neuronal, como se puede apreciar en el apartado \ref{aleatorio vs backpropagation resultados}, comparo la velocidad a la que aprende la red neuronal usando los dos diferentes tipos de entrenamiento, y originalmente las conclusiones que saqué fueron las siguientes:
+\subsection{Desarrollo de \textit{backpropagation}}
+Durante esta iteración apliqué \textit{backpropagation} a la red neuronal ya creada antes, como puedes ver en el apartado \ref{marco teorico backpropagation}, y me di cuenta de un grave error que cometí desarrollando la red neuronal, como se puede apreciar en el apartado \ref{aleatorio vs backpropagation resultados}, comparo la velocidad a la que aprende la red neuronal usando los dos diferentes tipos de entrenamiento, y originalmente las conclusiones que saqué fueron las siguientes:
 \\
-El algoritmo aleatorio consigue aprender más rápido que el de backpropagation porque el problema de la puerta XOR es demasiado sencillo, y por lo tanto la estructura de la red es demasiado simple. Llegando a concluir que el algoritmo aleatorio encuentra la solución el 80\% de las veces después de iterar 1000 veces, mientras que el algoritmo de backpropagation encuentra la solución sólo el 1.4\% de las veces, y para llegar al 80\% habría que iterar 100000 veces. Cuando le comenté estas conclusiones a mi tutor me dijo que era muy extraño que una red neuronal tardara tanto en aprender el problema de la XOR, siendo tan simple la estructura de la red (dos neuronas de entrada, una capa oculta con cuatro neuronas, y una de salida). Para hallar estos datos ejecuté cada uno de los anteriores experimentos 10000 veces y así conseguir que la media fuese algo significativo, y que la varianza afectase lo mínimo posible.
+El algoritmo aleatorio consigue aprender más rápido que el de \textit{backpropagation} porque el problema de la puerta XOR es demasiado sencillo, y por lo tanto la estructura de la red es demasiado simple. Llegando a concluir que el algoritmo aleatorio encuentra la solución el 80\% de las veces después de iterar 1000 veces, mientras que el algoritmo de \textit{backpropagation} encuentra la solución sólo el 1.4\% de las veces, y para llegar al 80\% habría que iterar 100000 veces. Cuando le comenté estas conclusiones a mi tutor me dijo que era muy extraño que una red neuronal tardara tanto en aprender el problema de la XOR, siendo tan simple la estructura de la red (dos neuronas de entrada, una capa oculta con cuatro neuronas, y una de salida). Para hallar estos datos ejecuté cada uno de los anteriores experimentos 10000 veces y así conseguir que la media fuese algo significativo, y que la varianza afectase lo mínimo posible.
 
-¿Dónde se encontraba el problema? No parece una conclusión lógica. El problema, como recuerdo en la cita del principio de esta memoria, estaba entre la silla y el teclado. Y es que había programado mal el constructor de la clase de la red neuronal, este asignaba mal los punteros de una capa de la red a su siguiente capa. De tal forma que para calcular el delta de backpropagation sólo se calculaba bien en la última capa, que no depende de ninguna capa posterior, por lo tanto sólo variaban los pesos de las neuronas de la última capa, y por eso era tan costoso que la red aprendiese, porque el resto de capas se quedaban con el valor inicial aleatorio y no variaban en todo el entrenamiento. En la figura \ref{problema aprendizaje red neuronal} puedes ver un ejemplo ilustrativo del problema.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/problema-de-aprendizaje-red.png}
 	\caption{Problema de aprendizaje de la red neuronal.}
-	 \label{problema aprendizaje red neuronal}
+	\label{problema aprendizaje red neuronal}
 \end{figure}
+
+¿Dónde se encontraba el problema? No parece una conclusión lógica. El problema, como recuerdo en la cita del principio de esta memoria, estaba entre la silla y el teclado. Y es que había programado mal el constructor de la clase de la red neuronal, este asignaba mal los punteros de una capa de la red a su siguiente capa. De tal forma que para calcular el delta de \textit{backpropagation} sólo se calculaba bien en la última capa, que no depende de ninguna capa posterior, por lo tanto sólo variaban los pesos de las neuronas de la última capa, y por eso era tan costoso que la red aprendiese, porque el resto de capas se quedaban con el valor inicial aleatorio y no variaban en todo el entrenamiento. En la figura \ref{problema aprendizaje red neuronal} se puede apreciar un ejemplo ilustrativo del problema.
+
 
 \section{Séptima iteración: creación de menús}
 El día \textbf{11 de marzo de 2021} volvimos a tener una llamada de revisión de trabajo y nuevas propuestas, pero según se desarrolló la anterior iteración, mi tutor y yo acordamos que para esta acabaría lo ya acordado, prestando especial atención en el desarrollo de la memoria, ya que era lo que más trabajo requería en la situación en la que estaba, y conociendo que ya quedaba poco tiempo para la entrega del \gls{tfg}.
@@ -316,10 +318,10 @@ Pero como los menús de los juego no suelen ser en una ventana, decidí hacerlo 
 	\caption{Menú del juego.}
 	\label{Menu del juego}
 \end{figure}
-Ahora ya, teniendo las herramientas que nos da Dear ImGui, me dispuse a desarrollar un menú en el cuál el jugador, pueda decidir cómo entrenar a su \gls{ia}, y además que pueda ver de manera gráfica cómo va aprendiendo y cuáles son las consecuencias de cambiar los parámetros de entrenamiento de la \gls{ia}. Puedes ver el menú de entrenamiento en la figura \ref{Menu de entrenamiento}.
+Ahora ya, teniendo las herramientas que nos da Dear ImGui, me dispuse a desarrollar un menú en el cuál el jugador, pueda decidir cómo entrenar a su \gls{ia}, y además que pueda ver de manera gráfica cómo va aprendiendo y cuáles son las consecuencias de cambiar los parámetros de entrenamiento de la \gls{ia}. Se puede ver el menú de entrenamiento en la figura \ref{Menu de entrenamiento}.
 
 \subsection{Campo de entrenamiento}
-El campo de entrenamiento es el apartado de arena que puedes ver en la figura \ref{Menu del juego}, que te pondrá a jugar en el mismo campo de siempre, pero sin rival, cuando la pelota llega a la pared del rival rebotará, de esta manera el jugador podrá reaccionar a diferentes situaciones de partida (con el minion rival en una posición, las bolas en otras posiciones, con velocidades distintas, etc.) que servirán como dataset para un posterior entrenamiento en el menú de entrenamiento.
+El campo de entrenamiento es el apartado de arena que se puede ver en la figura \ref{Menu del juego}, que te pondrá a jugar en el mismo campo de siempre, pero sin rival, cuando la pelota llega a la pared del rival rebotará, de esta manera el jugador podrá reaccionar a diferentes situaciones de partida (con el minion rival en una posición, las bolas en otras posiciones, con velocidades distintas, etc.) que servirán como dataset para un posterior entrenamiento en el menú de entrenamiento.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/arena-de-entrenamiento.png}
@@ -347,7 +349,7 @@ El \textbf{13 de abril de 2021} ya solo quedaba un mes para la confirmación de 
 \subsection{Arreglo del entrenamiento}
 Cuando desarrollé el algoritmo de aprendizaje de la red neuronal inicialmente, decidí añadir un factor de importancia a cada acción (pulsar arriba, abajo, o no pulsar). Esto fue porque ya tuve problemas inicialmente con el perceptrón y sé que la cantidad de ejemplos de cada tipo está desproporcionada, ya que existe mayor cantidad de ejemplos de no pulsar, respecto a los que sí hay una pulsación de tecla.
 \\
-Como el algoritmo de Backpropagation ya estaba programado, decidí que en la última capa el delta se multiplicase por el porcentaje de importancia que le diera el usuario, pero aparentemente no funcionaba. En la reunión con mi tutor me explicó que multiplicar el delta destrozaba el aprendizaje, que lo que tendría que hacer realmente era escoger de forma aleatoria, con una probabilidad (la que el usuario ha asignado en el menú de entrenamiento), los elementos de la muestra. Posteriormente, desordenar el vector de frames obtenido para que la red neuronal no aprenda los últimos movimientos de la partida, por culpa de la corrección de Backpropagation, ya que es un problema conocido que tras un número alto de iteraciones la red puede aprender el ruido de la muestra y generalizar mal fuera de ella.
+Como el algoritmo de \textit{backpropagation} ya estaba programado, decidí que en la última capa el delta se multiplicase por el porcentaje de importancia que le diera el usuario, pero aparentemente no funcionaba. En la reunión con mi tutor me explicó que multiplicar el delta destrozaba el aprendizaje, que lo que tendría que hacer realmente era escoger de forma aleatoria, con una probabilidad (la que el usuario ha asignado en el menú de entrenamiento), los elementos de la muestra. Posteriormente, desordenar el vector de frames obtenido para que la red neuronal no aprenda los últimos movimientos de la partida, por culpa de la corrección de \textit{backpropagation}, ya que es un problema conocido que tras un número alto de iteraciones la red puede aprender el ruido de la muestra y generalizar mal fuera de ella.
 
 \begin{figure}[h]
 	\centering
@@ -366,7 +368,7 @@ Como el algoritmo de Backpropagation ya estaba programado, decidí que en la úl
 	\label{Comparacion alto vs bajo error}
 \end{figure}
 
-Además, la gráfica que representaba el porcentaje de error de la red neuronal de forma genérica era poco representativa, porque como vemos en la figura \ref{Comparacion alto vs bajo error}, cuando intentas que la red neuronal se comporte mejor en partida aumentando la importancia de pulsar, el error aumenta desde el 50\% hasta el 70\%. Mientras que, si lo que aumento es la importancia de no tocar (teniendo en cuenta que representa el 75\% del dataset), el error de la red permanece entre el 20\% y el 23\%. Esto puede dar una falsa imagen al usuario de que la red no está aprendiendo, por eso he separado en dos gráficas, el error que comete respecto a los ejemplos de no tocar, y el error que comete respecto a los ejemplos de sí hacerlo (figura \ref{menu dos graficas}).
+Además, la gráfica que representaba el porcentaje de error de la red neuronal de forma genérica era poco representativa, porque como se puede ver en la figura \ref{Comparacion alto vs bajo error}, cuando intentas que la red neuronal se comporte mejor en partida aumentando la importancia de pulsar, el error aumenta desde el 50\% hasta el 70\%. Mientras que, si lo que aumento es la importancia de no tocar (teniendo en cuenta que representa el 75\% del dataset), el error de la red permanece entre el 20\% y el 23\%. Esto puede dar una falsa imagen al usuario de que la red no está aprendiendo, por eso he separado en dos gráficas, el error que comete respecto a los ejemplos de no tocar, y el error que comete respecto a los ejemplos de sí hacerlo (figura \ref{menu dos graficas}).
 
 \begin{figure}[H]
 	\centering
@@ -414,6 +416,7 @@ El día \textbf{6 de mayo de 2021} fue la última iteración antes de decidir si
 El problema del aprendizaje en el juego ya había sido solventado en la octava iteración en el apartado \ref{octava iteracion}, mientras que el problema de errores en la programación ya había sido resuelto en la sexta iteración, en el apartado \ref{sexta iteracion}. Entonces, ¿qué es lo que había que corregir? ¿Por qué la red no es capaz de aprender con los datos que le aporta? Por esto es que marcamos el objetivo de ``Detectar y corregir el error de aprendizaje en el juego''.
 
 Para mayor claridad, añadí una tercera gráfica, para ver si lo que aprendía era pulsar hacia arriba o hacia abajo. Además de un cálculo de cuántos pesos tiene en total la red, para poder determinar la dimension Vapnik-Chervonenkis, y cuántos ejemplos de cada tipo se están cogiendo en lugar de su porcentaje para mayor claridad (anteriormente era el porcentaje, pero esto aparece ahora cuando la barra es pulsada, y lo que aparece abajo es el número de muestras que tendrá de cada tipo). Figura \ref{ultimo menu de entrenamiento}.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/menu-de-entrenamiento-definitivo.png}
@@ -421,13 +424,14 @@ Para mayor claridad, añadí una tercera gráfica, para ver si lo que aprendía 
 	\label{ultimo menu de entrenamiento}
 \end{figure}
 
-Con todas las herramientas diseñadas me puse a investigar sobre los posibles errores tanto en el código (revisar las lecciones para ver si había tenido algún error de concepto), como en las muestras que se le entregan (que estuviese bien distribuido), y no encontraba ningún error. Lo más llamativo era el comportamiento de las gráficas, pues por lo general, el error de cada uno de los tipos pasaba de 100\% a 0\% de golpe entre el error denominado como "pulsar", ya sea en la tecla hacia arriba y en la tecla hacia abajo, mientras que cuando uno de estos dos pasaba a 0\% de error, el denominado como "no pulsar" pasaba a ser del 50\%. Puedes ver un ejemplo de esto en la figura \ref{error erratico}.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{archivos/imagenes/error-erratico.png}
 	\caption{Variación del error confusa.}
 	\label{error erratico}
 \end{figure}
+
+Con todas las herramientas diseñadas me puse a investigar sobre los posibles errores tanto en el código (revisar las lecciones para ver si había tenido algún error de concepto), como en las muestras que se le entregan (que estuviese bien distribuido), y no encontraba ningún error. Lo más llamativo era el comportamiento de las gráficas, pues por lo general, el error de cada uno de los tipos pasaba de 100\% a 0\% de golpe entre el error denominado como "pulsar", ya sea en la tecla hacia arriba y en la tecla hacia abajo, mientras que cuando uno de estos dos pasaba a 0\% de error, el denominado como "no pulsar" pasaba a ser del 50\%. He tomado captura de esto en una ilustración en la figura \ref{error erratico}.
 
 Era, cuanto menos, curioso. Después de un tiempo probando y cambiando los distintos parámetros, conseguí que esto ya no fuera así. Usé una red más compleja que la que estaba usando comúnmente, un 20\% de ejemplos de no tocar frente al 80\% de sí hacerlo, una cantidad de iteraciones más alta, y un ratio de aprendizaje ridículamente bajo comparado con lo que estaba usando hasta ahora (acostumbrado a variar entre cero y dos, pero lo más normal era uno), 0.00185. La red comenzó a bajar el error en los tres tipos poco a poco, y no a saltos agigantados, como se aprecia en la figura \ref{error concordante}. Por lo tanto, llegué a la conclusión de que estaba aprendiendo, cosa que confirmé luego poniéndolo a prueba en el juego.
 \\
@@ -439,11 +443,11 @@ Por supuesto, después de conocer el por qué del error, el rango de ratio de ap
 	\label{error concordante}
 \end{figure}
 
-Sin embargo, aunque ahora la red neuronal es capaz de jugar, noto que la forma en la que juega es más errática que cuando era controlada por un perceptrón, incluso más errática que el algoritmo de \gls{ia} diseñada simple que hice. Hablaré más sobre ello en el apartado de conclusiones (apartado \ref{conclusiones}).
+Sin embargo, aunque ahora la red neuronal es capaz de jugar, noto que la forma en la que juega es más errática que cuando era controlada por un par de perceptrones, incluso más errática que el algoritmo de \gls{ia} diseñada simple que hice. Hablaré más sobre ello en el apartado de conclusiones (apartado \ref{conclusiones}).
 
-Respecto al descenso del gradiente, estuve revisando las diferentes fuentes de información que he utilizado durante el proyecto, y he comprendido la diferencia con el modelo estocástico. Es posible que ese sea el motivo por el que la red neuronal es más errática de lo que debería. La diferencia entre el modelo común y el estocástico es que en el descenso del gradiente común, se hace la media de todos los errores de la muestra, y a partir de ahí se aplica Backpropagation, mientras que con el modelo estocástico se aplica la corrección a un subgrupo de toda la muestra. Sin embargo, aplicar esos cambios no parece que fuese a cambiar drásticamente el resultado ya que me he encargado de aleatorizar el orden de las muestras de tal forma que no pueda aprender patrones por el estado de la partida, sino solo por los datos.
+Respecto al descenso del gradiente, estuve revisando las diferentes fuentes de información que he utilizado durante el proyecto, y he comprendido la diferencia con el modelo estocástico. Es posible que ese sea el motivo por el que la red neuronal es más errática de lo que debería. La diferencia entre el modelo común y el estocástico es que en el descenso del gradiente común, se hace la media de todos los errores de la muestra, y a partir de ahí se aplica \textit{backpropagation}, mientras que con el modelo estocástico se aplica la corrección a un subgrupo de toda la muestra. Sin embargo, aplicar esos cambios no parece que fuese a cambiar drásticamente el resultado ya que me he encargado de aleatorizar el orden de las muestras de tal forma que no pueda aprender patrones por el estado de la partida, sino solo por los datos.
 
-Para poder depurar mejor las redes neuronales, añadí una opción en el menú principal llamada ``Edit neural network''. En ella se presentan todos los pesos de la red sin tener que manipular el fichero manualmente, cosa que podría causar errores. Puedes cambiar de una capa a la siguiente o la anterior, y variar todos los pesos de la misma. Además esta opción te dice el error que está cometiendo la red, para poder comparar si está mejorando. Puedes verla en la figura \ref{editar red neuronal}.
+Para poder depurar mejor las redes neuronales, añadí una opción en el menú principal llamada ``Edit neural network''. En ella se presentan todos los pesos de la red para poder manipularlos sin tener que hacerlo desde el fichero manualmente, cosa que podría causar errores. Se puede cambiar de una capa a la siguiente o la anterior, y variar todos los pesos de la misma. Además esta opción dice el error que está cometiendo la red para las muestras asignadas previamente, para poder comparar si está mejorando. Este nuevo menú es el de la figura \ref{editar red neuronal}.
 
 \begin{figure}[H]
 	\centering
