@@ -501,11 +501,10 @@ void ImGuiUtilities::postrender() const noexcept {
 }
 
 void ImGuiUtilities::reverseYAxis() const noexcept {
-    uint32_t buffer_size = m_w*m_h;
     uint32_t* buffer { m_framebuffer };
     for(std::size_t i = 0; i<m_h/2; ++i) {
         for(std::size_t j = 0; j<m_w; ++j) {
-            std::swap(buffer[i*m_w + j], buffer[buffer_size - i*m_w + j]);
+            std::swap(buffer[i*m_w + j], buffer[(m_h-1-i) * m_w + j]);
         }
     }
 }
