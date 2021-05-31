@@ -19,6 +19,6 @@ private:
     ECS::EntityManager_t& m_EntMan;
     ECS::Entity_t& createEntity(uint32_t w, uint32_t h, uint32_t color) const;
     ECS::Entity_t& createPalette(uint32_t w, uint32_t h, uint32_t color, uint8_t side) const;
-    void           createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const;
+    std::vector<ECS::EntityID_t> createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const;
     constexpr static uint32_t paletteW { 10 }, paletteH { 100 };
 };

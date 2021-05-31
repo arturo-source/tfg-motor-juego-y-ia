@@ -128,21 +128,33 @@ void GameObjectFactory_t::createWalls(const uint32_t scrWidth, const uint32_t sc
     constexpr uint32_t wallWidth { 10 }, wallHeight { 50 };
     const uint32_t wallsPerColumn { scrHeight / (wallHeight+1) };
     const uint32_t middleScrWidth { scrWidth/2 };
+    
+    static std::vector<ECS::EntityID_t> wallsReferences {};
+    for(const auto eid: wallsReferences) {
+        m_EntMan.destroyEntityByID(eid);
+    }
+    wallsReferences.clear();
 
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth + (i+1) * (wallWidth+3)};
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, leftTeamColor);
+        const auto walls = createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, leftTeamColor);
+        wallsReferences.insert(wallsReferences.end(), walls.begin(), walls.end());
     }
     for(uint32_t i = 0; i < columns; ++i) {
         uint32_t x { middleScrWidth - (i+2) * (wallWidth+3) };
-        createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, rightTeamColor);
+        const auto walls = createWallsColumn(x, wallsPerColumn, wallWidth, wallHeight, rightTeamColor);
+        wallsReferences.insert(wallsReferences.end(), walls.begin(), walls.end());
     }
 }
 
-void GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const {
+std::vector<ECS::EntityID_t> GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wallsPerColumn, const uint32_t wallWidth, const uint32_t wallHeight, const uint32_t color) const {
+    std::vector<ECS::EntityID_t> wallsReferences;
+    wallsReferences.reserve(wallsPerColumn);
+
     for(uint32_t j = 0; j < wallsPerColumn; ++j) {
         uint32_t y { 10 + j * (wallHeight+3) };
         auto& e = createEntity(wallWidth, wallHeight, color);
+        wallsReferences.push_back(e.getEntityID());
         
         auto* col = e.getComponent<ColliderComponent_t>();
         if(col) col->properties = ColliderComponent_t::P_IsWall | ColliderComponent_t::P_Bounces;
@@ -153,6 +165,8 @@ void GameObjectFactory_t::createWallsColumn(const uint32_t x, const uint32_t wal
             phy->y = y;
         }
     }
+
+    return wallsReferences;
 }
 
 void GameObjectFactory_t::createMiddleLine(const uint32_t scrWidth, const uint32_t scrHeight) const {

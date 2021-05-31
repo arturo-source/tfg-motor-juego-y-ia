@@ -16,9 +16,6 @@ struct GameReferences {
         constexpr uint32_t leftTeamColor2  { 0xFF005b4f };
         constexpr uint32_t rightTeamColor  { 0xFF56c8d8 };
         constexpr uint32_t rightTeamColor2 { 0xFF006978 };
-
-        if(gameMode & G_WithWall)
-            GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 1, leftTeamColor2, rightTeamColor2);
         
         if( !(gameMode & (G_TrainLeft | G_TrainRight)) ) { //Normal mode
             ECS::Entity_t& Lplayer_entity = GOFact.createPalette(InputComponent_t::S_Left , leftTeamColor);
@@ -93,6 +90,12 @@ struct GameReferences {
     };
 
     void resetGame() {
+        constexpr uint32_t leftTeamColor2  { 0xFF005b4f };
+        constexpr uint32_t rightTeamColor2 { 0xFF006978 };
+
+        if(gameMode & G_WithWall)
+            GOFact.createWalls(kSCRWIDTH, kSCRHEIGHT, 1, leftTeamColor2, rightTeamColor2);
+
         const uint32_t avgheight { kSCRHEIGHT/2 };
         const uint32_t avgwidth { kSCRWIDTH/2 };
         Lball->vx = -3; Lball->vy = randFloat(-3, 3); Lball->x =             200; Lball->y = avgheight; Lball->aceleration = 0;
