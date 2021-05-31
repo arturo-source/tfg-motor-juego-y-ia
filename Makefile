@@ -40,7 +40,7 @@ INCDIR	:= -I$(SRC) -I$(LIBDIR)
 ifeq ($(UNAME),Linux)
 	OS := linux
 else
-	OS := windows
+	OS := windows_custom
 endif
 
 ifdef CROSSWIN
@@ -48,7 +48,8 @@ ifdef CROSSWIN
 	CC:=x86_64-w64-mingw32-g++
 	AR:=x86_64-w64-mingw32-ar
 	RANLIB:=x86_64-w64-mingw32-ranlib
-	OS:=windows
+	OS:=windows_custom
+	LIB += -lglfw3 -lglew32 -lopengl32 -lgdi32 -lssp -limm32
 else
 	LIB += -lX11 -lXext
 	LIB += -lglfw -lGLEW -lGL

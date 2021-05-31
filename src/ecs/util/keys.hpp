@@ -4,22 +4,6 @@
 
 namespace ECS {
 using KeySym = unsigned long;
-#ifdef windows
-    constexpr KeySym Tab   = '\t';
-    constexpr KeySym Esc   = '\e';
-    constexpr KeySym Space = ' ';
-    constexpr KeySym Intro = 13;
-    constexpr KeySym l     = 'L';
-    constexpr KeySym o     = 'O';
-    constexpr KeySym a     = 'A';
-    constexpr KeySym s     = 'S';
-    constexpr KeySym d     = 'D';
-    constexpr KeySym w     = 'W';
-    constexpr KeySym Up    = 38;
-    constexpr KeySym Down  = 40;
-    constexpr KeySym Left  = 37;
-    constexpr KeySym Right = 39;
-#else
     constexpr KeySym Tab   = GLFW_KEY_TAB;
     constexpr KeySym Esc   = GLFW_KEY_ESCAPE;
     constexpr KeySym Space = GLFW_KEY_SPACE;
@@ -34,6 +18,5 @@ using KeySym = unsigned long;
     constexpr KeySym Down  = GLFW_KEY_DOWN;
     constexpr KeySym Left  = GLFW_KEY_LEFT;
     constexpr KeySym Right = GLFW_KEY_RIGHT;
-#endif
     
 } // namespace ECS
