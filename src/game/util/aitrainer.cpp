@@ -23,7 +23,7 @@ void AItrainer_t::export_weights_as_csv(const char* filename) const {
 
 void AItrainer_t::prepareData(const GameConfig& gConfig) {
     std::vector<uint32_t> neurons;
-    neurons.push_back(16);
+    neurons.push_back(12);
     for(std::size_t i = 0; i<gConfig.n_layers; ++i) 
         neurons.push_back(gConfig.neuron_per_layer);
 
@@ -74,8 +74,8 @@ void AItrainer_t::read_data_csv(const std::string& filename) {
         VecDouble_t matchStateInput {
             atof(x.c_str()),
             atof(y.c_str()),
-            atof(vy.c_str()),
-            atof(aceleration.c_str()),
+            // atof(vy.c_str()),
+            // atof(aceleration.c_str()),
             atof(my_ballx.c_str()),
             atof(my_bally.c_str()),
             atof(my_ballVx.c_str()),
@@ -86,8 +86,8 @@ void AItrainer_t::read_data_csv(const std::string& filename) {
             atof(other_ballVy.c_str()),
             atof(minion_x.c_str()),
             atof(minion_y.c_str()),
-            atof(minion_vy.c_str()),
-            atof(minion_aceleration.c_str())
+            // atof(minion_vy.c_str()),
+            // atof(minion_aceleration.c_str())
         };
         dataInputs.push_back(matchStateInput);
 
