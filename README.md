@@ -1,6 +1,8 @@
 # Tecnología de Videojuegos y Machine Learning desde cero
 Este repositorio es en el que almaceno el resultado de mi **Trabajo de Fin de Grado (TFG)** para el grado de **Ingeniería Informática** en **la Universidad de Alicante (UA)**. En él encontrarás tanto la memoria como el código fuente del proyecto desarrollado por mí desde cero.
 
+La memoria de este proyecto ha sido desarrollada en LaTeX, y para ser compilado puede ser usado cualquier compilador, como por ejemplo xelatex.
+
 ## Instalación
 En caso de querer compilar el proyecto, este está preparado con un Makefile para ello. Las dependencias del proyecto son X11, GLFW, OpenGL y GLEW, asegúrate de tenerlo instalado, de no ser así búscalo en los repositorios del gestor de paquetes de tu distribución Linux. El proyecto está hecho para ser compilado en Linux, pero se puede compilar para Windows con la herramienta MinGW, el Makefile está preparado para ello.
 Una vez instaladas las dependencias, por supuesto también hará falta tener instalado git y make. Los comandos que has de ejecutar son los siguientes:
@@ -14,6 +16,7 @@ En caso de tener ya el proyecto descargado, no es necesario ejecutar el primer c
 
 ## Ejecución
 Una vez compilado, ejecutarás `./game` desde la misma carpeta y se abrirá una ventana con el juego. Y aparecerá el siguiente menú en la ventana:
+
 ![Menú del juego](https://github.com/arturo-source/tfg-motor-juego-y-ia/blob/master/Memoria/archivos/imagenes/menu-inicia-definitivo.png)
 
 En él podrás seleccionar las opciones de jugar, hacer arena, o entrenar. También editar un fichero de pesos de una red neuronal, y salir del programa. 
