@@ -52,7 +52,7 @@ struct SaveFileMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().saveFileMenu(gConfig); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 
 private:
@@ -105,7 +105,7 @@ struct ResultOfTrainingMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().trainMenu_selectFilters(gConfig, failed_press_up, failed_press_down, failed_nopress, AI); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
 
         if(gConfig.exit) {
             m_Alive = false;
@@ -142,7 +142,7 @@ struct EditWeightsMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().editweightsMenu(gConfig, AI); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 private:
     AItrainer_t AI;
@@ -177,7 +177,7 @@ struct SelectFileMenu2_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu2(gConfig, train_files, weight_files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 private:
     std::vector<const char*> train_files;
@@ -213,7 +213,7 @@ struct SelectFileMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().selectFileMenu(gConfig, train_files, weight_files); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 private:
     std::vector<const char*> train_files;
@@ -240,7 +240,7 @@ struct PlayModeMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().playModeMenu(gConfig, files, train); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 private:
     std::vector<const char*> files;
@@ -265,6 +265,6 @@ struct MainMenu_t : MenuState_t {
 
         timer.timedCall("REN", [&](){ Render.getMenu().mainMenu(gConfig); });
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
     }
 };

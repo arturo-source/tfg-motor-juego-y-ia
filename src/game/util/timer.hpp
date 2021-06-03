@@ -29,7 +29,7 @@ struct GameTimer_t {
     void timedCall(std::string_view name, FUNC_t&& func) {
         GameTimer_t timer;
         func();
-        std::cout << "[" << name << "]" << timer.ellapsed()/1000 << " ";
+        // std::cout << "[" << name << "]" << timer.ellapsed()/1000 << " ";
     }
 private:
     timepoint_t m_start;

@@ -5,7 +5,7 @@
 #include <random>
 
 void AItrainer_t::train(const int n_iter, const GameConfig& gConfig, float& failed_press_up, float& failed_press_down, float& failed_nopress) {
-    nn.print();
+    // nn.print();
     nn.backpropagation(dataInputs, dataOutputs, n_iter, gConfig);
     // nn.average_error(dataInputs, dataOutputs);
     failed_keys(failed_press_up, failed_press_down, failed_nopress);

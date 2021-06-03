@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <memory>
-#include <iostream>
 #include <sstream>
 #include <thread>
 #include <game/sys/render.tpp>
@@ -44,7 +43,7 @@ struct GameManager_t : StateBase_t {
         timer.timedCall("WEA", [&](){ Weapons.update(EntityMan); } );
         timer.timedCall("CSV", [&](){ gameReferences.dumpCSV(); } );
         timer.timedCall("EXT", [&](){ timer.waitUntil_ns(NSPF); } );
-        std::cout << "\n";
+        // std::cout << "\n";
 
         m_playing = !Input.isKeyPressed(ECS::Esc) && !ScoreboardSystem_t<ECS::EntityManager_t>::end_game;
         if(ScoreboardSystem_t<ECS::EntityManager_t>::scored) {

@@ -5,7 +5,7 @@
 % Contacto: info@jmrplens.com / Telegram:@jmrplens
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Anexo}
+\chapter{Anexos}
 \section{Vicisitudes durante el desarrollo}
 El primer problema que me gustaría comentar en el anexo fue la sobrestimación de mis capacidades. Por lo que me ha comentado mi tutor, es algo que suele pasar, sobretodo cuando eres una persona sin experiencia en el sector. Desde el principio del proyecto apunté a hacer cosas que eran extremadamente difíciles, pero por suerte mi tutor supo cómo orientarme en el camino y pararme los pies en ciertos momentos, ya que de no haber sido así, es probable que no hubiese acabado el proyecto. 
 \\
@@ -20,7 +20,10 @@ No voy a contar cómo fue la recuperación del sistema operativo ya que no proce
 Por último quiero comentar que este largo desarrollo ha sido posible porque este es mi quinto año de carrera, sólo tenía dos asignaturas que cursar en todo el año, y por eso me he permitido la licencia de dedicarle tanto tiempo al proyecto. Por otro lado, si ya hubiese tenido conocimientos previos más avanzados sobre \gls{ia}, y sobre motores de videojuegos, el desarrollo podría haberse acortado meses, sin embargo, es algo que he hecho con ganas y me ha servido para tener una experiencia que tendrá mucha utilidad en mi futuro.
 
 \section{Cómo probar el juego}
-Puede darse el caso de que quieras probar el juego, por lo que te daré las instrucciones para compilarlo, y además, los controles del juego.
+Puede darse el caso de que quieras probar el juego, por lo que te daré las instrucciones para compilarlo, y además, los controles del juego. Lo primero que has de hacer es clonar el repositorio desde GitHub, con el siguiente comando
+
+\texttt{git clone https://github.com/arturo-source/tfg-motor-juego-y-ia.git}
+
 Compilar es tan sencillo como entrar en la carpeta donde se ubique el Makefile y ejecutar desde una terminal \texttt{make libs \&\& make}, se generará un ejecutable llamado game y tendrás que ejecutar desde ese mismo directorio \texttt{./game}. Sin embargo, puede que tengas algún problema en la compilación, siempre y cuando no tengas instalado X11, GLFW, OpenGL y GLEW. Para instalar estas librerías en Linux, dependerá de tu distribución, pero lo que tienes que hacer es buscar con tu gestor de paquetes cómo se llaman en tu distribución estas librerías y descargarlas.
 
 Para jugar al juego, una vez compilado, lo que harás será seleccionar la opción ``Play'', esta sirve para jugar una \gls{ia} contra otra. Mientras que la opción ``Arena'', sirve para recoger datos en un archivo dataset, con el cual podrás entrar en la siguiente opción llamada ``Train''. Esta última te llevará a un nuevo menú en el que podrás ajustar diferentes parámetros para el entrenamiento mediante \textit{backpropagation}. Todo esto se ve en la figura \ref{Menu inicial definitivo}.
